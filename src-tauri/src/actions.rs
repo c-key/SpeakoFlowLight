@@ -33,18 +33,23 @@ struct RecordingErrorEvent {
     detail: Option<String>,
 }
 
+/// Set while an in-app "dictate into this field" recording is in flight, so
+/// its transcript is delivered to the webview as an event instead of being
+/// pasted into whatever OS window happens to be focused.
+///
+/// Set and cleared in `TranscribeAction::start` rather than in the command that
+/// starts the recording: that way a stale in-app click can never hijack a later
+/// global dictation.
+static DICTATE_TO_FIELD: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
 /// Drop guard that notifies the [`TranscriptionCoordinator`] when the
 /// transcription pipeline finishes — whether it completes normally or panics.
 struct FinishGuard(AppHandle);
 impl Drop for FinishGuard {
     fn drop(&mut self) {
-        // The whole pipeline (recording + transcription + any assistant
-        // generation) is done, so drop the cancel shortcut here rather than at
-        // recording-stop. Keeping it registered through generation is what lets
-        // Esc abort a streaming assistant answer or Flow generation, not just a
-        // recording.
+        // The whole pipeline (recording + transcription + cleanup) is done, so
+        // drop the cancel shortcut here rather than at recording-stop.
         shortcut::unregister_cancel_shortcut(&self.0);
-        crate::flow::stop_prewarm_watch();
         if let Some(c) = self.0.try_state::<TranscriptionCoordinator>() {
             c.notify_processing_finished();
         }
@@ -56,8 +61,8 @@ impl Drop for FinishGuard {
         // later recordings until restart. cancel_stream() is a guaranteed no-op
         // when no stream is active, and finalize_stream() already take()s the
         // router on the success path, so this only ever releases a worker that
-        // was never finalized. Harmless for AssistantAction, which never starts
-        // a stream. The guard drops after finalize_stream()/paste, so a
+        // was never finalized. The guard drops after finalize_stream()/paste,
+        // so a
         // still-wanted stream is never cancelled.
         if let Some(tm) = self.0.try_state::<Arc<TranscriptionManager>>() {
             tm.cancel_stream();
@@ -103,6 +108,37 @@ fn strip_invisible_chars(s: &str) -> String {
     s.replace(['\u{200B}', '\u{200C}', '\u{200D}', '\u{FEFF}'], "")
 }
 
+/// Remove `<think>`/`<thinking>`/`<reasoning>` sections from model output.
+///
+/// Case-insensitive and offset-safe: ASCII-lowercasing preserves byte offsets
+/// exactly (the tags are ASCII), so indices found in the lowercased copy are
+/// valid in the original. An unclosed opening tag drops everything after it,
+/// which is the safe direction — a leaked monologue must never be pasted.
+fn strip_reasoning_blocks(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let lower = text.to_ascii_lowercase();
+    let mut pos = 0usize;
+    while pos < text.len() {
+        // Find the next reasoning-open tag at or after `pos`.
+        let next = ["<think>", "<thinking>", "<reasoning>"]
+            .iter()
+            .filter_map(|tag| lower[pos..].find(*tag).map(|i| (pos + i, *tag)))
+            .min_by_key(|(i, _)| *i);
+        let Some((start, tag)) = next else {
+            out.push_str(&text[pos..]);
+            break;
+        };
+        out.push_str(&text[pos..start]);
+        // `tag` is like "<think>", so this yields the full "</think>".
+        let close = format!("</{}", &tag[1..]);
+        match lower[start..].find(&close) {
+            Some(rel) => pos = start + rel + close.len(),
+            None => break, // unclosed: drop the rest
+        }
+    }
+    out
+}
+
 /// Build a system prompt from the user's prompt template.
 /// Removes `${output}` placeholder since the transcription is sent as the user message.
 fn build_system_prompt(prompt_template: &str) -> String {
@@ -116,12 +152,36 @@ fn build_system_prompt(prompt_template: &str) -> String {
 /// what corrections happen, the **style** sits on top of it and decides how the
 /// result reads, and (for a general-purpose model) the final-output contract is
 /// appended after both so a style can shape wording but cannot turn cleanup into
-/// an explanation or an assistant reply.
+/// an explanation or an answer to the dictation.
 fn append_style_layer(prompt: &mut String, instruction: Option<&str>) {
     if let Some(instruction) = instruction.map(str::trim).filter(|text| !text.is_empty()) {
         prompt
             .push_str("\n\n---\nWRITING STYLE (apply this while preserving the source message):\n");
         prompt.push_str(instruction);
+    }
+}
+
+/// Append the active profile's own instruction layer, between the writing
+/// style and the output contract.
+///
+/// A profile says what KIND of text this is — a message body, a chat line, a
+/// note — which is a different axis from the tone. It sits after the style so a
+/// profile can settle layout questions the style has no opinion on, and before
+/// the output contract so it can never license a preamble or a commentary.
+fn append_profile_layer(prompt: &mut String, instructions: Option<&str>) {
+    if let Some(instructions) = instructions.map(str::trim).filter(|text| !text.is_empty()) {
+        prompt.push_str("\n\n---\nPROFILE (apply this while preserving the source message):\n");
+        prompt.push_str(instructions);
+    }
+}
+
+/// Append the personal-memory block: background about the speaker, never an
+/// instruction. Comes last before the output contract, and the block carries
+/// its own precedence policy (see `crate::memory::build_memory_block`).
+fn append_memory_layer(prompt: &mut String, memory_block: Option<&str>) {
+    if let Some(block) = memory_block.map(str::trim).filter(|text| !text.is_empty()) {
+        prompt.push_str("\n\n---\nSPEAKER BACKGROUND (context only, never content):\n");
+        prompt.push_str(block);
     }
 }
 
@@ -155,7 +215,7 @@ fn sanitize_post_process_output(s: &str) -> String {
     // server flag fails to suppress it. Pasting a monologue into the user's
     // document is worse than pasting the raw transcript, so drop it here even
     // though the cleanup engine already launches with a zero thinking budget.
-    let stripped = crate::flow::strip_reasoning_blocks(s);
+    let stripped = strip_reasoning_blocks(s);
     let mut text = strip_invisible_chars(&stripped).trim().to_string();
 
     // Strip a single surrounding Markdown code fence: ```lang\n … \n``` (or a
@@ -214,31 +274,13 @@ fn prewarm_builtin_llm(app: &AppHandle, model: String) {
     });
 }
 
-/// The dedicated AI-cleanup engine (separate process/port from the assistant's,
-/// so the two can never evict each other).
+/// The dedicated AI-cleanup engine (its own process/port, so a model loaded for
+/// cleanup is never evicted by anything else).
 fn cleanup_llm(app: &AppHandle) -> Arc<crate::managers::local_llm::LocalLlmManager> {
     app.state::<crate::managers::local_llm::CleanupLlm>()
         .inner()
         .0
         .clone()
-}
-
-/// Same overlap trick for the assistant's own engine, which is a different
-/// process on a different port (and keeps its own model, projector and context).
-fn prewarm_assistant_llm(app: &AppHandle, model: String) {
-    let manager = app
-        .state::<Arc<crate::managers::local_llm::LocalLlmManager>>()
-        .inner()
-        .clone();
-    tauri::async_runtime::spawn(async move {
-        match manager.ensure_running(&model).await {
-            Ok(()) => manager.warm_up().await,
-            Err(e) => debug!(
-                "Assistant LLM prewarm failed (will retry on first use): {}",
-                e
-            ),
-        }
-    });
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -361,6 +403,7 @@ const CLEANUP_TEMPERATURE: f32 = 0.0;
 fn build_post_process_request(
     config: &ResolvedPostProcessConfig,
     transcription: &str,
+    memory_block: Option<&str>,
 ) -> PostProcessRequest {
     // Layer 1 — the cleanup system prompt the user selected.
     let mut system_prompt = build_system_prompt(&config.prompt);
@@ -368,6 +411,13 @@ fn build_post_process_request(
     // explicit user choice, so it is sent even to a fine-tune (which is why the
     // UI recommends, rather than enforces, leaving it at "None" for one).
     append_style_layer(&mut system_prompt, config.tone_instruction.as_deref());
+    // Layer 3 — the active profile's instructions. Also an explicit user
+    // choice, so a fine-tune gets it too.
+    append_profile_layer(&mut system_prompt, config.profile_instructions.as_deref());
+    // Layer 4 — personal memory, when the feature is on and this profile opts
+    // in. Background, not instructions: it exists so the model keeps the
+    // speaker's names and terms instead of "correcting" them.
+    append_memory_layer(&mut system_prompt, memory_block);
     // App-added scaffolding, and the one part that is not a user choice. It
     // exists to stop a general-purpose chat model from narrating its plan
     // instead of returning the transcript, and it announces that it overrides
@@ -703,9 +753,10 @@ async fn send_one_post_process_request(
     reasoning: Option<crate::llm_client::ReasoningConfig>,
     keep_system_role: bool,
 ) -> Result<Option<String>, crate::llm_client::ChatCompletionError> {
-    // The built-in provider's stored base URL points at the assistant engine.
-    // Cleanup runs on its own engine process/port, so the caller passes that
-    // endpoint in and it wins for this request only (settings stay untouched).
+    // The built-in provider's stored base URL points at the default engine
+    // port. Cleanup runs on its own engine process/port, so the caller passes
+    // that endpoint in and it wins for this request only (settings stay
+    // untouched).
     let provider = match endpoint {
         Some(base_url) if base_url != config.provider.base_url => {
             let mut provider = config.provider.clone();
@@ -733,10 +784,11 @@ async fn send_one_post_process_request(
 async fn run_provider_post_process(
     config: &ResolvedPostProcessConfig,
     transcription: &str,
+    memory_block: Option<&str>,
     deadline: TokioInstant,
     endpoint: Option<&str>,
 ) -> PostProcessAttemptOutcome {
-    let request = build_post_process_request(config, transcription);
+    let request = build_post_process_request(config, transcription, memory_block);
     // A cleanup fine-tune is never asked for structured output. The schema
     // becomes a decoding grammar on the built-in engine, which forces the model
     // to emit a JSON object — the opposite of the bare cleaned text it was
@@ -866,6 +918,16 @@ async fn post_process_transcription(
         config.provider.id, config.model, config.prompt_id, config.tone_id, config.source
     );
 
+    // Selecting the relevant memory needs the transcript, so the block is built
+    // here rather than at resolve time. `memory_applies` was already decided by
+    // the resolver; `build_memory_block` re-checks it and returns None when the
+    // store is empty, so this is a cheap no-op for anyone not using memory.
+    let memory_block = config
+        .memory_applies
+        .then(|| crate::memory::build_memory_block(&get_settings(app), transcription))
+        .flatten();
+    let memory_block = memory_block.as_deref();
+
     let _llm_activity_guard = if config.provider.id == "builtin" {
         let manager = cleanup_llm(app);
         let startup_started = Instant::now();
@@ -900,7 +962,7 @@ async fn post_process_transcription(
                     PostProcessFailureKind::UnsupportedProvider,
                 );
             }
-            let request = build_post_process_request(config, transcription);
+            let request = build_post_process_request(config, transcription, memory_block);
             let token_limit = config.model.trim().parse::<i32>().unwrap_or(0);
             // Same rule as `run_provider_post_process`: the length guard is
             // calibrated for a chat model that might start explaining itself, so
@@ -938,7 +1000,14 @@ async fn post_process_transcription(
     // Cleanup talks to its own engine when the built-in provider is active; every
     // other provider keeps the endpoint it was configured with.
     let endpoint = (config.provider.id == "builtin").then(|| cleanup_llm(app).base_url());
-    run_provider_post_process(config, transcription, deadline, endpoint.as_deref()).await
+    run_provider_post_process(
+        config,
+        transcription,
+        memory_block,
+        deadline,
+        endpoint.as_deref(),
+    )
+    .await
 }
 
 fn fallback_reason_for_unavailable(
@@ -1187,25 +1256,14 @@ impl ShortcutAction for TranscribeAction {
         let start_time = Instant::now();
         debug!("TranscribeAction::start called for binding: {}", binding_id);
 
-        // A fresh dictation can't be redirected by a stale Ask-Assistant click.
-        crate::assistant::clear_transcribe_redirect();
-
-        // Route the transcript: an in-app dictation (the Create-with-AI persona
-        // box uses source "in-app") delivers its text to the webview via an
+        // Route the transcript: an in-app dictation (a settings field's mic
+        // button uses source "in-app") delivers its text to the webview via an
         // event; every other dictation pastes into the focused OS window as
-        // usual. Setting/clearing here — rather than in the command — means a
-        // stale in-app click can never hijack a later global dictation.
-        if shortcut_str == "in-app" {
-            crate::assistant::set_dictate_to_field();
-        } else {
-            crate::assistant::clear_dictate_to_field();
-        }
-
-        // Optionally silence a still-playing assistant reply. Off by default —
-        // earphone users often want to keep listening while they dictate.
-        if get_settings(app).assistant_tts_stop_on_dictation {
-            crate::tts::stop_all(app);
-        }
+        // usual. See `DICTATE_TO_FIELD` for why this is set here.
+        DICTATE_TO_FIELD.store(
+            shortcut_str == "in-app",
+            std::sync::atomic::Ordering::SeqCst,
+        );
 
         // Load model in the background
         let tm = app.state::<Arc<TranscriptionManager>>();
@@ -1252,10 +1310,9 @@ impl ShortcutAction for TranscribeAction {
         // Get the microphone mode to determine audio feedback timing
         let settings = get_settings(app);
 
-        // Prewarm the effective built-in cleanup model during recording so a
-        // dedicated selection and an Assistant fallback receive identical cold-
-        // start treatment. Runtime still calls ensure_running inside the user
-        // timeout; this is only a best-effort overlap with recording.
+        // Prewarm the built-in cleanup model during recording. Runtime still
+        // calls ensure_running inside the user timeout; this is only a
+        // best-effort overlap with recording.
         if self.post_process
             && settings.post_process_unload_timeout != ModelUnloadTimeout::Immediately
         {
@@ -1264,16 +1321,6 @@ impl ShortcutAction for TranscribeAction {
                     prewarm_builtin_llm(app, config.model);
                 }
             }
-        }
-
-        // Arm the Flow live-transcript watcher for plain dictation: if the
-        // activation phrase is heard in the streaming text, the local model
-        // starts loading while the user is still speaking. Nothing loads on
-        // ordinary dictations — the watcher only fires on the phrase.
-        if !self.post_process && settings.flow_enabled {
-            crate::flow::reset_prewarm_watch();
-        } else {
-            crate::flow::stop_prewarm_watch();
         }
 
         let is_always_on = settings.always_on_microphone;
@@ -1385,7 +1432,6 @@ impl ShortcutAction for TranscribeAction {
 
         let binding_id = binding_id.to_string(); // Clone binding_id for the async task
         let post_process = self.post_process;
-        let flow_cancel_generation = crate::flow::cancellation_generation();
 
         tauri::async_runtime::spawn(async move {
             let _guard = FinishGuard(ah.clone());
@@ -1469,23 +1515,12 @@ impl ShortcutAction for TranscribeAction {
                                 transcription
                             );
 
-                            // Rerouted to the assistant (the overlay's Ask-
-                            // Assistant button): hand the transcript to the
-                            // assistant instead of pasting it anywhere.
-                            if crate::assistant::take_transcribe_redirect() {
-                                utils::hide_recording_overlay(&ah);
-                                change_tray_icon(&ah, TrayIconState::Idle);
-                                crate::assistant::show_assistant_voice_overlay(&ah);
-                                crate::assistant::run_voice_turn(ah.clone(), transcription).await;
-                                return;
-                            }
-
-                            // In-app dictation (e.g. the Create-with-AI persona
-                            // description box): deliver the transcript to the
-                            // webview as an event so it lands in the focused
-                            // in-app field reliably, without a synthetic paste
-                            // or touching the OS clipboard.
-                            if crate::assistant::take_dictate_to_field() {
+                            // In-app dictation (e.g. a profile's instruction
+                            // box): deliver the transcript to the webview as an
+                            // event so it lands in the focused in-app field
+                            // reliably, without a synthetic paste or touching
+                            // the OS clipboard.
+                            if DICTATE_TO_FIELD.swap(false, std::sync::atomic::Ordering::SeqCst) {
                                 utils::hide_recording_overlay(&ah);
                                 change_tray_icon(&ah, TrayIconState::Idle);
                                 if let Err(e) =
@@ -1496,181 +1531,10 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
-                            // Generate with Flow: when enabled, a normal
-                            // dictation that begins with the activation phrase
-                            // becomes a one-shot AI generation command whose
-                            // finished result is pasted instead of the spoken
-                            // words. Only the plain dictation binding
-                            // participates — the AI-cleanup binding keeps its
-                            // existing behavior. All-or-nothing: any failure
-                            // pastes nothing and shows a brief overlay notice.
-                            //
-                            // The same slot also carries the AI-cleanup fallback
-                            // notice below. The two can never collide: Flow only
-                            // runs when `!post_process` and cleanup only when
-                            // `post_process`.
+                            // Carries the AI-cleanup fallback notice: a
+                            // cleanup that silently fell back to the raw
+                            // transcript says so briefly on the overlay.
                             let mut overlay_notice: Option<&'static str> = None;
-                            if !post_process {
-                                let settings = crate::settings::get_settings(&ah);
-                                match crate::flow::plan_flow(&settings, &transcription) {
-                                    crate::flow::FlowPlan::NotFlow => {}
-                                    crate::flow::FlowPlan::Unconfigured => {
-                                        // No assistant model set up: behave as
-                                        // ordinary dictation, then briefly tell
-                                        // the user why nothing was generated.
-                                        debug!("Flow phrase matched but no assistant model is configured; pasting as dictation");
-                                        overlay_notice = Some("flowNotConfigured");
-                                    }
-                                    crate::flow::FlowPlan::EmptyCommand => {
-                                        // Just the phrase, no command. Never
-                                        // paste the phrase itself, but keep its
-                                        // transcript and audio in Flow history.
-                                        if wav_saved {
-                                            if let Err(err) = hm.save_entry(
-                                                file_name,
-                                                transcription,
-                                                false,
-                                                None,
-                                                Some(crate::flow::FLOW_HISTORY_MARKER.to_string()),
-                                            ) {
-                                                error!("Failed to save history entry: {}", err);
-                                            }
-                                        }
-                                        utils::show_overlay_notice(&ah, "flowEmpty");
-                                        change_tray_icon(&ah, TrayIconState::Idle);
-                                        return;
-                                    }
-                                    crate::flow::FlowPlan::Generate { command } => {
-                                        utils::show_generating_overlay(&ah);
-                                        match crate::flow::run_flow_generation(
-                                            &ah,
-                                            &command,
-                                            flow_cancel_generation,
-                                        )
-                                        .await
-                                        {
-                                            Ok(generated) => {
-                                                // Persist the completed Flow turn before the
-                                                // paste boundary. If Escape lands after
-                                                // generation, History still keeps what was
-                                                // said, the audio, and the finished output.
-                                                if wav_saved {
-                                                    if let Err(err) = hm.save_entry(
-                                                        file_name,
-                                                        transcription,
-                                                        false,
-                                                        Some(generated.clone()),
-                                                        Some(
-                                                            crate::flow::FLOW_HISTORY_MARKER
-                                                                .to_string(),
-                                                        ),
-                                                    ) {
-                                                        error!(
-                                                            "Failed to save history entry: {}",
-                                                            err
-                                                        );
-                                                    }
-                                                }
-                                                if crate::flow::is_generation_cancelled(
-                                                    flow_cancel_generation,
-                                                ) {
-                                                    debug!(
-                                                        "Flow generation cancelled before paste"
-                                                    );
-                                                    utils::hide_recording_overlay(&ah);
-                                                    change_tray_icon(&ah, TrayIconState::Idle);
-                                                    return;
-                                                }
-                                                let ah_clone = ah.clone();
-                                                ah.run_on_main_thread(move || {
-                                                    if crate::flow::is_generation_cancelled(
-                                                        flow_cancel_generation,
-                                                    ) {
-                                                        debug!("Flow paste skipped after cancellation");
-                                                        utils::hide_recording_overlay(&ah_clone);
-                                                        change_tray_icon(
-                                                            &ah_clone,
-                                                            TrayIconState::Idle,
-                                                        );
-                                                        return;
-                                                    }
-                                                    match utils::paste_with_behavior(
-                                                        generated,
-                                                        ah_clone.clone(),
-                                                        crate::clipboard::PasteBehavior {
-                                                            allow_trailing_space: false,
-                                                            allow_auto_submit: false,
-                                                        },
-                                                    ) {
-                                                        Ok(()) => {
-                                                            debug!("Flow output pasted successfully")
-                                                        }
-                                                        Err(e) => {
-                                                            error!(
-                                                                "Failed to paste Flow output: {}",
-                                                                e
-                                                            );
-                                                            let _ =
-                                                                ah_clone.emit("paste-error", ());
-                                                        }
-                                                    }
-                                                    utils::hide_recording_overlay(&ah_clone);
-                                                    change_tray_icon(
-                                                        &ah_clone,
-                                                        TrayIconState::Idle,
-                                                    );
-                                                })
-                                                .unwrap_or_else(|e| {
-                                                    error!(
-                                                        "Failed to run Flow paste on main thread: {:?}",
-                                                        e
-                                                    );
-                                                    utils::hide_recording_overlay(&ah);
-                                                    change_tray_icon(&ah, TrayIconState::Idle);
-                                                });
-                                            }
-                                            Err(e) => {
-                                                // Keep every completed Flow recording in
-                                                // History, including failed or cancelled
-                                                // generations. The missing output is shown
-                                                // explicitly in the Flow view.
-                                                if wav_saved {
-                                                    if let Err(err) = hm.save_entry(
-                                                        file_name,
-                                                        transcription,
-                                                        false,
-                                                        None,
-                                                        Some(
-                                                            crate::flow::FLOW_HISTORY_MARKER
-                                                                .to_string(),
-                                                        ),
-                                                    ) {
-                                                        error!(
-                                                            "Failed to save history entry: {}",
-                                                            err
-                                                        );
-                                                    }
-                                                }
-                                                if crate::flow::is_generation_cancelled(
-                                                    flow_cancel_generation,
-                                                ) {
-                                                    debug!("Flow generation cancelled");
-                                                    utils::hide_recording_overlay(&ah);
-                                                    change_tray_icon(&ah, TrayIconState::Idle);
-                                                    return;
-                                                }
-                                                // Paste NOTHING on failure —
-                                                // no partials, no errors, no
-                                                // raw command.
-                                                error!("Flow generation failed: {}", e);
-                                                utils::show_overlay_notice(&ah, "flowFailed");
-                                                change_tray_icon(&ah, TrayIconState::Idle);
-                                            }
-                                        }
-                                        return;
-                                    }
-                                }
-                            }
 
                             if post_process {
                                 show_processing_overlay(&ah);
@@ -1725,11 +1589,9 @@ impl ShortcutAction for TranscribeAction {
                                             let _ = ah_clone.emit("paste-error", ());
                                         }
                                     }
-                                    // A Flow phrase that couldn't run (no
-                                    // assistant model) pastes as dictation and
-                                    // then briefly explains itself; a cleanup
-                                    // that fell back does the same. Otherwise
-                                    // the overlay just hides.
+                                    // A cleanup that fell back pastes the raw
+                                    // transcript and then briefly explains
+                                    // itself. Otherwise the overlay just hides.
                                     match overlay_notice {
                                         Some(key) => utils::show_overlay_notice(&ah_clone, key),
                                         None => utils::hide_recording_overlay(&ah_clone),
@@ -1789,224 +1651,6 @@ impl ShortcutAction for CancelAction {
     }
 }
 
-// Assistant Action: record → STT → LLM → stream into the assistant panel.
-// Reuses TranscribeAction's record/transcribe flow but never pastes.
-struct AssistantAction;
-
-impl ShortcutAction for AssistantAction {
-    fn start(&self, app: &AppHandle, binding_id: &str, _shortcut_str: &str) {
-        debug!("AssistantAction::start called for binding: {}", binding_id);
-
-        // Manual Immediate timing captures at recording start. Beginning every
-        // recording advances the epoch even when no capture is allowed, so a
-        // worker from an older/cancelled recording cannot populate this turn.
-        {
-            let settings = get_settings(app);
-            let profile = settings
-                .active_assistant_provider()
-                .map(|p| crate::screenshot::CaptureProfile::for_base_url(&p.base_url))
-                .unwrap_or(crate::screenshot::CaptureProfile::Generous);
-            let capture_requested = settings.assistant_screen_access_mode
-                == crate::settings::AssistantScreenAccessMode::Manual
-                && settings.assistant_vision_capture_timing
-                    == crate::settings::VisionCaptureTiming::Immediate
-                && !settings.active_character_is_cat();
-            if let Some((manual_token, immediate_epoch)) =
-                crate::assistant::begin_immediate_capture(app, capture_requested)
-            {
-                let app_for_capture = app.clone();
-                std::thread::spawn(move || {
-                    match crate::screenshot::capture_screen_data_url_at(None, profile) {
-                        Ok(url) => {
-                            crate::assistant::stash_immediate_capture(
-                                &app_for_capture,
-                                manual_token,
-                                immediate_epoch,
-                                url,
-                            );
-                        }
-                        Err(e) => debug!("Immediate vision capture failed: {}", e),
-                    }
-                });
-            }
-
-            // Agent-decides mode with Immediate timing: grab a frame now, while
-            // the user is still talking, so that if the model does call
-            // `capture_screen` the tool has it in hand instead of spending a few
-            // seconds of the user's silence on a screenshot. With On-send timing
-            // the capture starts at the beginning of the turn instead (see
-            // `ensure_agent_capture_started`). The frame stays on this machine
-            // and is dropped at the end of the turn if the model never asks.
-            if let Some(ticket) = crate::assistant::begin_agent_capture(&settings, profile) {
-                std::thread::spawn(move || {
-                    ticket.fulfill(crate::screenshot::capture_screen_data_url_at(None, profile));
-                });
-            }
-        }
-
-        // Starting a new question interrupts the previous spoken answer — the
-        // assistant must never talk over the user's next recording.
-        crate::tts::stop_all(app);
-
-        let tm = app.state::<Arc<TranscriptionManager>>();
-        let rm = app.state::<Arc<AudioRecordingManager>>();
-
-        tm.initiate_model_load();
-        let rm_clone = Arc::clone(&rm);
-        std::thread::spawn(move || {
-            if let Err(e) = rm_clone.preload_vad() {
-                debug!("VAD pre-load failed: {}", e);
-            }
-        });
-
-        // Prewarm the built-in LLM during recording (when the assistant uses
-        // it) so its load overlaps with recording + transcription.
-        {
-            let settings = get_settings(app);
-            if settings.local_llm_unload_timeout != ModelUnloadTimeout::Immediately {
-                if let Some(provider) = settings.active_assistant_provider() {
-                    if provider.id == "builtin" {
-                        if let Some(model) = settings.assistant_models.get("builtin") {
-                            if !model.trim().is_empty() {
-                                prewarm_assistant_llm(app, model.clone());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Show the configured non-focus-stealing overlay right away so the user
-        // sees the listening state without opening the full assistant window.
-        crate::assistant::show_assistant_voice_overlay(app);
-        crate::assistant::emit_state(app, "listening");
-        // Tell the floating panel whether this turn will capture the screen
-        // so it can show a "vision" indicator. The actual capture decision is
-        // re-evaluated at stop, but the dedicated vision binding always does.
-        let _ = app.emit("assistant-vision-active", binding_id == "assistant_vision");
-
-        // The assistant panel renders its own listening/transcribing state, so
-        // we intentionally do NOT show the STT recording lozenge here — that
-        // would put two status surfaces on screen for one voice turn.
-        change_tray_icon(app, TrayIconState::Recording);
-
-        let binding_id = binding_id.to_string();
-        let mut recording_error: Option<String> = None;
-        match rm.try_start_recording(&binding_id) {
-            Ok(()) => {
-                let app_clone = app.clone();
-                let rm_clone = Arc::clone(&rm);
-                std::thread::spawn(move || {
-                    std::thread::sleep(std::time::Duration::from_millis(100));
-                    play_feedback_sound_blocking(&app_clone, SoundType::Start);
-                    rm_clone.apply_mute();
-                });
-            }
-            Err(e) => {
-                debug!("Failed to start assistant recording: {}", e);
-                recording_error = Some(e);
-            }
-        }
-
-        if recording_error.is_none() {
-            shortcut::register_cancel_shortcut(app);
-        } else {
-            change_tray_icon(app, TrayIconState::Idle);
-            crate::assistant::emit_state(app, "idle");
-            if let Some(err) = recording_error {
-                let error_type = if is_microphone_access_denied(&err) {
-                    "microphone_permission_denied"
-                } else if is_no_input_device_error(&err) {
-                    "no_input_device"
-                } else {
-                    "unknown"
-                };
-                // Mirror the failure onto the assistant surfaces (pill/panel)
-                // so a voice turn that can't start is never a silent no-op.
-                let assistant_code = match error_type {
-                    "microphone_permission_denied" => "mic_denied",
-                    "no_input_device" => "mic_unavailable",
-                    _ => "mic_error",
-                };
-                crate::assistant::emit_error(app, assistant_code, err.clone());
-                let _ = app.emit(
-                    "recording-error",
-                    RecordingErrorEvent {
-                        error_type: error_type.to_string(),
-                        detail: Some(err),
-                    },
-                );
-            }
-        }
-    }
-
-    fn stop(&self, app: &AppHandle, binding_id: &str, _shortcut_str: &str) {
-        // NOTE: the cancel shortcut is intentionally NOT unregistered here (as
-        // it is for dictation). It stays registered through transcription and
-        // the assistant's answer generation so Esc can stop a streaming reply;
-        // the pipeline's FinishGuard drops it when the whole turn completes.
-        debug!("AssistantAction::stop called for binding: {}", binding_id);
-
-        let ah = app.clone();
-        let rm = Arc::clone(&app.state::<Arc<AudioRecordingManager>>());
-        let tm = Arc::clone(&app.state::<Arc<TranscriptionManager>>());
-
-        change_tray_icon(app, TrayIconState::Transcribing);
-        crate::assistant::emit_state(app, "transcribing");
-
-        rm.remove_mute();
-        play_feedback_sound(app, SoundType::Stop);
-
-        let binding_id = binding_id.to_string();
-        tauri::async_runtime::spawn(async move {
-            let _guard = FinishGuard(ah.clone());
-
-            let samples = match rm.stop_recording(&binding_id) {
-                Some(samples) if !samples.is_empty() => samples,
-                _ => {
-                    debug!("Assistant recording produced no audio samples");
-                    change_tray_icon(&ah, TrayIconState::Idle);
-                    crate::assistant::emit_state(&ah, "idle");
-                    return;
-                }
-            };
-
-            // Vision: the dedicated vision binding always captures; the
-            // normal binding captures when the question clearly refers to
-            // the screen ("what's on my display..."). Capture happens after
-            // transcription so we know the intent — the screen content is
-            // unchanged in those ~150ms.
-            match tm.transcribe(samples) {
-                Ok(transcription) => {
-                    change_tray_icon(&ah, TrayIconState::Idle);
-                    // Screen decision + staged attachments + turn, shared with
-                    // the STT overlay's Ask-Assistant redirect.
-                    crate::assistant::run_voice_turn(ah.clone(), transcription).await;
-                }
-                Err(err) => {
-                    error!("Assistant transcription error: {}", err);
-                    change_tray_icon(&ah, TrayIconState::Idle);
-                    crate::assistant::emit_error(&ah, "transcription", err.to_string());
-                    crate::assistant::emit_state(&ah, "idle");
-                }
-            }
-        });
-    }
-}
-
-// Assistant Panel Toggle Action: show/hide the floating panel.
-struct AssistantPanelToggleAction;
-
-impl ShortcutAction for AssistantPanelToggleAction {
-    fn start(&self, app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
-        crate::assistant::toggle_assistant_panel(app);
-    }
-
-    fn stop(&self, _app: &AppHandle, _binding_id: &str, _shortcut_str: &str) {
-        // Nothing to do on stop for panel toggle
-    }
-}
-
 // Test Action
 struct TestAction;
 
@@ -2046,14 +1690,6 @@ pub static ACTION_MAP: Lazy<HashMap<String, Arc<dyn ShortcutAction>>> = Lazy::ne
     map.insert(
         "cancel".to_string(),
         Arc::new(CancelAction) as Arc<dyn ShortcutAction>,
-    );
-    map.insert(
-        "assistant".to_string(),
-        Arc::new(AssistantAction) as Arc<dyn ShortcutAction>,
-    );
-    map.insert(
-        "assistant_panel_toggle".to_string(),
-        Arc::new(AssistantPanelToggleAction) as Arc<dyn ShortcutAction>,
     );
     map.insert(
         "test".to_string(),
@@ -2315,6 +1951,8 @@ mod tests {
             trained_for_cleanup: false,
             source: PostProcessConfigSource::DedicatedCleanupSelection,
             api_key: String::new(),
+            profile_instructions: None,
+            memory_applies: false,
         }
     }
 
@@ -2346,7 +1984,7 @@ mod tests {
         );
 
         for fixture in fixtures {
-            let request = build_post_process_request(&config, fixture);
+            let request = build_post_process_request(&config, fixture, None);
             assert_eq!(request.user_content, fixture);
             assert!(!request.system_prompt.contains("${output}"));
             assert!(request
@@ -2373,7 +2011,7 @@ mod tests {
                 tone,
                 "Clean the transcript without changing facts.",
             );
-            let system = build_post_process_request(&config, "Neutral source").system_prompt;
+            let system = build_post_process_request(&config, "Neutral source", None).system_prompt;
             if tone == PostProcessTone::None {
                 assert!(!system.contains("WRITING STYLE"));
             } else {
@@ -2399,7 +2037,7 @@ mod tests {
         );
         config.trained_for_cleanup = true;
 
-        let request = build_post_process_request(&config, "um the meeting is at six");
+        let request = build_post_process_request(&config, "um the meeting is at six", None);
 
         // Layer 1 and nothing else: the app's output contract is scaffolding for
         // a general chat model and actively fights a trained one.
@@ -2424,7 +2062,8 @@ mod tests {
         );
         config.trained_for_cleanup = true;
 
-        let system = build_post_process_request(&config, "um the meeting is at six").system_prompt;
+        let system =
+            build_post_process_request(&config, "um the meeting is at six", None).system_prompt;
 
         assert!(system.contains("WRITING STYLE"));
         assert!(system.contains("Rewrite in a formal register"));
@@ -2442,7 +2081,8 @@ mod tests {
         );
         assert!(!config.trained_for_cleanup);
 
-        let system = build_post_process_request(&config, "um the meeting is at six").system_prompt;
+        let system =
+            build_post_process_request(&config, "um the meeting is at six", None).system_prompt;
 
         // Fixed hierarchy: cleanup prompt, then style, then the contract last.
         let style = system.find("WRITING STYLE").unwrap();
@@ -2527,7 +2167,7 @@ mod tests {
         config.tone_instruction =
             Some("Remove profanity and replace it with calm, neutral wording.".to_string());
 
-        let system = build_post_process_request(&config, "This is damn urgent").system_prompt;
+        let system = build_post_process_request(&config, "This is damn urgent", None).system_prompt;
         let style_position = system.find("Remove profanity").unwrap();
         let contract_position = system.find("FINAL OUTPUT CONTRACT").unwrap();
         assert!(style_position < contract_position);
@@ -2597,6 +2237,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw transcript exactly",
+            None,
             TokioInstant::now() + Duration::from_secs(2),
             None,
         ));
@@ -2642,6 +2283,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(3),
             None,
         ));
@@ -2686,6 +2328,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(3),
             None,
         ));
@@ -2766,6 +2409,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(3),
             None,
         ));
@@ -2793,6 +2437,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(2),
             None,
         ));
@@ -2821,6 +2466,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_millis(100),
             None,
         ));
@@ -2850,6 +2496,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(2),
             None,
         ));
@@ -2882,6 +2529,7 @@ mod tests {
             let outcome = tauri::async_runtime::block_on(run_provider_post_process(
                 &config,
                 "raw",
+                None,
                 TokioInstant::now() + Duration::from_secs(2),
                 None,
             ));
@@ -2914,6 +2562,7 @@ mod tests {
         let outcome = tauri::async_runtime::block_on(run_provider_post_process(
             &config,
             "raw",
+            None,
             TokioInstant::now() + Duration::from_secs(2),
             None,
         ));
@@ -3000,6 +2649,8 @@ mod tests {
             trained_for_cleanup: false,
             source: PostProcessConfigSource::DedicatedCleanupSelection,
             api_key: String::new(),
+            profile_instructions: None,
+            memory_applies: false,
         }
     }
 
@@ -3007,6 +2658,7 @@ mod tests {
         match tauri::async_runtime::block_on(run_provider_post_process(
             config,
             text,
+            None,
             TokioInstant::now() + Duration::from_secs(60),
             None,
         )) {
@@ -3245,6 +2897,7 @@ mod tests {
             let outcome = tauri::async_runtime::block_on(run_provider_post_process(
                 &config,
                 "raw",
+                None,
                 TokioInstant::now() + Duration::from_secs(2),
                 None,
             ));

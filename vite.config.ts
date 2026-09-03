@@ -17,14 +17,12 @@ export default defineConfig(async () => ({
     },
   },
 
-  // Multiple entry points for main app, overlay, and assistant panel
+  // Two entry points: the main settings window and the recording overlay.
   build: {
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
         overlay: resolve(__dirname, "src/overlay/index.html"),
-        assistant: resolve(__dirname, "src/assistant/index.html"),
-        snip: resolve(__dirname, "src/assistant/snip.html"),
       },
     },
   },

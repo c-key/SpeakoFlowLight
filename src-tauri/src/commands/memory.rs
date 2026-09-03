@@ -1,50 +1,68 @@
 //! Tauri commands for the local personal-memory feature (Settings → Memory).
 //!
-//! Everything here reads/writes `settings.assistant_memory` (and the related
-//! toggles) and lives entirely on-device. Mutations emit
-//! `assistant-settings-changed` so the panel and settings window refresh.
+//! Everything here reads/writes `settings.memory` (and the related toggles) and
+//! lives entirely on-device. Memory feeds AI cleanup: when the active profile
+//! opts in, the relevant parts are injected into the cleanup prompt so a
+//! dictation comes back with your names, terms, and style intact. Mutations
+//! emit `settings-changed` so open windows refresh.
 
-use crate::assistant::AssistantConversation;
+use crate::managers::history::HistoryManager;
 use crate::memory;
 use crate::settings::{
     get_settings, write_settings, MemoryConfidence, MemoryDetail, MemoryNote, UserMemory,
 };
+use std::sync::Arc;
 use tauri::{AppHandle, Emitter, Manager};
 
-/// Notify open webviews (settings window + panel) that settings changed.
+/// How many recent dictations a manual "learn from my dictations" pass reads.
+const DISTILL_HISTORY_LIMIT: usize = 30;
+
+/// Notify open webviews (the settings window) that settings changed.
 fn emit_settings_changed(app: &AppHandle) {
-    let _ = app.emit("assistant-settings-changed", ());
+    let _ = app.emit("settings-changed", ());
 }
 
 /// Turn the personal-memory feature on or off. Off by default.
 #[tauri::command]
 #[specta::specta]
-pub fn set_assistant_memory_enabled(app: AppHandle, enabled: bool) -> Result<(), String> {
+pub fn set_memory_enabled(app: AppHandle, enabled: bool) -> Result<(), String> {
     let mut settings = get_settings(&app);
-    settings.assistant_memory_enabled = enabled;
+    settings.memory_enabled = enabled;
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
 }
 
-/// Set how much memory is injected per turn (the token-budget dial).
+/// Set how much memory is injected per cleanup pass (the budget dial).
 #[tauri::command]
 #[specta::specta]
-pub fn set_assistant_memory_detail(app: AppHandle, detail: MemoryDetail) -> Result<(), String> {
+pub fn set_memory_detail(app: AppHandle, detail: MemoryDetail) -> Result<(), String> {
     let mut settings = get_settings(&app);
-    settings.assistant_memory_detail = detail;
+    settings.memory_detail = detail;
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
 }
 
-/// Toggle incognito: when on, this conversation is neither remembered nor
-/// personalized from memory.
+/// Toggle incognito: while on, dictations are neither personalized from memory
+/// nor learned from.
 #[tauri::command]
 #[specta::specta]
-pub fn set_assistant_memory_incognito(app: AppHandle, incognito: bool) -> Result<(), String> {
+pub fn set_memory_incognito(app: AppHandle, incognito: bool) -> Result<(), String> {
     let mut settings = get_settings(&app);
-    settings.assistant_memory_incognito = incognito;
+    settings.memory_incognito = incognito;
+    write_settings(&app, settings);
+    emit_settings_changed(&app);
+    Ok(())
+}
+
+/// Turn automatic learning from past dictations on or off. Off by default, so
+/// memory holds only what the user entered or explicitly asked for.
+#[tauri::command]
+#[specta::specta]
+pub fn set_memory_auto_learn(app: AppHandle, enabled: bool) -> Result<(), String> {
+    let mut settings = get_settings(&app);
+    settings.memory_auto_learn = enabled;
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
@@ -53,7 +71,7 @@ pub fn set_assistant_memory_incognito(app: AppHandle, incognito: bool) -> Result
 /// Replace the always-on "About You" summary (user-edited in Settings).
 #[tauri::command]
 #[specta::specta]
-pub fn set_assistant_memory_about_you(app: AppHandle, text: String) -> Result<(), String> {
+pub fn set_memory_about_you(app: AppHandle, text: String) -> Result<(), String> {
     let trimmed = text.trim();
     if memory::is_sensitive(trimmed) {
         return Err(
@@ -62,7 +80,7 @@ pub fn set_assistant_memory_about_you(app: AppHandle, text: String) -> Result<()
         );
     }
     let mut settings = get_settings(&app);
-    settings.assistant_memory.about_you = trimmed.chars().take(600).collect();
+    settings.memory.about_you = trimmed.chars().take(600).collect();
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
@@ -71,7 +89,7 @@ pub fn set_assistant_memory_about_you(app: AppHandle, text: String) -> Result<()
 /// Add a user-authored note (explicit → high confidence). Returns the new note.
 #[tauri::command]
 #[specta::specta]
-pub fn add_assistant_memory_note(app: AppHandle, text: String) -> Result<MemoryNote, String> {
+pub fn add_memory_note(app: AppHandle, text: String) -> Result<MemoryNote, String> {
     let trimmed = text.trim();
     if trimmed.is_empty() {
         return Err("Write something to remember first.".to_string());
@@ -89,7 +107,7 @@ pub fn add_assistant_memory_note(app: AppHandle, text: String) -> Result<MemoryN
         source: "user".to_string(),
     };
     let mut settings = get_settings(&app);
-    settings.assistant_memory.notes.push(note.clone());
+    settings.memory.notes.push(note.clone());
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(note)
@@ -98,11 +116,7 @@ pub fn add_assistant_memory_note(app: AppHandle, text: String) -> Result<MemoryN
 /// Edit an existing note's text (keeps it user-owned; bumps its date).
 #[tauri::command]
 #[specta::specta]
-pub fn update_assistant_memory_note(
-    app: AppHandle,
-    id: String,
-    text: String,
-) -> Result<(), String> {
+pub fn update_memory_note(app: AppHandle, id: String, text: String) -> Result<(), String> {
     let trimmed = text.trim();
     if trimmed.is_empty() {
         return Err("A note can't be empty — delete it instead.".to_string());
@@ -113,12 +127,7 @@ pub fn update_assistant_memory_note(
         );
     }
     let mut settings = get_settings(&app);
-    let Some(note) = settings
-        .assistant_memory
-        .notes
-        .iter_mut()
-        .find(|n| n.id == id)
-    else {
+    let Some(note) = settings.memory.notes.iter_mut().find(|n| n.id == id) else {
         return Err("That note no longer exists.".to_string());
     };
     note.text = trimmed.chars().take(240).collect();
@@ -131,9 +140,9 @@ pub fn update_assistant_memory_note(
 /// Delete a single note by id.
 #[tauri::command]
 #[specta::specta]
-pub fn delete_assistant_memory_note(app: AppHandle, id: String) -> Result<(), String> {
+pub fn delete_memory_note(app: AppHandle, id: String) -> Result<(), String> {
     let mut settings = get_settings(&app);
-    settings.assistant_memory.notes.retain(|n| n.id != id);
+    settings.memory.notes.retain(|n| n.id != id);
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
@@ -143,9 +152,9 @@ pub fn delete_assistant_memory_note(app: AppHandle, id: String) -> Result<(), St
 /// enabled toggle.
 #[tauri::command]
 #[specta::specta]
-pub fn clear_assistant_memory(app: AppHandle) -> Result<(), String> {
+pub fn clear_memory(app: AppHandle) -> Result<(), String> {
     let mut settings = get_settings(&app);
-    settings.assistant_memory = UserMemory::default();
+    settings.memory = UserMemory::default();
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(())
@@ -155,10 +164,9 @@ pub fn clear_assistant_memory(app: AppHandle) -> Result<(), String> {
 /// save dialog). Your data, in a portable, human-readable file.
 #[tauri::command]
 #[specta::specta]
-pub fn export_assistant_memory(app: AppHandle, path: String) -> Result<(), String> {
+pub fn export_memory(app: AppHandle, path: String) -> Result<(), String> {
     let settings = get_settings(&app);
-    let json =
-        serde_json::to_string_pretty(&settings.assistant_memory).map_err(|e| e.to_string())?;
+    let json = serde_json::to_string_pretty(&settings.memory).map_err(|e| e.to_string())?;
     std::fs::write(&path, json).map_err(|e| format!("Couldn't write file: {}", e))?;
     Ok(())
 }
@@ -168,7 +176,7 @@ pub fn export_assistant_memory(app: AppHandle, path: String) -> Result<(), Strin
 /// on the way in.
 #[tauri::command]
 #[specta::specta]
-pub fn import_assistant_memory(app: AppHandle, path: String) -> Result<UserMemory, String> {
+pub fn import_memory(app: AppHandle, path: String) -> Result<UserMemory, String> {
     let bytes = std::fs::read(&path).map_err(|e| format!("Couldn't read file: {}", e))?;
     let mut imported: UserMemory = serde_json::from_slice(&bytes)
         .map_err(|e| format!("That file isn't a valid memory export: {}", e))?;
@@ -195,41 +203,39 @@ pub fn import_assistant_memory(app: AppHandle, path: String) -> Result<UserMemor
     }
 
     let mut settings = get_settings(&app);
-    settings.assistant_memory = imported.clone();
+    settings.memory = imported.clone();
     write_settings(&app, settings);
     emit_settings_changed(&app);
     Ok(imported)
 }
 
-/// Distill memory from the CURRENT conversation right now (the "Update memory
-/// from this chat" button). Runs the offline extraction pass immediately so the
-/// user can see it work without waiting for the conversation to end.
+/// Learn from recent dictations right now (the "Update memory from my
+/// dictations" button). Reads the last [`DISTILL_HISTORY_LIMIT`] history
+/// entries and runs the extraction pass immediately, so the user can see it
+/// work instead of waiting for it to happen in the background.
+///
+/// Deliberately explicit: automatic learning is off by default (see
+/// `memory_auto_learn`), which makes this button the only path into memory
+/// besides typing a note by hand.
 #[tauri::command]
 #[specta::specta]
-pub async fn assistant_distill_memory_now(app: AppHandle) -> Result<(), String> {
+pub async fn distill_memory_now(app: AppHandle) -> Result<(), String> {
     let settings = get_settings(&app);
-    if !settings.assistant_memory_enabled {
+    if !settings.memory_enabled {
         return Err("Turn on memory first.".to_string());
     }
-    if settings.assistant_memory_incognito {
-        return Err("This conversation is incognito — turn that off to remember it.".to_string());
+    if settings.memory_incognito {
+        return Err("Memory is in incognito mode — turn that off first.".to_string());
     }
 
-    let messages = {
-        let conversation = app.state::<AssistantConversation>();
-        let guard = conversation
-            .messages
-            .lock()
-            .map_err(|e| format!("Conversation lock poisoned: {}", e))?;
-        guard.clone()
-    };
-    if memory::user_turn_count(&messages) < 2 {
-        return Err("Have a short conversation first, then I can learn from it.".to_string());
+    let history = app.state::<Arc<HistoryManager>>();
+    let texts = history
+        .recent_transcript_texts(DISTILL_HISTORY_LIMIT)
+        .map_err(|e| format!("Couldn't read your dictation history: {}", e))?;
+    if texts.len() < 2 {
+        return Err("Dictate a few times first, then I can learn from it.".to_string());
     }
 
-    memory::distill_and_store(app.clone(), messages).await;
-    // Mark this length as distilled so closing the panel later won't redo it.
-    app.state::<AssistantConversation>()
-        .mark_distilled_current();
+    memory::distill_and_store(app.clone(), texts).await;
     Ok(())
 }

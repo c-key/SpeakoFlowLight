@@ -185,61 +185,55 @@ impl CustomPostProcessTone {
     }
 }
 
-/// What powers a character's replies. Most characters are `Llm` (their `prompt`
-/// becomes the system prompt). `Cat` is a joke character that ignores the LLM
-/// entirely and just meows — see `assistant::run_cat_turn`.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
-#[serde(rename_all = "snake_case")]
-pub enum AssistantCharacterKind {
-    /// Normal persona: `prompt` is used as the assistant's system prompt.
-    #[default]
-    Llm,
-    /// Novelty persona with no model call — replies are random "meow"s.
-    Cat,
-}
-
-/// A selectable assistant persona ("character"). The active character's
-/// `prompt` overrides the plain `assistant_system_prompt` for LLM turns; its
-/// `name`/`avatar` label the panel. Built-ins ship with the app; users can add,
-/// edit, duplicate, import, AI-generate, and delete their own (the `default`
-/// character can never be deleted).
+/// A dictation profile: one switch that carries a whole AI-cleanup setup.
+///
+/// Upstream shipped these as assistant personas ("characters") for the floating
+/// chat panel. This build has no panel, so a profile does the job that actually
+/// matters for dictation: it bundles the cleanup prompt template, the tone, an
+/// extra instruction layer, and whether personal memory is injected — so
+/// switching from "work email" to "chat message" is one choice instead of
+/// three separate settings.
+///
+/// Built-ins ship with the app; users can add, edit, duplicate, import, and
+/// delete their own. The `default` profile can never be deleted.
 #[derive(Serialize, Deserialize, Debug, Clone, Type)]
-pub struct AssistantCharacter {
+pub struct Profile {
     /// Stable identifier. `"default"` is reserved for the non-deletable base
-    /// assistant; `"cat"` for the built-in joke character.
+    /// profile.
     pub id: String,
-    /// Display name shown in the panel header and the picker.
+    /// Display name shown in the picker and the tray.
     pub name: String,
-    /// System prompt / persona. Ignored for `Cat`.
+    /// Extra style/context instructions layered onto the cleanup prompt (after
+    /// the tone directive, before the output contract). Empty adds nothing.
+    #[serde(default, alias = "prompt")]
+    pub instructions: String,
+    /// Which cleanup prompt template this profile selects. Empty keeps whatever
+    /// `post_process_selected_prompt_id` is set to globally.
     #[serde(default)]
-    pub prompt: String,
-    /// Optional in-character opening line shown in the panel's empty state.
+    pub prompt_id: String,
+    /// Built-in tone id or a `CustomPostProcessTone.id` applied on top of the
+    /// prompt. Empty keeps the global `post_process_selected_tone_id`.
     #[serde(default)]
-    pub greeting: String,
+    pub tone_id: String,
+    /// Whether personal memory is injected while this profile is active. Off
+    /// for profiles where the user's personal context is irrelevant.
+    #[serde(default)]
+    pub use_memory: bool,
     /// Optional avatar as a `data:image/...;base64,...` URL (empty → initial).
     #[serde(default)]
     pub avatar: String,
-    /// What powers this character's replies.
-    #[serde(default)]
-    pub kind: AssistantCharacterKind,
-    /// True for characters shipped with the app. Built-ins may be edited or
+    /// True for profiles shipped with the app. Built-ins may be edited or
     /// duplicated; only `default` is protected from deletion.
     #[serde(default)]
     pub builtin: bool,
-    /// Optional one-line role/description shown as the card subtitle in the
-    /// persona picker (e.g. "Short, direct answers"). Purely cosmetic — it
-    /// never reaches the model.
+    /// One-line subtitle shown on the profile card (e.g. "Short, direct
+    /// answers"). Purely cosmetic — it never reaches the model.
     #[serde(default)]
     pub description: String,
-    /// Optional per-persona reply-length override. `None` inherits the global
-    /// `assistant_response_length`; `Some(_)` wins for this persona's turns so
-    /// a "Concise" persona can stay short while an "In-Depth" one runs long.
-    #[serde(default)]
-    pub response_length: Option<AssistantResponseLength>,
 }
 
 /// How sure we are about a remembered fact. Facts the user stated explicitly
-/// are `High`; facts the model inferred from a conversation are `Low`. Feeds
+/// are `High`; facts the model inferred from dictations are `Low`. Feeds
 /// pruning (low-confidence notes fade first) and injection ordering.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
 #[serde(rename_all = "snake_case")]
@@ -250,9 +244,9 @@ pub enum MemoryConfidence {
     High,
 }
 
-/// A single durable fact the assistant has learned (or been told) about the
-/// user. Notes are pulled into a turn by relevance, within a token budget —
-/// never all at once — and are fully user-editable in Settings → Memory.
+/// A single durable fact SpeakoFlow has learned (or been told) about the user.
+/// Notes are pulled into a cleanup pass by relevance, within a character budget
+/// — never all at once — and are fully user-editable in Settings → Memory.
 #[derive(Serialize, Deserialize, Debug, Clone, Type)]
 pub struct MemoryNote {
     /// Stable identifier for edit/delete.
@@ -267,15 +261,15 @@ pub struct MemoryNote {
     #[serde(default)]
     pub confidence: MemoryConfidence,
     /// Where the note came from: `"user"` (typed/dictated explicitly) or
-    /// `"auto"` (distilled from a conversation). Purely informational.
+    /// `"auto"` (distilled from past dictations). Purely informational.
     #[serde(default)]
     pub source: String,
 }
 
 /// The user's personal, local-first memory: a short always-on "About You"
 /// summary plus a list of durable notes. Stored on-device in settings and
-/// injected (in part) into assistant turns only when
-/// `assistant_memory_enabled` is on and the conversation isn't incognito.
+/// injected (in part) into an AI-cleanup pass only when `memory_enabled` is on,
+/// incognito is off, and the active profile opts in.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
 pub struct UserMemory {
     /// The always-on summary injected into every reply (kept to a few
@@ -287,9 +281,9 @@ pub struct UserMemory {
     pub notes: Vec<MemoryNote>,
 }
 
-/// How much memory to inject each turn — a token-budget dial. `Light` keeps
-/// only the summary; `Balanced` adds a few relevant notes; `Detailed` adds
-/// more. Keeps memory cost flat regardless of how much has been learned.
+/// How much memory to inject per cleanup pass — a token-budget dial. `Light`
+/// keeps only the summary; `Balanced` adds a few relevant notes; `Detailed`
+/// adds more. Keeps memory cost flat regardless of how much has been learned.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
 #[serde(rename_all = "snake_case")]
 pub enum MemoryDetail {
@@ -374,7 +368,6 @@ pub struct PostProcessProvider {
 #[serde(rename_all = "snake_case")]
 pub enum PostProcessConfigSource {
     DedicatedCleanupSelection,
-    AssistantFallback,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
@@ -431,6 +424,14 @@ pub(crate) struct ResolvedPostProcessConfig {
     /// system prompt + optional writing style) are still sent, because those are
     /// explicit choices rather than app-added scaffolding.
     pub trained_for_cleanup: bool,
+    /// The active profile's extra instruction layer, appended after the tone
+    /// directive and before the final output contract. `None` when the profile
+    /// adds nothing.
+    pub profile_instructions: Option<String>,
+    /// Whether personal memory may be injected for this attempt. The block
+    /// itself is built per request, because selecting the relevant notes needs
+    /// the transcript.
+    pub memory_applies: bool,
     pub source: PostProcessConfigSource,
     pub api_key: String,
 }
@@ -451,12 +452,11 @@ pub enum OverlayPosition {
     Bottom,
 }
 
-/// How the recording / assistant overlay presents itself while active.
+/// How the recording overlay presents itself while active.
 /// `Auto` follows the model: Live when the selected model supports live
 /// streaming transcription, otherwise Minimal — the user can override to a
 /// concrete choice. `None` shows nothing, `Minimal` is the compact pill, and
-/// `Live` is the enlarged readable card (running transcript + — for the
-/// assistant — the streamed reply).
+/// `Live` is the enlarged readable card (running transcript).
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum OverlayStyle {
@@ -525,94 +525,6 @@ pub enum AutoSubmitKey {
     Enter,
     CtrlEnter,
     CmdEnter,
-}
-
-/// Desired length of the assistant's replies. Appended as a directive to the
-/// system prompt at request time, so it works with the single main prompt
-/// (no separate summary layer). `Default` injects nothing.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
-#[serde(rename_all = "snake_case")]
-pub enum AssistantResponseLength {
-    /// No length directive — use the system prompt as-is.
-    #[default]
-    Default,
-    Short,
-    Medium,
-    Long,
-}
-
-impl AssistantResponseLength {
-    /// The instruction appended to the system prompt, or `None` for `Default`.
-    pub fn directive(&self) -> Option<&'static str> {
-        match self {
-            AssistantResponseLength::Default => None,
-            AssistantResponseLength::Short => Some(
-                "Keep your reply very short — usually one or two sentences. Match the user's intent: a greeting or trivial message gets a brief, friendly reply, never a long one.",
-            ),
-            AssistantResponseLength::Medium => Some(
-                "Keep replies fairly brief — a short paragraph at most. Don't pad simple messages with extra detail.",
-            ),
-            AssistantResponseLength::Long => Some(
-                "Give thorough, detailed replies when the question genuinely calls for it. Still match the user's intent: greetings or trivial messages get a short reply, not filler.",
-            ),
-        }
-    }
-}
-
-/// Controls who may initiate screen capture for assistant turns.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
-#[serde(rename_all = "snake_case")]
-pub enum AssistantScreenAccessMode {
-    /// Screen capture is disabled.
-    Off,
-    /// The user explicitly attaches or requests each capture.
-    #[default]
-    Manual,
-    /// The assistant may decide when the current turn needs a capture.
-    AgentDecides,
-}
-
-/// When a screen capture is taken for an assistant turn.
-///
-/// This only changes the timing for **voice** questions (where there's a real
-/// gap between starting and finishing the question); typed messages always
-/// capture at send, since the panel is already on screen either way.
-///
-/// It applies to both ways a capture can happen: a Manual capture the user
-/// armed, and an Agent-decides capture the model asks for mid-turn. In the agent
-/// case `Immediate` is purely a speed setting — the frame is held locally and is
-/// only ever sent if the model actually calls the screen tool.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
-#[serde(rename_all = "snake_case")]
-pub enum VisionCaptureTiming {
-    /// Capture the moment you start asking (voice: at hotkey/mic press), so it
-    /// grabs what you were looking at when you began — not what's on screen
-    /// after you finish talking. This is the default, and it is also what makes
-    /// an agent-decided screen look instant instead of costing a screenshot
-    /// inside the wait.
-    #[default]
-    Immediate,
-    /// Capture when the message is actually sent (voice: after you stop talking
-    /// and it transcribes). The original behaviour.
-    OnSend,
-}
-
-/// How thorough a web search should be. This is the single dial that replaces
-/// the old raw "max results" number: it controls how many queries run, how many
-/// pages get scraped, and how much source text the model receives. All three
-/// tiers are tuned to stay fast (one retrieval pass, heavy parallelism, tight
-/// timeouts) — this is "answer-with-search like ChatGPT/Gemini do in seconds",
-/// not minutes-long deep research.
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Type)]
-#[serde(rename_all = "snake_case")]
-pub enum AssistantSearchDepth {
-    /// Fastest. One query, snippets + a couple of scraped pages. Quick facts.
-    Low,
-    /// Balanced default. A few queries, rerank, scrape the top handful.
-    #[default]
-    Medium,
-    /// Broadest single pass. More queries/sources, scrape more winners.
-    High,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
@@ -872,6 +784,8 @@ impl std::ops::DerefMut for SecretMap {
     }
 }
 
+// Only the removed web-search and TTS settings held one of these.
+#[allow(dead_code)]
 #[derive(Clone, Default, Serialize, Deserialize, Type)]
 #[serde(transparent)]
 pub struct SecretString(pub String);
@@ -914,16 +828,6 @@ pub struct AppSettings {
     /// …). Only relevant while push-to-talk and Tap to Lock are on.
     #[serde(default = "default_tap_to_lock_key")]
     pub tap_to_lock_key: String,
-    /// The key you tap while holding a push-to-talk **assistant** recording to
-    /// lock it hands-free, so you can release the hotkey and keep talking to the
-    /// assistant. Separate from the dictation `tap_to_lock_key` so it can be a
-    /// different combo (defaults to Shift). Accepts a modifier ("shift", "ctrl",
-    /// …) or a plain key name ("tab", "f8", …). Pick a key that isn't part of
-    /// your assistant record shortcut — one that overlaps (e.g. Space while the
-    /// shortcut is ctrl+alt+space) is ignored, since the held key would instantly
-    /// lock the recording. Clear it (empty) to disable.
-    #[serde(default = "default_assistant_tap_to_lock_key")]
-    pub assistant_tap_to_lock_key: String,
     pub audio_feedback: bool,
     #[serde(default = "default_audio_feedback_volume")]
     pub audio_feedback_volume: f32,
@@ -969,10 +873,6 @@ pub struct AppSettings {
     /// the model's live-streaming support (Live if supported, else Minimal).
     #[serde(default = "default_overlay_style")]
     pub overlay_style: OverlayStyle,
-    /// Assistant overlay style: Auto/None/Minimal/Live. Live shows the running
-    /// transcript plus the streamed reply as readable text; Minimal is the pill.
-    #[serde(default = "default_overlay_style")]
-    pub assistant_overlay_style: OverlayStyle,
     #[serde(default = "default_debug_mode")]
     pub debug_mode: bool,
     #[serde(default = "default_log_level")]
@@ -1069,20 +969,6 @@ pub struct AppSettings {
     /// their model selection apparently gone.
     #[serde(default)]
     pub post_process_last_cloud_provider_id: Option<String>,
-    /// "Generate with Flow": when on, a dictation that begins with the
-    /// activation phrase becomes a one-shot AI generation command whose result
-    /// is pasted instead of the spoken words. Off by default.
-    #[serde(default)]
-    pub flow_enabled: bool,
-    /// The spoken activation phrase that triggers Flow at the start of a
-    /// normal dictation (matched case- and punctuation-insensitively).
-    #[serde(default = "default_flow_phrase")]
-    pub flow_phrase: String,
-    /// Whether Flow may use the `capture_screen` tool for a command that
-    /// clearly refers to the screen. Separate from the assistant's screen
-    /// access mode on purpose — the two features are permissioned independently.
-    #[serde(default)]
-    pub flow_screen_access: bool,
     #[serde(default)]
     pub mute_while_recording: bool,
     #[serde(default)]
@@ -1114,185 +1000,46 @@ pub struct AppSettings {
     pub whisper_gpu_device: i32,
     #[serde(default)]
     pub extra_recording_buffer_ms: u64,
-    /// Master switch for the assistant experience: the floating panel window,
-    /// its two hotkeys, spoken replies, profiles and personal memory.
-    ///
-    /// Off makes SpeakoFlow dictation-only and, crucially, never creates the
-    /// always-on-top panel WebView — a whole renderer process plus whatever it
-    /// loads (the local TTS model above all) that otherwise lives for as long as
-    /// the app does. Kept separate from the provider/model settings on purpose:
-    /// "Generate with Flow" and AI Correction share those and keep working.
-    #[serde(default = "default_true")]
-    pub assistant_enabled: bool,
-    #[serde(default = "default_assistant_provider_id")]
-    pub assistant_provider_id: String,
-    /// The cloud provider the assistant last used, remembered so its device ⇄
-    /// cloud switch restores the user's choice instead of guessing. Same
-    /// reasoning as `post_process_last_cloud_provider_id`.
-    #[serde(default)]
-    pub assistant_last_cloud_provider_id: Option<String>,
-    #[serde(default)]
-    pub assistant_models: HashMap<String, String>,
-    #[serde(default = "default_assistant_system_prompt")]
-    pub assistant_system_prompt: String,
-    /// Controls whether screen capture is off, user-triggered, or agent-decided.
-    #[serde(default)]
-    pub assistant_screen_access_mode: AssistantScreenAccessMode,
-    /// Compatibility mirror for code that still consumes the former boolean.
-    /// Derived from `assistant_screen_access_mode` whenever settings are repaired
-    /// or written: only `Off` maps to false.
-    #[serde(default = "default_assistant_screenshot_enabled")]
-    pub assistant_screenshot_enabled: bool,
-    /// When a screen capture is taken for a voice turn (immediate vs at-send).
-    #[serde(default)]
-    pub assistant_vision_capture_timing: VisionCaptureTiming,
-    #[serde(default)]
-    pub assistant_tts_enabled: bool,
-    #[serde(default = "default_assistant_tts_engine")]
-    pub assistant_tts_engine: String,
-    #[serde(default = "default_assistant_tts_voice")]
-    pub assistant_tts_voice: String,
-    #[serde(default = "default_assistant_tts_base_url")]
-    pub assistant_tts_base_url: String,
-    #[serde(default)]
-    pub assistant_tts_api_key: SecretString,
-    #[serde(default = "default_assistant_tts_model")]
-    pub assistant_tts_model: String,
-    #[serde(default = "default_assistant_tts_remote_voice")]
-    pub assistant_tts_remote_voice: String,
-    /// Per-engine remote-TTS configuration. The flat `assistant_tts_base_url`,
-    /// `assistant_tts_model`, `assistant_tts_remote_voice`, and
-    /// `assistant_tts_api_key` fields above are a denormalized MIRROR of
-    /// whichever engine is currently active (kept so `tts.rs` and the settings
-    /// UI can read a single value). These maps are the source of truth, keyed by
-    /// engine id ("openai" / "elevenlabs" / "azure"), so each engine keeps its
-    /// own endpoint, model, voice, and API key instead of sharing one slot and
-    /// getting wiped when the engine is switched.
-    #[serde(default)]
-    pub assistant_tts_base_urls: HashMap<String, String>,
-    #[serde(default)]
-    pub assistant_tts_models: HashMap<String, String>,
-    #[serde(default)]
-    pub assistant_tts_remote_voices: HashMap<String, String>,
-    #[serde(default)]
-    pub assistant_tts_api_keys: SecretMap,
-    #[serde(default = "default_assistant_tts_kokoro_dtype")]
-    pub assistant_tts_kokoro_dtype: String,
-    /// Playback speed multiplier for spoken assistant summaries. 1.0 is normal;
-    /// 0.5 is half speed, 2.0 is double, etc. Applied locally for Kokoro (via
-    /// the webview audio element) and natively for remote engines where the
-    /// API supports it.
-    #[serde(default = "default_assistant_tts_speed")]
-    pub assistant_tts_speed: f64,
-    #[serde(default = "default_assistant_max_history_messages")]
-    pub assistant_max_history_messages: u32,
-    /// When on, once a conversation grows past the model's context window the
-    /// assistant folds older turns into a rolling summary (kept in context)
-    /// instead of dropping them, so long chats keep flowing. On by default.
-    #[serde(default = "default_assistant_auto_summarize")]
-    pub assistant_auto_summarize: bool,
     /// Context window (in tokens) the built-in local LLM engine launches with.
     /// Applied when the engine starts; ignored by external providers
     /// (Ollama / LM Studio / cloud), which manage their own context.
     #[serde(default = "default_local_llm_context_size")]
     pub local_llm_context_size: u32,
-    #[serde(default)]
-    pub assistant_response_length: AssistantResponseLength,
-    /// Selectable assistant personas. The active one's prompt overrides
-    /// `assistant_system_prompt` for LLM turns. Seeded with built-ins on first
-    /// run (see `default_assistant_characters`).
-    #[serde(default)]
-    pub assistant_characters: Vec<AssistantCharacter>,
-    /// Id of the currently active character (defaults to `"default"`).
-    #[serde(default = "default_active_character_id")]
-    pub assistant_active_character_id: String,
-    /// Whether the assistant keeps a local, personal memory of the user (an
+    /// Selectable dictation profiles: each bundles a cleanup prompt, tone,
+    /// extra instructions, and whether memory is injected. Seeded with
+    /// built-ins on first run (see `default_profiles`).
+    #[serde(default, alias = "assistant_characters")]
+    pub profiles: Vec<Profile>,
+    /// Id of the currently active profile (defaults to `"default"`).
+    #[serde(
+        default = "default_active_profile_id",
+        alias = "assistant_active_character_id"
+    )]
+    pub active_profile_id: String,
+    /// Whether SpeakoFlow keeps a local, personal memory of the user (an
     /// always-on "About You" summary plus durable notes) and injects the
-    /// relevant parts into each reply. Off by default; everything stays on this
+    /// relevant parts into AI cleanup. Off by default; everything stays on this
     /// device and is fully user-editable in Settings → Memory.
-    #[serde(default)]
-    pub assistant_memory_enabled: bool,
+    #[serde(default, alias = "assistant_memory_enabled")]
+    pub memory_enabled: bool,
     /// The user's personal memory: a short always-on summary + durable notes.
+    #[serde(default, alias = "assistant_memory")]
+    pub memory: UserMemory,
+    /// How much memory to inject per cleanup pass (a character-budget dial).
+    /// Light keeps only the summary; Balanced adds a few relevant notes;
+    /// Detailed adds more.
+    #[serde(default, alias = "assistant_memory_detail")]
+    pub memory_detail: MemoryDetail,
+    /// When true, memory is "incognito": neither injected into cleanup nor
+    /// learned from new dictations. A quick switch so private dictation leaves
+    /// no trace in memory.
+    #[serde(default, alias = "assistant_memory_incognito")]
+    pub memory_incognito: bool,
+    /// Whether SpeakoFlow may distill new memory notes from past dictations
+    /// on its own. Off by default: with it off, memory only ever holds what the
+    /// user typed in Settings → Memory or asked for explicitly.
     #[serde(default)]
-    pub assistant_memory: UserMemory,
-    /// How much memory to inject each turn (a token-budget dial). Light keeps
-    /// only the summary; Balanced adds a few relevant notes; Detailed adds more.
-    #[serde(default)]
-    pub assistant_memory_detail: MemoryDetail,
-    /// When true, this conversation is "incognito": memory is neither injected
-    /// into replies nor learned from the conversation. A quick switch so a
-    /// private chat leaves no trace in memory.
-    #[serde(default)]
-    pub assistant_memory_incognito: bool,
-    #[serde(default = "default_assistant_font_size")]
-    pub assistant_font_size: String,
-    /// Surface opacity of the floating assistant panel (0.5–1.0). At 1.0 the
-    /// panel is fully opaque; lower values let the desktop blur through.
-    ///
-    /// Note: the old `assistant_accent`, `assistant_panel_size`, and
-    /// `assistant_panel_theme` customization fields were removed (the panel is
-    /// dark-only now) — serde silently ignores those keys in previously stored
-    /// settings.
-    #[serde(default = "default_assistant_panel_opacity")]
-    pub assistant_panel_opacity: f64,
-    /// Overall size of the expanded floating assistant panel: "compact",
-    /// "standard" (default), or "large". Chosen in Panel Appearance settings and
-    /// applied as the window's logical width/height. A manual drag-resize still
-    /// overrides it for the current session.
-    #[serde(default = "default_assistant_panel_size")]
-    pub assistant_panel_size: String,
-    /// Whether starting a plain dictation should silence an assistant reply
-    /// that is still being read aloud. Off by default — earphone users often
-    /// want to keep listening while they dictate. (Asking the assistant a NEW
-    /// question always interrupts the previous answer, regardless.)
-    #[serde(default)]
-    pub assistant_tts_stop_on_dictation: bool,
-    /// Whether the assistant may search the web. When on, an automatic
-    /// heuristic decides per-question whether a search is actually worthwhile
-    /// (factual/time-sensitive questions yes; chit-chat, code, math no), so
-    /// casual messages stay instant.
-    #[serde(default)]
-    pub assistant_web_search_enabled: bool,
-    /// Which search backend to use: "serper" (default), "brave", "tavily",
-    /// "exa", "serpapi", or "tinyfish". All are snippet-only and use a single
-    /// API key.
-    #[serde(default = "default_assistant_web_search_provider")]
-    pub assistant_web_search_provider: String,
-    /// How many results to feed the model. Kept modest to bound prompt size;
-    /// clamped to 1–10 at search time.
-    #[serde(default = "default_assistant_web_search_max_results")]
-    pub assistant_web_search_max_results: u32,
-    /// DEPRECATED / unused since web search became snippet-only (Firecrawl and
-    /// its page-scrape stage were removed). Kept so existing settings files and
-    /// generated bindings stay stable; no current provider reads it.
-    #[serde(default = "default_assistant_web_search_fetch_content")]
-    pub assistant_web_search_fetch_content: bool,
-    /// How thorough web search is (Low/Medium/High). Replaces the old raw
-    /// "max results" number as the primary control; tuned to stay fast.
-    #[serde(default)]
-    pub assistant_search_depth: AssistantSearchDepth,
-    /// DEPRECATED / unused since the Firecrawl credit guard was removed (search
-    /// is now snippet-only over per-request SERP APIs). Kept so existing
-    /// settings files and generated bindings stay stable.
-    #[serde(default = "default_assistant_web_search_daily_credit_budget")]
-    pub assistant_web_search_daily_credit_budget: u32,
-    /// Built-in local model ONLY: when true, decide whether to search with the
-    /// same LLM planner the cloud providers use (smarter, but an extra
-    /// generation pass — slower, especially on weak hardware). When false
-    /// (default), use the instant keyword heuristic. No effect on cloud/custom
-    /// providers, which always use the planner.
-    #[serde(default)]
-    pub assistant_local_search_smart: bool,
-    /// When the active assistant provider has its OWN built-in web search
-    /// (currently OpenRouter's `:online`), prefer it over the app's own search.
-    /// Providers without native search always use the app's search regardless.
-    /// Default true, so OpenRouter uses its built-in search out of the box.
-    #[serde(default = "default_assistant_prefer_provider_web_search")]
-    pub assistant_prefer_provider_web_search: bool,
-    /// API keys for the keyed search providers, keyed by provider id
-    /// ("serper", "brave", "tavily", "exa", "serpapi", "tinyfish").
-    #[serde(default = "default_web_search_api_keys")]
-    pub web_search_api_keys: SecretMap,
+    pub memory_auto_learn: bool,
     #[serde(default)]
     pub theme: Theme,
     #[serde(default)]
@@ -1414,11 +1161,6 @@ fn default_post_process_timeout_secs() -> u32 {
     10
 }
 
-/// Default spoken activation phrase for "Generate with Flow".
-fn default_flow_phrase() -> String {
-    "Hey Flow".to_string()
-}
-
 fn default_app_language() -> String {
     tauri_plugin_os::locale()
         .map(|l| l.replace('_', "-"))
@@ -1426,10 +1168,6 @@ fn default_app_language() -> String {
 }
 
 fn default_show_tray_icon() -> bool {
-    true
-}
-
-fn default_assistant_prefer_provider_web_search() -> bool {
     true
 }
 
@@ -1829,174 +1567,70 @@ fn default_typing_tool() -> TypingTool {
     TypingTool::Auto
 }
 
-fn default_assistant_provider_id() -> String {
-    "custom".to_string()
-}
-
-/// Stable system prompt for the assistant. Keep this byte-identical across
-/// requests — provider-side prompt caching keys off the exact prefix.
-fn default_assistant_system_prompt() -> String {
-    "You are a helpful voice assistant. The user talks to you by speaking; their speech is transcribed and sent to you, so expect occasional transcription errors and infer the intended meaning. Be concise and direct. Use plain text formatting suitable for a small chat panel. When a screenshot of the user's screen is attached, describe or use what you actually see in it.".to_string()
-}
-
-fn default_assistant_screenshot_enabled() -> bool {
-    true
-}
-
-fn default_active_character_id() -> String {
+fn default_active_profile_id() -> String {
     "default".to_string()
 }
 
-/// The base (non-deletable) assistant character, seeded from the user's current
-/// system prompt so upgrades preserve any customization.
-fn default_assistant_character(system_prompt: &str) -> AssistantCharacter {
-    let prompt = if system_prompt.trim().is_empty() {
-        default_assistant_system_prompt()
-    } else {
-        system_prompt.to_string()
-    };
-    AssistantCharacter {
+/// The base (non-deletable) profile: whatever the user has configured globally.
+/// Empty `prompt_id`/`tone_id` mean "inherit the global choice", so selecting
+/// this profile changes nothing — it is the neutral starting point.
+fn default_profile() -> Profile {
+    Profile {
         id: "default".to_string(),
-        name: "Assistant".to_string(),
-        prompt,
-        greeting: String::new(),
+        name: "Default".to_string(),
+        instructions: String::new(),
+        prompt_id: String::new(),
+        tone_id: String::new(),
+        use_memory: false,
         avatar: String::new(),
-        kind: AssistantCharacterKind::Llm,
         builtin: true,
-        description: "Balanced, general-purpose help".to_string(),
-        response_length: None,
+        description: "Your global cleanup settings, unchanged".to_string(),
     }
 }
 
 /// Built-in starter profiles seeded on first run. `default` is always first and
 /// can never be deleted; the rest are editable, duplicatable examples that show
-/// off what profiles can do. A small, tasteful set: a balanced assistant, a
-/// warm companion, a quick answerer, and a blunt/honest one. (Existing users'
-/// saved profiles are untouched when this list changes — it only affects fresh
-/// installs and the "Restore" actions.)
-pub fn default_assistant_characters(system_prompt: &str) -> Vec<AssistantCharacter> {
+/// what a profile can do — each one a different writing situation, not a
+/// different personality. (Existing users' saved profiles are untouched when
+/// this list changes — it only affects fresh installs and the "Restore"
+/// actions.)
+pub fn default_profiles() -> Vec<Profile> {
     vec![
-        default_assistant_character(system_prompt),
-        AssistantCharacter {
-            id: "companion".to_string(),
-            name: "Companion".to_string(),
-            prompt: "You are a warm, empathetic companion for when the user wants to talk something through. Listen first, acknowledge and validate how they feel, and stay gentle, patient, and non-judgmental. Reflect back what you hear, ask caring follow-up questions, and don't rush to 'fix' things unless they ask. Keep a calm, human tone. You are not a therapist or a substitute for professional care; if the user mentions wanting to harm themselves or is in crisis, gently and briefly encourage them to reach out to a local emergency number or a crisis line (in the US, call or text 988), then stay supportive. The user is speaking to you, so expect transcription quirks and infer their intent.".to_string(),
-            greeting: String::new(),
+        default_profile(),
+        Profile {
+            id: "email".to_string(),
+            name: "Email".to_string(),
+            instructions: "Format the result as a message body: greeting on its own line if the speaker dictated one, short paragraphs, and a sign-off line if they dictated one. Never invent a greeting, a sign-off, or a subject line that wasn't spoken.".to_string(),
+            prompt_id: String::new(),
+            tone_id: "professional".to_string(),
+            use_memory: true,
             avatar: String::new(),
-            kind: AssistantCharacterKind::Llm,
             builtin: true,
-            description: "Warm, empathetic support".to_string(),
-            response_length: Some(AssistantResponseLength::Medium),
+            description: "Professional tone, laid out as a message".to_string(),
         },
-        AssistantCharacter {
-            id: "quick".to_string(),
-            name: "Quick".to_string(),
-            prompt: "You are a fast, friendly assistant that gives quick, clean answers. Reply in as few words as the question honestly allows — usually one or two sentences — with no preamble, no filler, and no restating the question. Stay warm and natural, just brief: get straight to the useful part and only expand if the user asks. The user is speaking to you, so expect transcription quirks and infer their intent.".to_string(),
-            greeting: String::new(),
+        Profile {
+            id: "chat".to_string(),
+            name: "Chat".to_string(),
+            instructions: "Keep it as one short, casual message — no paragraph breaks, no greeting, no sign-off.".to_string(),
+            prompt_id: String::new(),
+            tone_id: "casual".to_string(),
+            use_memory: false,
             avatar: String::new(),
-            kind: AssistantCharacterKind::Llm,
             builtin: true,
-            description: "Fast, friendly, to the point".to_string(),
-            response_length: Some(AssistantResponseLength::Short),
+            description: "Casual one-liners for chat apps".to_string(),
         },
-        AssistantCharacter {
-            id: "unfiltered".to_string(),
-            name: "Unfiltered".to_string(),
-            prompt: "You are a blunt, brutally honest advisor. Prioritize truth and usefulness over politeness: don't flatter, don't hedge, and don't pad answers with disclaimers or pleasantries. If something is wrong, weak, or a bad idea, say so plainly and explain exactly why. Disagree openly, name the real risks and trade-offs, and give the hard feedback most people would soften. Be direct and concise, and skip the \"great question\" niceties. Critique the idea or the work, not the person — stay honest and constructive rather than insulting. The user is speaking to you, so expect transcription quirks and infer their intent.".to_string(),
-            greeting: String::new(),
+        Profile {
+            id: "notes".to_string(),
+            name: "Notes".to_string(),
+            instructions: "Keep every detail and the speaker's own wording. Break a long dictation into short lines or bullet points where the speaker clearly moved to a new point, but never summarize, reorder, or drop anything.".to_string(),
+            prompt_id: String::new(),
+            tone_id: "none".to_string(),
+            use_memory: true,
             avatar: String::new(),
-            kind: AssistantCharacterKind::Llm,
             builtin: true,
-            description: "Blunt, honest feedback — no sugar-coating".to_string(),
-            response_length: None,
+            description: "Verbatim capture, lightly structured".to_string(),
         },
     ]
-}
-
-fn default_assistant_tts_voice() -> String {
-    "af_heart".to_string()
-}
-
-fn default_assistant_tts_engine() -> String {
-    "kokoro".to_string()
-}
-
-fn default_assistant_tts_base_url() -> String {
-    "https://api.openai.com/v1".to_string()
-}
-
-/// OpenRouter is a preset provider, not a user-configurable compatible server.
-pub(crate) const OPENROUTER_TTS_BASE_URL: &str = "https://openrouter.ai/api/v1";
-
-/// Sensible default TTS base URL for a given engine. Used when the engine is
-/// switched so a stale value (e.g. the OpenAI URL lingering under the Azure
-/// engine and 404ing on Load voices) never leaks across engines.
-pub fn default_tts_base_url_for_engine(engine: &str) -> String {
-    match engine {
-        "openai" => "https://api.openai.com/v1".to_string(),
-        // OpenRouter is the OpenAI-compatible engine pointed at OpenRouter's
-        // hosted `/audio/speech` endpoint, so it gets its own default base URL.
-        "openrouter" => OPENROUTER_TTS_BASE_URL.to_string(),
-        // Azure Speech / ElevenLabs / Kokoro don't reuse the OpenAI base URL; an
-        // empty value shows the field's placeholder so the user enters the right
-        // endpoint (or needs none, for ElevenLabs/Kokoro).
-        _ => String::new(),
-    }
-}
-
-/// Default TTS model for a given engine.
-///
-/// Intentionally empty for every engine: the model field is a "loadable" picker
-/// (it has a reload button that fetches the engine's real model list). Starting
-/// empty means the user sees the field's placeholder and presses reload to pick
-/// a real model, instead of inheriting a value they never chose — in particular
-/// OpenAI's `gpt-4o-mini-tts`, which used to leak onto ElevenLabs/Azure. The
-/// synthesis paths in `tts.rs` still fall back to a working model when empty.
-pub fn default_tts_model_for_engine(_engine: &str) -> String {
-    String::new()
-}
-
-/// Default remote voice for a given engine.
-///
-/// Intentionally empty for every engine, for the same reason as
-/// [`default_tts_model_for_engine`]: the voice field is a loadable picker, so it
-/// starts empty and the user presses reload to fetch and choose a real voice.
-/// This is what stops OpenAI's `alloy` from being pre-filled under ElevenLabs
-/// (where it 404s as `voice_not_found`). Azure still falls back to
-/// `en-US-JennyNeural` at synthesis time when left empty.
-pub fn default_tts_remote_voice_for_engine(_engine: &str) -> String {
-    String::new()
-}
-
-fn default_assistant_tts_model() -> String {
-    // Empty by default (loadable field — see default_tts_model_for_engine).
-    String::new()
-}
-
-fn default_assistant_tts_remote_voice() -> String {
-    // Empty by default (loadable field — see default_tts_remote_voice_for_engine).
-    String::new()
-}
-
-fn default_assistant_tts_kokoro_dtype() -> String {
-    // fp32 is recommended for WebGPU; users on weak/no GPU can pick a
-    // quantized dtype (q8/q4/q4f16) for much faster CPU/WASM synthesis.
-    "fp32".to_string()
-}
-
-fn default_assistant_tts_speed() -> f64 {
-    // Normal speaking rate. The UI offers presets (0.5x–3x) and free entry;
-    // values are clamped to a sane range when persisted.
-    1.0
-}
-
-fn default_assistant_max_history_messages() -> u32 {
-    // How many prior messages (user+assistant) the model sees as context.
-    12
-}
-
-fn default_assistant_auto_summarize() -> bool {
-    true
 }
 
 fn default_local_llm_context_size() -> u32 {
@@ -2013,20 +1647,12 @@ fn default_local_llm_unload_timeout() -> ModelUnloadTimeout {
 }
 
 fn default_post_process_unload_timeout() -> ModelUnloadTimeout {
-    // Longer than the assistant's: the cleanup engine is small (a few hundred MB
-    // for the models this feature targets), does no work while idle, and is used
-    // on every dictation — so holding it through a normal writing session is a
-    // better trade than reloading it repeatedly. Users on tight memory can dial
-    // this down (or to `Immediately`) without touching the assistant.
+    // Longer than the general local-LLM default: the cleanup engine is small (a
+    // few hundred MB for the models this feature targets), does no work while
+    // idle, and is used on every dictation — so holding it through a normal
+    // writing session is a better trade than reloading it repeatedly. Users on
+    // tight memory can dial this down (or to `Immediately`).
     ModelUnloadTimeout::Min15
-}
-
-fn default_assistant_panel_opacity() -> f64 {
-    1.0
-}
-
-fn default_assistant_panel_size() -> String {
-    "standard".to_string()
 }
 
 fn default_tap_to_lock() -> bool {
@@ -2042,262 +1668,30 @@ fn default_tap_to_lock_key() -> String {
     "shift".to_string()
 }
 
-fn default_assistant_tap_to_lock_key() -> String {
-    // Windows: Space (see default_tap_to_lock_key — record combos are
-    // modifier-only there, so Space can't overlap the held shortcut).
-    #[cfg(target_os = "windows")]
-    return "space".to_string();
-    // Elsewhere: Shift, not Space — the default assistant shortcut (e.g.
-    // option+ctrl+space) already holds Space, and a lock key that overlaps the
-    // record shortcut can't work (the held key would instantly lock it).
-    #[cfg(not(target_os = "windows"))]
-    "shift".to_string()
-}
+fn ensure_profile_defaults(settings: &mut AppSettings) -> bool {
+    let mut changed = false;
 
-fn default_assistant_font_size() -> String {
-    "medium".to_string()
-}
-
-fn default_assistant_web_search_provider() -> String {
-    // Serper is the default snippet backend: fast (~1–2 s) Google SERP results,
-    // a generous free tier, and cheap at scale. Requires a (free) API key.
-    "serper".to_string()
-}
-
-fn default_assistant_web_search_max_results() -> u32 {
-    // A handful of full-content sources gives the model enough to synthesize a
-    // solid answer without flooding the prompt.
-    5
-}
-
-fn default_assistant_web_search_fetch_content() -> bool {
-    // DEPRECATED / unused (web search is snippet-only). Default kept for
-    // back-compat with existing settings files.
-    true
-}
-
-fn default_assistant_web_search_daily_credit_budget() -> u32 {
-    // DEPRECATED / unused (the Firecrawl credit guard was removed; search is
-    // snippet-only). Default kept for back-compat with existing settings files.
-    2000
-}
-
-fn default_web_search_api_keys() -> SecretMap {
-    let mut map = HashMap::new();
-    map.insert("serper".to_string(), String::new());
-    map.insert("brave".to_string(), String::new());
-    map.insert("tavily".to_string(), String::new());
-    map.insert("exa".to_string(), String::new());
-    map.insert("serpapi".to_string(), String::new());
-    map.insert("tinyfish".to_string(), String::new());
-    SecretMap(map)
-}
-
-fn sync_assistant_screen_access_compat(settings: &mut AppSettings) -> bool {
-    let screenshot_enabled = !matches!(
-        settings.assistant_screen_access_mode,
-        AssistantScreenAccessMode::Off
-    );
-    if settings.assistant_screenshot_enabled == screenshot_enabled {
-        return false;
-    }
-
-    settings.assistant_screenshot_enabled = screenshot_enabled;
-    true
-}
-
-fn ensure_assistant_defaults(settings: &mut AppSettings) -> bool {
-    let mut changed = sync_assistant_screen_access_compat(settings);
-    for provider in default_post_process_providers() {
-        if !settings.assistant_models.contains_key(&provider.id) {
-            settings
-                .assistant_models
-                .insert(provider.id.clone(), String::new());
-            changed = true;
-        }
-    }
-    let assistant_provider_is_valid = settings.post_process_providers.iter().any(|provider| {
-        provider.id == settings.assistant_provider_id
-            && assistant_provider_is_supported(&provider.id)
-    });
-    if !assistant_provider_is_valid {
-        settings.assistant_provider_id = default_assistant_provider_id();
+    // Seed the built-in profiles on first run.
+    if settings.profiles.is_empty() {
+        settings.profiles = default_profiles();
         changed = true;
     }
-    if settings.assistant_system_prompt.trim().is_empty() {
-        settings.assistant_system_prompt = default_assistant_system_prompt();
+    // The base "default" profile must always exist — it is non-deletable and
+    // is the neutral fallback. Re-seed it if a bad import/edit dropped it.
+    if !settings.profiles.iter().any(|p| p.id == "default") {
+        settings.profiles.insert(0, default_profile());
         changed = true;
     }
-    // Seed the built-in characters on first run, keyed off the (possibly
-    // customized) system prompt so the base "Assistant" preserves it.
-    if settings.assistant_characters.is_empty() {
-        settings.assistant_characters =
-            default_assistant_characters(&settings.assistant_system_prompt);
-        changed = true;
-    }
-    // The base "default" character must always exist — it's non-deletable and
-    // backs the plain system prompt. Re-seed it if a bad import/edit dropped it.
+    // Keep the active-profile id pointing at a profile that still exists.
     if !settings
-        .assistant_characters
+        .profiles
         .iter()
-        .any(|c| c.id == "default")
+        .any(|p| p.id == settings.active_profile_id)
     {
-        settings.assistant_characters.insert(
-            0,
-            default_assistant_character(&settings.assistant_system_prompt),
-        );
+        settings.active_profile_id = default_active_profile_id();
         changed = true;
     }
-    // Keep the active-character id pointing at a character that still exists.
-    if !settings
-        .assistant_characters
-        .iter()
-        .any(|c| c.id == settings.assistant_active_character_id)
-    {
-        settings.assistant_active_character_id = default_active_character_id();
-        changed = true;
-    }
-    if settings.assistant_tts_voice.trim().is_empty() {
-        settings.assistant_tts_voice = default_assistant_tts_voice();
-        changed = true;
-    }
-    if !matches!(
-        settings.assistant_tts_engine.as_str(),
-        "kokoro" | "openai" | "openrouter" | "elevenlabs" | "azure"
-    ) {
-        settings.assistant_tts_engine = default_assistant_tts_engine();
-        changed = true;
-    }
-    if settings.assistant_tts_base_url.trim().is_empty() {
-        settings.assistant_tts_base_url = default_assistant_tts_base_url();
-        changed = true;
-    }
-    // NOTE: the flat `assistant_tts_model` / `assistant_tts_remote_voice` fields
-    // are deliberately NOT forced to a default here. They are loadable picker
-    // fields that start empty (see `default_tts_model_for_engine` /
-    // `default_tts_remote_voice_for_engine`) and are only a mirror of the active
-    // engine's per-engine map, rebuilt by `sync_active_tts_fields`. Forcing them
-    // to OpenAI's `gpt-4o-mini-tts` / `alloy` is exactly what used to leak those
-    // values onto ElevenLabs/Azure (via the migration block below), so the user
-    // saw an `alloy` voice that 404s (`voice_not_found`) under ElevenLabs.
 
-    // Migrate the legacy single-slot TTS config into the per-engine maps. Older
-    // builds stored one base URL / model / voice shared by every engine (and
-    // reset them on every engine switch). Seed the ACTIVE engine's slot from the
-    // flat fields so an upgrade preserves the user's current remote-TTS setup;
-    // other engines start empty and fall back to their own defaults. The flat
-    // fields stay a live mirror of the active engine (see sync_active_tts_fields).
-    // NOTE: the API key is migrated separately in hydrate_secrets, because at
-    // this point the flat key is still blanked (it lives in the keychain).
-    {
-        let engine = settings.assistant_tts_engine.clone();
-        if !settings.assistant_tts_base_url.trim().is_empty()
-            && !settings.assistant_tts_base_urls.contains_key(&engine)
-        {
-            settings
-                .assistant_tts_base_urls
-                .insert(engine.clone(), settings.assistant_tts_base_url.clone());
-            changed = true;
-        }
-        if !settings.assistant_tts_model.trim().is_empty()
-            && !settings.assistant_tts_models.contains_key(&engine)
-        {
-            settings
-                .assistant_tts_models
-                .insert(engine.clone(), settings.assistant_tts_model.clone());
-            changed = true;
-        }
-        if !settings.assistant_tts_remote_voice.trim().is_empty()
-            && !settings.assistant_tts_remote_voices.contains_key(&engine)
-        {
-            settings
-                .assistant_tts_remote_voices
-                .insert(engine.clone(), settings.assistant_tts_remote_voice.clone());
-            changed = true;
-        }
-    }
-    // One-time cleanup for stores polluted by the old leak: the OpenAI voice
-    // (`alloy`) and model (`gpt-4o-mini-tts`) used to get stamped into whatever
-    // engine was active, so ElevenLabs/Azure could end up with an `alloy` voice
-    // that 404s. Those values are invalid for any non-OpenAI engine, so drop them
-    // and let the field fall back to empty — the user then loads + picks a real
-    // voice/model. Runs AFTER the migration block above so a leaked value that
-    // just got re-stamped from the flat mirror is also removed.
-    for engine in ["elevenlabs", "azure"] {
-        if settings
-            .assistant_tts_remote_voices
-            .get(engine)
-            .map(String::as_str)
-            == Some("alloy")
-        {
-            settings.assistant_tts_remote_voices.remove(engine);
-            changed = true;
-        }
-        if settings
-            .assistant_tts_models
-            .get(engine)
-            .map(String::as_str)
-            == Some("gpt-4o-mini-tts")
-        {
-            settings.assistant_tts_models.remove(engine);
-            changed = true;
-        }
-    }
-    if !matches!(
-        settings.assistant_tts_kokoro_dtype.as_str(),
-        "fp32" | "fp16" | "q8" | "q4" | "q4f16" | "q8-cpu"
-    ) {
-        settings.assistant_tts_kokoro_dtype = default_assistant_tts_kokoro_dtype();
-        changed = true;
-    }
-    // Keep conversation memory in a sane range (0 = no memory, 200 hard cap).
-    if settings.assistant_max_history_messages > 200 {
-        settings.assistant_max_history_messages = 200;
-        changed = true;
-    }
-    if !matches!(
-        settings.assistant_font_size.as_str(),
-        "small" | "medium" | "large"
-    ) {
-        settings.assistant_font_size = default_assistant_font_size();
-        changed = true;
-    }
-    if !(0.5..=1.0).contains(&settings.assistant_panel_opacity) {
-        settings.assistant_panel_opacity = default_assistant_panel_opacity();
-        changed = true;
-    }
-    if !matches!(
-        settings.assistant_panel_size.as_str(),
-        "compact" | "standard" | "large"
-    ) {
-        settings.assistant_panel_size = default_assistant_panel_size();
-        changed = true;
-    }
-    // Web search: validate provider and backfill API-key slots for keyed
-    // providers so the settings UI always has entries to bind to. Legacy values
-    // (e.g. the removed "firecrawl"/"duckduckgo") fail this match and migrate to
-    // the default (Serper).
-    if !matches!(
-        settings.assistant_web_search_provider.as_str(),
-        "serper" | "brave" | "tavily" | "exa" | "serpapi" | "tinyfish"
-    ) {
-        settings.assistant_web_search_provider = default_assistant_web_search_provider();
-        changed = true;
-    }
-    if settings.assistant_web_search_max_results == 0
-        || settings.assistant_web_search_max_results > 10
-    {
-        settings.assistant_web_search_max_results = default_assistant_web_search_max_results();
-        changed = true;
-    }
-    for provider_id in ["serper", "brave", "tavily", "exa", "serpapi", "tinyfish"] {
-        if !settings.web_search_api_keys.contains_key(provider_id) {
-            settings
-                .web_search_api_keys
-                .insert(provider_id.to_string(), String::new());
-            changed = true;
-        }
-    }
     changed
 }
 
@@ -2398,13 +1792,6 @@ fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
     {
         settings.post_process_last_cloud_provider_id =
             Some(settings.post_process_provider_id.clone());
-        changed = true;
-    }
-    if settings.assistant_last_cloud_provider_id.is_none()
-        && settings.assistant_provider_id != BUILTIN_POST_PROCESS_PROVIDER_ID
-        && !settings.assistant_provider_id.trim().is_empty()
-    {
-        settings.assistant_last_cloud_provider_id = Some(settings.assistant_provider_id.clone());
         changed = true;
     }
 
@@ -2541,58 +1928,9 @@ pub fn get_default_settings() -> AppSettings {
             description: "Cancels the current recording.".to_string(),
             // Disabled by default: a global Esc cancel swallows Esc presses
             // meant for other apps (closing dialogs/menus) whenever a recording
-            // or assistant reply is active. Users can record a key to enable it.
+            // is active. Users can record a key to enable it.
             default_binding: "".to_string(),
             current_binding: "".to_string(),
-        },
-    );
-
-    #[cfg(target_os = "macos")]
-    let default_assistant_shortcut = "option+ctrl+space";
-    // Windows: modifier-only hold (Left Ctrl + Left Alt), tap Space to go
-    // hands-free. Left-side keys specifically: AltGr on international layouts
-    // reports as Left Ctrl + Right Alt, which must NOT start the assistant.
-    #[cfg(target_os = "windows")]
-    let default_assistant_shortcut = "ctrl_left+alt_left";
-    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-    let default_assistant_shortcut = "ctrl+alt+space";
-
-    bindings.insert(
-        "assistant".to_string(),
-        ShortcutBinding {
-            id: "assistant".to_string(),
-            name: "Assistant".to_string(),
-            description:
-                "Ask the AI assistant by voice; the answer appears in the assistant panel."
-                    .to_string(),
-            default_binding: default_assistant_shortcut.to_string(),
-            current_binding: default_assistant_shortcut.to_string(),
-        },
-    );
-
-    // Note: there's intentionally no dedicated "Assistant + Screen" shortcut.
-    // Ctrl/Cmd+Alt+Shift+Space is reserved as the assistant's hands-free (lock)
-    // variant. Attach a screenshot from the assistant panel's camera button
-    // instead; a dedicated screen shortcut may return later on a free combo.
-
-    #[cfg(target_os = "macos")]
-    let default_panel_toggle_shortcut = "option+ctrl+a";
-    // Windows: must NOT contain the assistant's modifier-only combo
-    // (ctrl_left+alt) as a subset, or opening the panel would also start an
-    // assistant recording. Ctrl+Shift+A stays clear of both recording combos.
-    #[cfg(target_os = "windows")]
-    let default_panel_toggle_shortcut = "ctrl+shift+a";
-    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
-    let default_panel_toggle_shortcut = "ctrl+alt+a";
-
-    bindings.insert(
-        "assistant_panel_toggle".to_string(),
-        ShortcutBinding {
-            id: "assistant_panel_toggle".to_string(),
-            name: "Toggle Assistant Panel".to_string(),
-            description: "Shows or hides the floating assistant panel.".to_string(),
-            default_binding: default_panel_toggle_shortcut.to_string(),
-            current_binding: default_panel_toggle_shortcut.to_string(),
         },
     );
 
@@ -2601,7 +1939,6 @@ pub fn get_default_settings() -> AppSettings {
         push_to_talk: true,
         tap_to_lock: default_tap_to_lock(),
         tap_to_lock_key: default_tap_to_lock_key(),
-        assistant_tap_to_lock_key: default_assistant_tap_to_lock_key(),
         audio_feedback: false,
         audio_feedback_volume: default_audio_feedback_volume(),
         sound_theme: default_sound_theme(),
@@ -2619,7 +1956,6 @@ pub fn get_default_settings() -> AppSettings {
         selected_language: "auto".to_string(),
         overlay_position: default_overlay_position(),
         overlay_style: default_overlay_style(),
-        assistant_overlay_style: default_overlay_style(),
         debug_mode: false,
         log_level: default_log_level(),
         custom_words: Vec::new(),
@@ -2652,9 +1988,6 @@ pub fn get_default_settings() -> AppSettings {
         // point of the repair pass below (several tests rely on that, and a
         // settings write on every launch would be pointless churn).
         post_process_last_cloud_provider_id: Some(default_post_process_provider_id()),
-        flow_enabled: false,
-        flow_phrase: default_flow_phrase(),
-        flow_screen_access: false,
         mute_while_recording: false,
         append_trailing_space: false,
         app_language: default_app_language(),
@@ -2671,57 +2004,14 @@ pub fn get_default_settings() -> AppSettings {
         ort_accelerator: OrtAcceleratorSetting::default(),
         whisper_gpu_device: default_whisper_gpu_device(),
         extra_recording_buffer_ms: 0,
-        assistant_enabled: true,
-        assistant_provider_id: default_assistant_provider_id(),
-        assistant_last_cloud_provider_id: Some(default_assistant_provider_id()),
-        assistant_models: {
-            let mut map = HashMap::new();
-            for provider in default_post_process_providers() {
-                map.insert(provider.id, String::new());
-            }
-            map
-        },
-        assistant_system_prompt: default_assistant_system_prompt(),
-        assistant_screen_access_mode: AssistantScreenAccessMode::default(),
-        assistant_screenshot_enabled: default_assistant_screenshot_enabled(),
-        assistant_vision_capture_timing: VisionCaptureTiming::default(),
-        assistant_tts_enabled: false,
-        assistant_tts_engine: default_assistant_tts_engine(),
-        assistant_tts_voice: default_assistant_tts_voice(),
-        assistant_tts_base_url: default_assistant_tts_base_url(),
-        assistant_tts_api_key: SecretString::default(),
-        assistant_tts_model: default_assistant_tts_model(),
-        assistant_tts_remote_voice: default_assistant_tts_remote_voice(),
-        assistant_tts_base_urls: HashMap::new(),
-        assistant_tts_models: HashMap::new(),
-        assistant_tts_remote_voices: HashMap::new(),
-        assistant_tts_api_keys: SecretMap::default(),
-        assistant_tts_kokoro_dtype: default_assistant_tts_kokoro_dtype(),
-        assistant_tts_speed: default_assistant_tts_speed(),
-        assistant_max_history_messages: default_assistant_max_history_messages(),
-        assistant_auto_summarize: default_assistant_auto_summarize(),
         local_llm_context_size: default_local_llm_context_size(),
-        assistant_response_length: AssistantResponseLength::default(),
-        assistant_characters: default_assistant_characters(&default_assistant_system_prompt()),
-        assistant_active_character_id: default_active_character_id(),
-        assistant_memory_enabled: false,
-        assistant_memory: UserMemory::default(),
-        assistant_memory_detail: MemoryDetail::default(),
-        assistant_memory_incognito: false,
-        assistant_font_size: default_assistant_font_size(),
-        assistant_panel_opacity: default_assistant_panel_opacity(),
-        assistant_panel_size: default_assistant_panel_size(),
-        assistant_tts_stop_on_dictation: false,
-        assistant_web_search_enabled: false,
-        assistant_web_search_provider: default_assistant_web_search_provider(),
-        assistant_web_search_max_results: default_assistant_web_search_max_results(),
-        assistant_web_search_fetch_content: default_assistant_web_search_fetch_content(),
-        assistant_search_depth: AssistantSearchDepth::default(),
-        assistant_web_search_daily_credit_budget: default_assistant_web_search_daily_credit_budget(
-        ),
-        assistant_local_search_smart: false,
-        assistant_prefer_provider_web_search: default_assistant_prefer_provider_web_search(),
-        web_search_api_keys: default_web_search_api_keys(),
+        profiles: default_profiles(),
+        active_profile_id: default_active_profile_id(),
+        memory_enabled: false,
+        memory: UserMemory::default(),
+        memory_detail: MemoryDetail::default(),
+        memory_incognito: false,
+        memory_auto_learn: false,
         theme: Theme::default(),
         ui_text_size: UiTextSize::default(),
         main_window_width: None,
@@ -2740,54 +2030,64 @@ impl Default for AppSettings {
 }
 
 impl AppSettings {
+    // No caller left: the resolver reads the provider list directly.
+    #[allow(dead_code)]
     pub fn active_post_process_provider(&self) -> Option<&PostProcessProvider> {
         self.post_process_providers
             .iter()
             .find(|provider| provider.id == self.post_process_provider_id)
     }
 
-    pub fn active_assistant_provider(&self) -> Option<&PostProcessProvider> {
-        self.post_process_providers
-            .iter()
-            .find(|provider| provider.id == self.assistant_provider_id)
-    }
-
-    /// The currently selected character, falling back to the first available
+    /// The currently selected profile, falling back to the first available
     /// (only `None` when the list is somehow empty).
-    pub fn active_character(&self) -> Option<&AssistantCharacter> {
-        self.assistant_characters
+    pub fn active_profile(&self) -> Option<&Profile> {
+        self.profiles
             .iter()
-            .find(|c| c.id == self.assistant_active_character_id)
-            .or_else(|| self.assistant_characters.first())
+            .find(|p| p.id == self.active_profile_id)
+            .or_else(|| self.profiles.first())
     }
 
-    /// Whether the active character is the no-LLM joke "Cat".
-    pub fn active_character_is_cat(&self) -> bool {
-        self.active_character()
-            .map(|c| c.kind == AssistantCharacterKind::Cat)
-            .unwrap_or(false)
-    }
-
-    /// The effective system prompt for an LLM turn: the active character's
-    /// prompt when it's an LLM persona with a non-empty prompt, otherwise the
-    /// plain `assistant_system_prompt`.
-    pub fn effective_system_prompt(&self) -> String {
-        if let Some(c) = self.active_character() {
-            if c.kind == AssistantCharacterKind::Llm && !c.prompt.trim().is_empty() {
-                return c.prompt.clone();
-            }
+    /// The cleanup prompt id that applies right now: the active profile's own
+    /// choice when it makes one, otherwise the global selection.
+    pub fn effective_prompt_id(&self) -> Option<String> {
+        if let Some(id) = self
+            .active_profile()
+            .map(|p| p.prompt_id.trim())
+            .filter(|id| !id.is_empty())
+        {
+            return Some(id.to_string());
         }
-        self.assistant_system_prompt.clone()
+        self.post_process_selected_prompt_id.clone()
     }
 
-    /// The reply-length preference that applies to the current turn: the active
-    /// persona's own override when it sets one, otherwise the global
-    /// `assistant_response_length`. Feeds the directive appended to the system
-    /// prompt, so each persona can run short or long independently.
-    pub fn effective_response_length(&self) -> AssistantResponseLength {
-        self.active_character()
-            .and_then(|c| c.response_length)
-            .unwrap_or(self.assistant_response_length)
+    /// The tone id that applies right now: the active profile's own choice when
+    /// it makes one, otherwise the global selection.
+    pub fn effective_tone_id(&self) -> Option<String> {
+        if let Some(id) = self
+            .active_profile()
+            .map(|p| p.tone_id.trim())
+            .filter(|id| !id.is_empty())
+        {
+            return Some(id.to_string());
+        }
+        self.post_process_selected_tone_id.clone()
+    }
+
+    /// The active profile's extra instruction layer, if it has one.
+    pub fn effective_profile_instructions(&self) -> Option<String> {
+        self.active_profile()
+            .map(|p| p.instructions.trim())
+            .filter(|t| !t.is_empty())
+            .map(str::to_string)
+    }
+
+    /// Whether personal memory may be injected into the current cleanup pass:
+    /// the feature has to be on, incognito off, and the active profile has to
+    /// opt in.
+    pub fn memory_applies(&self) -> bool {
+        self.memory_enabled
+            && !self.memory_incognito
+            && self.active_profile().map(|p| p.use_memory).unwrap_or(false)
     }
 
     pub fn post_process_provider(&self, provider_id: &str) -> Option<&PostProcessProvider> {
@@ -2804,57 +2104,12 @@ impl AppSettings {
             .iter_mut()
             .find(|provider| provider.id == provider_id)
     }
-
-    /// Mirror the ACTIVE TTS engine's per-engine values (base URL, model, remote
-    /// voice, API key) into the flat `assistant_tts_*` fields that `tts.rs` and
-    /// the settings UI read. The per-engine maps are the source of truth; this
-    /// keeps the single "active" copy in sync so switching engines loads that
-    /// engine's own saved settings instead of sharing/wiping one slot. Falls
-    /// back to each engine's sensible default when a value hasn't been set.
-    pub fn sync_active_tts_fields(&mut self) {
-        let engine = self.assistant_tts_engine.clone();
-        self.assistant_tts_base_url = if engine == "openrouter" {
-            // A preset provider always uses its canonical endpoint. Ignore any
-            // stale value saved by builds that exposed this as an editable field.
-            OPENROUTER_TTS_BASE_URL.to_string()
-        } else {
-            self.assistant_tts_base_urls
-                .get(&engine)
-                .cloned()
-                .filter(|s| !s.trim().is_empty())
-                .unwrap_or_else(|| default_tts_base_url_for_engine(&engine))
-        };
-        self.assistant_tts_model = self
-            .assistant_tts_models
-            .get(&engine)
-            .cloned()
-            .filter(|s| !s.trim().is_empty())
-            .unwrap_or_else(|| default_tts_model_for_engine(&engine));
-        self.assistant_tts_remote_voice = self
-            .assistant_tts_remote_voices
-            .get(&engine)
-            .cloned()
-            .filter(|s| !s.trim().is_empty())
-            .unwrap_or_else(|| default_tts_remote_voice_for_engine(&engine));
-        self.assistant_tts_api_key = SecretString(
-            self.assistant_tts_api_keys
-                .get(&engine)
-                .cloned()
-                .unwrap_or_default(),
-        );
-    }
 }
 
 /// Fixed hosted providers require credentials before a request. Local,
 /// built-in, Apple, custom, and unknown OpenAI-compatible endpoints are kept
 /// permissive because they may be intentionally keyless; a real 401/403 is
 /// still classified at request time.
-/// Apple Intelligence currently has a dedicated cleanup execution path only;
-/// the conversational Assistant uses OpenAI-compatible or built-in providers.
-pub fn assistant_provider_is_supported(provider_id: &str) -> bool {
-    provider_id != APPLE_INTELLIGENCE_PROVIDER_ID
-}
-
 pub(crate) fn post_process_provider_requires_api_key(provider_id: &str) -> bool {
     matches!(
         provider_id,
@@ -2925,8 +2180,8 @@ fn resolve_post_process_candidate(
 }
 
 fn resolve_post_process_tone(settings: &AppSettings) -> (String, Option<String>) {
-    let selected_id = settings
-        .post_process_selected_tone_id
+    let effective_tone_id = settings.effective_tone_id();
+    let selected_id = effective_tone_id
         .as_deref()
         .map(str::trim)
         .filter(|id| !id.is_empty())
@@ -2962,8 +2217,8 @@ pub(crate) fn resolve_post_process_config(
         });
     }
 
-    let prompt_id = settings
-        .post_process_selected_prompt_id
+    let effective_prompt_id = settings.effective_prompt_id();
+    let prompt_id = effective_prompt_id
         .as_deref()
         .map(str::trim)
         .filter(|id| !id.is_empty())
@@ -3000,35 +2255,13 @@ pub(crate) fn resolve_post_process_config(
         (prompt.id.clone(), prompt.prompt.clone())
     };
 
-    let dedicated = resolve_post_process_candidate(
+    let (provider, model, api_key) = resolve_post_process_candidate(
         settings,
         &settings.post_process_provider_id,
         &settings.post_process_models,
         PostProcessConfigSource::DedicatedCleanupSelection,
-    );
-
-    let (provider, model, api_key, source) = match dedicated {
-        Ok((provider, model, api_key)) => (
-            provider,
-            model,
-            api_key,
-            PostProcessConfigSource::DedicatedCleanupSelection,
-        ),
-        Err(dedicated_error) => match resolve_post_process_candidate(
-            settings,
-            &settings.assistant_provider_id,
-            &settings.assistant_models,
-            PostProcessConfigSource::AssistantFallback,
-        ) {
-            Ok((provider, model, api_key)) => (
-                provider,
-                model,
-                api_key,
-                PostProcessConfigSource::AssistantFallback,
-            ),
-            Err(_) => return Err(dedicated_error),
-        },
-    };
+    )?;
+    let source = PostProcessConfigSource::DedicatedCleanupSelection;
 
     let (tone_id, tone_instruction) = resolve_post_process_tone(settings);
     // Derived from the model, never asked of the user: a cleanup fine-tune needs
@@ -3044,6 +2277,8 @@ pub(crate) fn resolve_post_process_config(
         tone_id,
         tone_instruction,
         trained_for_cleanup,
+        profile_instructions: settings.effective_profile_instructions(),
+        memory_applies: settings.memory_applies(),
         source,
         api_key,
     })
@@ -3104,48 +2339,6 @@ fn persist_hydrated_secrets(settings: &mut AppSettings) {
             }
         }
     }
-    let provider_ids: Vec<String> = settings.web_search_api_keys.keys().cloned().collect();
-    for id in provider_ids {
-        let value = settings
-            .web_search_api_keys
-            .get(&id)
-            .cloned()
-            .unwrap_or_default();
-        if crate::secret_store::sync(&crate::secret_store::account_web_search(&id), &value) {
-            if let Some(slot) = settings.web_search_api_keys.get_mut(&id) {
-                slot.clear();
-            }
-        }
-    }
-    // Per-engine assistant TTS keys → keychain, blanked on disk on success.
-    // First make sure the active engine's slot mirrors the flat key so a direct
-    // flat-field write can't be lost when we blank the flat copy below.
-    {
-        let engine = settings.assistant_tts_engine.clone();
-        if !settings.assistant_tts_api_key.0.is_empty() {
-            let entry = settings.assistant_tts_api_keys.entry(engine).or_default();
-            if entry.is_empty() {
-                *entry = settings.assistant_tts_api_key.0.clone();
-            }
-        }
-    }
-    let tts_engines: Vec<String> = settings.assistant_tts_api_keys.keys().cloned().collect();
-    for engine in tts_engines {
-        let value = settings
-            .assistant_tts_api_keys
-            .get(&engine)
-            .cloned()
-            .unwrap_or_default();
-        if crate::secret_store::sync(&crate::secret_store::account_assistant_tts(&engine), &value) {
-            if let Some(slot) = settings.assistant_tts_api_keys.get_mut(&engine) {
-                slot.clear();
-            }
-        }
-    }
-    // The flat active-engine key is a derived mirror of the per-engine map; keep
-    // it out of the plaintext store (the value now lives in the keychain per
-    // engine, or in the map as the fallback when the keychain is unavailable).
-    settings.assistant_tts_api_key = SecretString::default();
 }
 
 /// One-time migration of legacy plaintext keys from the store into the keychain.
@@ -3176,100 +2369,7 @@ fn migrate_plaintext_secrets(settings: &mut AppSettings) -> bool {
             changed = true;
         }
     }
-    let provider_ids: Vec<String> = settings.web_search_api_keys.keys().cloned().collect();
-    for id in provider_ids {
-        let value = settings
-            .web_search_api_keys
-            .get(&id)
-            .cloned()
-            .unwrap_or_default();
-        if !value.is_empty()
-            && crate::secret_store::set(&crate::secret_store::account_web_search(&id), &value)
-        {
-            if let Some(slot) = settings.web_search_api_keys.get_mut(&id) {
-                slot.clear();
-            }
-            changed = true;
-        }
-    }
-    let tts_engines: Vec<String> = settings.assistant_tts_api_keys.keys().cloned().collect();
-    for engine in tts_engines {
-        let value = settings
-            .assistant_tts_api_keys
-            .get(&engine)
-            .cloned()
-            .unwrap_or_default();
-        if !value.is_empty()
-            && crate::secret_store::set(
-                &crate::secret_store::account_assistant_tts(&engine),
-                &value,
-            )
-        {
-            if let Some(slot) = settings.assistant_tts_api_keys.get_mut(&engine) {
-                slot.clear();
-            }
-            changed = true;
-        }
-    }
-    // Legacy plaintext builds had one flat TTS key. Move it directly into the
-    // ACTIVE engine's dedicated account; never recreate the old shared account,
-    // because that allowed one provider's key to populate every later engine.
-    if !settings.assistant_tts_api_key.0.is_empty() {
-        let engine = settings.assistant_tts_engine.clone();
-        let account = crate::secret_store::account_assistant_tts(&engine);
-        let dedicated_exists = crate::secret_store::get(&account).is_some();
-        if dedicated_exists || crate::secret_store::set(&account, &settings.assistant_tts_api_key.0)
-        {
-            settings.assistant_tts_api_keys.entry(engine).or_default();
-            settings.assistant_tts_api_key = SecretString::default();
-            changed = true;
-        }
-    }
     changed
-}
-
-/// Seed a legacy key into exactly one engine. Kept separate from keychain I/O
-/// so the isolation invariant can be regression-tested.
-fn seed_legacy_tts_key_for_active_engine(settings: &mut AppSettings, secret: String) -> bool {
-    let engine = settings.assistant_tts_engine.clone();
-    let entry = settings.assistant_tts_api_keys.entry(engine).or_default();
-    if entry.is_empty() {
-        *entry = secret;
-        true
-    } else {
-        false
-    }
-}
-
-/// Retire the pre-per-engine keychain credential. It is migrated once to the
-/// engine that was active when the upgraded app starts, then deleted. Crucially,
-/// this runs only during startup—not from `hydrate_secrets`—so switching engines
-/// later can never copy this key into another provider.
-fn migrate_legacy_shared_tts_key(settings: &mut AppSettings) -> bool {
-    let Some(legacy) = crate::secret_store::get(crate::secret_store::ACCOUNT_ASSISTANT_TTS) else {
-        return false;
-    };
-
-    let engine = settings.assistant_tts_engine.clone();
-    let account = crate::secret_store::account_assistant_tts(&engine);
-    let dedicated_exists = crate::secret_store::get(&account).is_some();
-    let migrated = dedicated_exists || crate::secret_store::set(&account, &legacy);
-
-    if migrated {
-        // Persist an empty map slot so normal hydration knows this engine has a
-        // dedicated keychain account on every later settings refresh.
-        let inserted = !settings.assistant_tts_api_keys.contains_key(&engine);
-        settings.assistant_tts_api_keys.entry(engine).or_default();
-        if !crate::secret_store::delete(crate::secret_store::ACCOUNT_ASSISTANT_TTS) {
-            warn!("Could not delete the retired shared TTS credential");
-        }
-        inserted
-    } else {
-        // Preserve access for this startup if keychain migration transiently
-        // failed, but do not persist or hydrate it into any other engine.
-        seed_legacy_tts_key_for_active_engine(settings, legacy);
-        false
-    }
 }
 
 /// Re-fill the in-memory secret fields from the OS keychain. No-op when the
@@ -3286,52 +2386,16 @@ fn hydrate_secrets(settings: &mut AppSettings) {
             *value = secret;
         }
     }
-    for (provider_id, value) in settings.web_search_api_keys.iter_mut() {
-        if let Some(secret) =
-            crate::secret_store::get(&crate::secret_store::account_web_search(provider_id))
-        {
-            *value = secret;
-        }
-    }
-    // Per-engine assistant TTS keys from the keychain.
-    let tts_engines: Vec<String> = settings.assistant_tts_api_keys.keys().cloned().collect();
-    for engine in tts_engines {
-        if let Some(secret) =
-            crate::secret_store::get(&crate::secret_store::account_assistant_tts(&engine))
-        {
-            if let Some(slot) = settings.assistant_tts_api_keys.get_mut(&engine) {
-                *slot = secret;
-            }
-        }
-    }
 }
 
 /// Normalizes settings JSON before deserializing the complete object.
 ///
-/// Stores created before `assistant_screen_access_mode` only have the legacy
-/// boolean. Preserve an explicit mode, otherwise migrate false to `Off` and
-/// true (or a missing boolean) to the default `Manual` mode. The migration is
-/// deliberately idempotent so callers can safely apply it at every boundary.
-fn normalize_settings_json(mut raw: serde_json::Value) -> (serde_json::Value, bool) {
-    let Some(settings) = raw.as_object_mut() else {
-        return (raw, false);
-    };
-    if settings.contains_key("assistant_screen_access_mode") {
-        return (raw, false);
-    }
-
-    let mode = match settings
-        .get("assistant_screenshot_enabled")
-        .and_then(serde_json::Value::as_bool)
-    {
-        Some(false) => "off",
-        Some(true) | None => "manual",
-    };
-    settings.insert(
-        "assistant_screen_access_mode".to_string(),
-        serde_json::Value::String(mode.to_string()),
-    );
-    (raw, true)
+/// Nothing needs rewriting in this build: the fields that were renamed away
+/// from the assistant (`profiles`, `memory*`) carry serde aliases, and the
+/// removed ones are simply ignored. Kept as a hook so the callers below stay
+/// unchanged and a future migration has one obvious place to live.
+fn normalize_settings_json(raw: serde_json::Value) -> (serde_json::Value, bool) {
+    (raw, false)
 }
 
 fn deserialize_settings_value(raw: serde_json::Value) -> (AppSettings, bool) {
@@ -3414,7 +2478,7 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
         // to the current default. Customized bindings are left alone,
         // but their "reset" target (default_binding) is refreshed.
         // Covers the Esc-cancel removal and the Windows modifier-only
-        // remap (transcribe/assistant/panel toggle).
+        // remap of the transcribe bindings.
         for (key, code_default) in &default_settings.bindings {
             if let Some(stored) = settings.bindings.get_mut(key) {
                 if stored.default_binding != code_default.default_binding {
@@ -3438,10 +2502,6 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
                 settings.tap_to_lock_key = "space".to_string();
                 updated = true;
             }
-            if settings.assistant_tap_to_lock_key == "shift" {
-                settings.assistant_tap_to_lock_key = "space".to_string();
-                updated = true;
-            }
         }
 
         // Merge default bindings into existing settings
@@ -3454,13 +2514,15 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
         }
 
         // Drop obsolete bindings from older settings files so they stop
-        // being registered:
-        //  - transcribe_toggle: the main shortcuts now lock hands-free
-        //    via their Shift variant, so the standalone toggle is gone.
-        //  - assistant_vision: Ctrl/Cmd+Alt+Shift+Space is now the
-        //    assistant's hands-free variant; screenshots come from the
-        //    panel's camera button instead.
-        for obsolete in ["transcribe_toggle", "assistant_vision"] {
+        // being registered. `transcribe_toggle` predates the Shift-variant
+        // hands-free lock; the rest belonged to the assistant panel, Flow, and
+        // the screen-vision feature, none of which exist in this build.
+        for obsolete in [
+            "transcribe_toggle",
+            "assistant",
+            "assistant_vision",
+            "assistant_panel_toggle",
+        ] {
             if settings.bindings.remove(obsolete).is_some() {
                 debug!("Removing obsolete '{}' binding", obsolete);
                 updated = true;
@@ -3479,7 +2541,7 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
         default_settings
     };
 
-    if ensure_post_process_defaults(&mut settings) | ensure_assistant_defaults(&mut settings) {
+    if ensure_post_process_defaults(&mut settings) | ensure_profile_defaults(&mut settings) {
         store.set("settings", serde_json::to_value(&settings).unwrap());
     }
 
@@ -3488,16 +2550,11 @@ pub fn load_or_create_app_settings(app: &AppHandle) -> AppSettings {
     // stripped from the JSON; the rest stay on disk (fallback). This never
     // deletes a keychain entry based on an already-stripped value, so restarts
     // are safe. Persist only if something actually moved.
-    if crate::secret_store::is_available() {
-        let secrets_migrated =
-            migrate_plaintext_secrets(&mut settings) | migrate_legacy_shared_tts_key(&mut settings);
-        if secrets_migrated {
-            store.set("settings", serde_json::to_value(&settings).unwrap());
-        }
+    if crate::secret_store::is_available() && migrate_plaintext_secrets(&mut settings) {
+        store.set("settings", serde_json::to_value(&settings).unwrap());
     }
 
-    // Fill the in-memory secrets from dedicated keychain accounts. The retired
-    // shared TTS account is intentionally never consulted here.
+    // Fill the in-memory secrets from dedicated keychain accounts.
     hydrate_secrets(&mut settings);
 
     settings
@@ -3565,7 +2622,7 @@ pub fn get_settings(app: &AppHandle) -> AppSettings {
         (get_default_settings(), true)
     };
 
-    if ensure_post_process_defaults(&mut settings) | ensure_assistant_defaults(&mut settings) {
+    if ensure_post_process_defaults(&mut settings) | ensure_profile_defaults(&mut settings) {
         updated = true;
     }
     if updated {
@@ -3577,12 +2634,6 @@ pub fn get_settings(app: &AppHandle) -> AppSettings {
     // plaintext fallback in place — when the keychain is unavailable.
     hydrate_secrets(&mut settings);
 
-    // Mirror the active TTS engine's per-engine values into the flat fields
-    // `tts.rs` / the UI read. The per-engine maps are the source of truth; this
-    // must run after hydration so the active engine's API key (restored from the
-    // keychain into the map) is reflected in the flat field too.
-    settings.sync_active_tts_fields();
-
     settings
 }
 
@@ -3590,10 +2641,6 @@ pub fn write_settings(app: &AppHandle, mut settings: AppSettings) {
     let store = app
         .store(crate::portable::store_path(SETTINGS_STORE_PATH))
         .expect("Failed to initialize store");
-
-    // The enum is the source of truth. Keep the former boolean synchronized for
-    // compatibility with capture paths that have not migrated yet.
-    sync_assistant_screen_access_compat(&mut settings);
 
     // Keep API keys in the OS keychain, never in the on-disk store. Each key is
     // blanked from the serialized copy only after the keychain confirms it holds
@@ -3637,167 +2684,6 @@ mod tests {
 
     fn default_settings_json() -> serde_json::Value {
         serde_json::to_value(get_default_settings()).unwrap()
-    }
-
-    #[test]
-    fn screen_access_normalization_migrates_legacy_true_false_and_missing() {
-        for (raw, expected_mode, expected_enabled) in [
-            (
-                serde_json::json!({ "assistant_screenshot_enabled": false }),
-                AssistantScreenAccessMode::Off,
-                false,
-            ),
-            (
-                serde_json::json!({ "assistant_screenshot_enabled": true }),
-                AssistantScreenAccessMode::Manual,
-                true,
-            ),
-            (
-                serde_json::json!({}),
-                AssistantScreenAccessMode::Manual,
-                true,
-            ),
-        ] {
-            let (normalized, changed) = normalize_settings_json(raw);
-            assert!(changed);
-            assert_eq!(
-                normalized["assistant_screen_access_mode"],
-                serde_json::to_value(expected_mode).unwrap()
-            );
-
-            let settings: AppSettings = serde_json::from_value(normalized).unwrap();
-            assert_eq!(settings.assistant_screen_access_mode, expected_mode);
-            assert_eq!(settings.assistant_screenshot_enabled, expected_enabled);
-        }
-    }
-
-    #[test]
-    fn startup_and_defensive_get_share_screen_mode_migration_boundary() {
-        for (raw, expected) in [
-            (
-                serde_json::json!({ "assistant_screenshot_enabled": false }),
-                AssistantScreenAccessMode::Off,
-            ),
-            (
-                serde_json::json!({ "assistant_screenshot_enabled": true }),
-                AssistantScreenAccessMode::Manual,
-            ),
-            (serde_json::json!({}), AssistantScreenAccessMode::Manual),
-        ] {
-            let (settings, updated) = deserialize_settings_value(raw);
-            assert!(updated);
-            assert_eq!(settings.assistant_screen_access_mode, expected);
-        }
-
-        let (agent, updated) = deserialize_settings_value(serde_json::json!({
-            "assistant_screen_access_mode": "agent_decides",
-            "assistant_screenshot_enabled": false
-        }));
-        assert!(!updated);
-        assert_eq!(
-            agent.assistant_screen_access_mode,
-            AssistantScreenAccessMode::AgentDecides
-        );
-
-        let (salvaged, updated) = deserialize_settings_value(serde_json::json!({
-            "assistant_screenshot_enabled": false,
-            "sound_theme": "invalid-neighbor"
-        }));
-        assert!(updated);
-        assert_eq!(
-            salvaged.assistant_screen_access_mode,
-            AssistantScreenAccessMode::Off
-        );
-    }
-
-    #[test]
-    fn screen_access_normalization_preserves_existing_agent_mode() {
-        let raw = serde_json::json!({
-            "assistant_screen_access_mode": "agent_decides",
-            "assistant_screenshot_enabled": false
-        });
-        let original = raw.clone();
-
-        let (normalized, changed) = normalize_settings_json(raw);
-        assert!(!changed);
-        assert_eq!(normalized, original);
-
-        let mut settings: AppSettings = serde_json::from_value(normalized).unwrap();
-        assert_eq!(
-            settings.assistant_screen_access_mode,
-            AssistantScreenAccessMode::AgentDecides
-        );
-        assert!(sync_assistant_screen_access_compat(&mut settings));
-        assert!(settings.assistant_screenshot_enabled);
-        assert_eq!(
-            settings.assistant_screen_access_mode,
-            AssistantScreenAccessMode::AgentDecides
-        );
-    }
-
-    #[test]
-    fn screen_access_normalization_is_idempotent() {
-        let raw = serde_json::json!({ "assistant_screenshot_enabled": false });
-        let (once, first_changed) = normalize_settings_json(raw);
-        let (twice, second_changed) = normalize_settings_json(once.clone());
-
-        assert!(first_changed);
-        assert!(!second_changed);
-        assert_eq!(twice, once);
-    }
-
-    #[test]
-    fn salvage_keeps_migrated_off_mode_when_neighboring_field_is_invalid() {
-        let raw = serde_json::json!({
-            "assistant_screenshot_enabled": false,
-            "selected_model": "keep-this-model",
-            "sound_theme": "theremin"
-        });
-        let (normalized, _) = normalize_settings_json(raw.clone());
-        assert!(serde_json::from_value::<AppSettings>(normalized).is_err());
-
-        let salvaged = salvage_settings(&raw);
-        assert_eq!(
-            salvaged.assistant_screen_access_mode,
-            AssistantScreenAccessMode::Off
-        );
-        assert!(!salvaged.assistant_screenshot_enabled);
-        assert_eq!(salvaged.selected_model, "keep-this-model");
-        assert_eq!(salvaged.sound_theme, default_sound_theme());
-    }
-
-    #[test]
-    fn unrelated_write_equivalent_round_trip_preserves_screen_access_mode() {
-        for (mode, expected_enabled) in [
-            (AssistantScreenAccessMode::Off, false),
-            (AssistantScreenAccessMode::Manual, true),
-            (AssistantScreenAccessMode::AgentDecides, true),
-        ] {
-            let mut settings = get_default_settings();
-            settings.assistant_screen_access_mode = mode;
-            settings.assistant_screenshot_enabled = !expected_enabled;
-            settings.history_limit = 37;
-
-            assert!(sync_assistant_screen_access_compat(&mut settings));
-            let serialized = serde_json::to_value(settings).unwrap();
-            let (normalized, changed) = normalize_settings_json(serialized);
-            assert!(!changed);
-
-            let round_trip: AppSettings = serde_json::from_value(normalized).unwrap();
-            assert_eq!(round_trip.assistant_screen_access_mode, mode);
-            assert_eq!(round_trip.assistant_screenshot_enabled, expected_enabled);
-            assert_eq!(round_trip.history_limit, 37);
-        }
-    }
-
-    #[test]
-    fn fresh_defaults_use_manual_screen_access() {
-        let settings = get_default_settings();
-        assert_eq!(
-            settings.assistant_screen_access_mode,
-            AssistantScreenAccessMode::Manual
-        );
-        assert!(settings.assistant_screenshot_enabled);
     }
 
     fn custom_prompt(id: &str, prompt: &str) -> LLMPrompt {
@@ -4194,18 +3080,12 @@ mod tests {
         // first device → cloud round trip after upgrading.
         let mut settings = get_default_settings();
         settings.post_process_provider_id = "openai".to_string();
-        settings.assistant_provider_id = "groq".to_string();
         settings.post_process_last_cloud_provider_id = None;
-        settings.assistant_last_cloud_provider_id = None;
 
         assert!(ensure_post_process_defaults(&mut settings));
         assert_eq!(
             settings.post_process_last_cloud_provider_id.as_deref(),
             Some("openai")
-        );
-        assert_eq!(
-            settings.assistant_last_cloud_provider_id.as_deref(),
-            Some("groq")
         );
 
         // The built-in engine is not a cloud provider, so it must never be
@@ -4213,12 +3093,9 @@ mod tests {
         // "On my device" and appear to do nothing.
         let mut on_device = get_default_settings();
         on_device.post_process_provider_id = BUILTIN_POST_PROCESS_PROVIDER_ID.to_string();
-        on_device.assistant_provider_id = BUILTIN_POST_PROCESS_PROVIDER_ID.to_string();
         on_device.post_process_last_cloud_provider_id = None;
-        on_device.assistant_last_cloud_provider_id = None;
         ensure_post_process_defaults(&mut on_device);
         assert!(on_device.post_process_last_cloud_provider_id.is_none());
-        assert!(on_device.assistant_last_cloud_provider_id.is_none());
     }
 
     #[test]
@@ -4252,10 +3129,6 @@ mod tests {
     fn resolver_prefers_valid_dedicated_selection_and_trims_model() {
         let mut settings = get_default_settings();
         configure_target(&mut settings, "openai", "  cleanup-model  ", "secret");
-        settings.assistant_provider_id = "builtin".to_string();
-        settings
-            .assistant_models
-            .insert("builtin".to_string(), "assistant-model".to_string());
 
         let resolved = resolve_post_process_config(&settings).expect("dedicated config");
         assert_eq!(
@@ -4265,36 +3138,6 @@ mod tests {
         assert_eq!(resolved.provider.id, "openai");
         assert_eq!(resolved.model, "cleanup-model");
         assert_eq!(resolved.api_key, "secret");
-    }
-
-    #[test]
-    fn resolver_uses_keyless_builtin_assistant_fallback_for_missing_dedicated_model() {
-        let mut settings = get_default_settings();
-        configure_target(&mut settings, "openai", "   ", "secret");
-        settings.assistant_provider_id = "builtin".to_string();
-        settings
-            .assistant_models
-            .insert("builtin".to_string(), "  local-assistant  ".to_string());
-
-        let resolved = resolve_post_process_config(&settings).expect("assistant fallback");
-        assert_eq!(resolved.source, PostProcessConfigSource::AssistantFallback);
-        assert_eq!(resolved.provider.id, "builtin");
-        assert_eq!(resolved.model, "local-assistant");
-        assert!(resolved.api_key.is_empty());
-    }
-
-    #[test]
-    fn resolver_falls_back_when_dedicated_cloud_key_is_missing() {
-        let mut settings = get_default_settings();
-        configure_target(&mut settings, "openai", "cleanup-model", " ");
-        settings.assistant_provider_id = "custom".to_string();
-        settings
-            .assistant_models
-            .insert("custom".to_string(), "keyless-model".to_string());
-
-        let resolved = resolve_post_process_config(&settings).expect("keyless custom fallback");
-        assert_eq!(resolved.source, PostProcessConfigSource::AssistantFallback);
-        assert_eq!(resolved.provider.id, "custom");
     }
 
     #[test]
@@ -4366,114 +3209,6 @@ mod tests {
         assert!(!json.contains("do-not-serialize-this-key"));
         assert!(!json.contains(default_improve_transcriptions_prompt()));
         assert!(!json.contains("api.openai.com"));
-    }
-
-    /// Loadable TTS fields start empty for every engine so the user presses the
-    /// reload button and picks, instead of inheriting OpenAI's `alloy` /
-    /// `gpt-4o-mini-tts` (which 404 under ElevenLabs/Azure).
-    #[test]
-    fn tts_voice_and_model_defaults_are_empty_for_all_engines() {
-        for engine in ["openai", "elevenlabs", "azure", "kokoro"] {
-            assert_eq!(default_tts_remote_voice_for_engine(engine), "");
-            assert_eq!(default_tts_model_for_engine(engine), "");
-        }
-        assert_eq!(default_assistant_tts_remote_voice(), "");
-        assert_eq!(default_assistant_tts_model(), "");
-    }
-
-    #[test]
-    fn legacy_tts_key_is_scoped_to_only_the_startup_active_engine() {
-        let mut settings = get_default_settings();
-        settings.assistant_tts_engine = "elevenlabs".to_string();
-
-        assert!(seed_legacy_tts_key_for_active_engine(
-            &mut settings,
-            "legacy-elevenlabs-key".to_string(),
-        ));
-        settings.sync_active_tts_fields();
-        assert_eq!(settings.assistant_tts_api_key.0, "legacy-elevenlabs-key");
-
-        // Selecting another engine must produce an empty key, not copy the
-        // legacy ElevenLabs credential into OpenRouter (or any other engine).
-        settings.assistant_tts_engine = "openrouter".to_string();
-        settings.sync_active_tts_fields();
-        assert_eq!(settings.assistant_tts_api_key.0, "");
-        assert!(!settings.assistant_tts_api_keys.contains_key("openrouter"));
-
-        // A real engine-specific key always wins over a legacy seed.
-        settings
-            .assistant_tts_api_keys
-            .insert("openrouter".to_string(), "real-openrouter-key".to_string());
-        assert!(!seed_legacy_tts_key_for_active_engine(
-            &mut settings,
-            "wrong-shared-key".to_string(),
-        ));
-        settings.sync_active_tts_fields();
-        assert_eq!(settings.assistant_tts_api_key.0, "real-openrouter-key");
-    }
-
-    #[test]
-    fn assistant_provider_repair_rejects_unknown_and_cleanup_only_ids() {
-        let mut apple = get_default_settings();
-        apple.assistant_provider_id = APPLE_INTELLIGENCE_PROVIDER_ID.to_string();
-        assert!(ensure_assistant_defaults(&mut apple));
-        assert_eq!(apple.assistant_provider_id, default_assistant_provider_id());
-
-        let mut unknown = get_default_settings();
-        unknown.assistant_provider_id = "removed-provider".to_string();
-        assert!(ensure_assistant_defaults(&mut unknown));
-        assert_eq!(
-            unknown.assistant_provider_id,
-            default_assistant_provider_id()
-        );
-
-        let mut valid = get_default_settings();
-        valid.assistant_provider_id = "builtin".to_string();
-        ensure_assistant_defaults(&mut valid);
-        assert_eq!(valid.assistant_provider_id, "builtin");
-    }
-
-    /// A store polluted by the old leak (OpenAI's `alloy` voice /
-    /// `gpt-4o-mini-tts` model stamped into a non-OpenAI engine slot) is healed:
-    /// `ensure_assistant_defaults` strips those bogus values so the field falls
-    /// back to empty, while a legitimate value (a real ElevenLabs voice id, or
-    /// the correct `eleven_flash_v2_5` model) is left untouched.
-    #[test]
-    fn ensure_assistant_defaults_strips_leaked_openai_tts_values() {
-        let mut settings = get_default_settings();
-        settings.assistant_tts_engine = "elevenlabs".to_string();
-        settings
-            .assistant_tts_remote_voices
-            .insert("elevenlabs".to_string(), "alloy".to_string());
-        settings
-            .assistant_tts_models
-            .insert("elevenlabs".to_string(), "gpt-4o-mini-tts".to_string());
-        settings
-            .assistant_tts_remote_voices
-            .insert("azure".to_string(), "alloy".to_string());
-        // A legitimate value must survive the cleanup.
-        settings
-            .assistant_tts_models
-            .insert("azure".to_string(), "eleven_flash_v2_5".to_string());
-
-        ensure_assistant_defaults(&mut settings);
-
-        assert_eq!(settings.assistant_tts_remote_voices.get("elevenlabs"), None);
-        assert_eq!(settings.assistant_tts_models.get("elevenlabs"), None);
-        assert_eq!(settings.assistant_tts_remote_voices.get("azure"), None);
-        assert_eq!(
-            settings
-                .assistant_tts_models
-                .get("azure")
-                .map(String::as_str),
-            Some("eleven_flash_v2_5")
-        );
-
-        // After the flat mirror is rebuilt, the active ElevenLabs engine shows
-        // an empty voice/model (placeholder), not a leaked `alloy`.
-        settings.sync_active_tts_fields();
-        assert_eq!(settings.assistant_tts_remote_voice, "");
-        assert_eq!(settings.assistant_tts_model, "");
     }
 
     /// The enlarged "Live" overlay is only for models that natively support

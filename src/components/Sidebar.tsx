@@ -6,7 +6,7 @@ import {
   FlaskConical,
   History,
   Info,
-  MessageCircle,
+  Sparkles,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -17,7 +17,7 @@ import {
   HistorySettings,
   DebugSettings,
   AboutSettings,
-  AssistantSection,
+  ProfilesSection,
 } from "./settings";
 
 export type SidebarSection = keyof typeof SECTIONS_CONFIG;
@@ -37,10 +37,9 @@ interface SectionConfig {
   enabled: (settings: any) => boolean;
 }
 
-// Five top-level sections (+ a debug section gated by debug_mode). The old
-// Models / Advanced / Post Process / Profiles / Memory sections were folded in:
-// Models + Post Process live inside Dictation; Profiles + Memory are sub-pages
-// of Assistant (see AssistantSection); Advanced's rows moved into General
+// Five top-level sections (+ a debug section gated by debug_mode). Models and
+// Post Process live inside Dictation; Profiles + Memory are sub-pages of
+// Personalization (see ProfilesSection); Advanced's rows moved into General
 // (a "More options" fold) and History (retention fold). Internal keys are kept
 // minimal and stable so `t()` call sites and code don't churn.
 export const SECTIONS_CONFIG = {
@@ -56,10 +55,10 @@ export const SECTIONS_CONFIG = {
     component: DictationSettings,
     enabled: () => true,
   },
-  assistant: {
-    labelKey: "sidebar.assistant",
-    icon: MessageCircle,
-    component: AssistantSection,
+  personalization: {
+    labelKey: "sidebar.personalization",
+    icon: Sparkles,
+    component: ProfilesSection,
     enabled: () => true,
   },
   history: {

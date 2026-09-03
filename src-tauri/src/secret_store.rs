@@ -27,32 +27,16 @@ use log::{debug, warn};
 
 /// Keyring *service* name. Matches the app's bundle identifier so all secrets
 /// are grouped under the app in the OS credential viewer.
-const SERVICE: &str = "com.abhishekbarali.speakoflow";
+const SERVICE: &str = "com.speakoflow.light";
 
 /// Account used only to detect whether the keychain backend works at all. It is
 /// never written, so the probe is non-destructive.
 const PROBE_ACCOUNT: &str = "__speakoflow_keychain_probe__";
 
-/// Account name for the single assistant TTS API key.
-pub const ACCOUNT_ASSISTANT_TTS: &str = "assistant_tts";
-
-/// Account name for a per-engine assistant TTS key, keyed by engine id
-/// (e.g. `assistant_tts:openai`). Each remote TTS engine (openai / elevenlabs /
-/// azure) keeps its own key instead of sharing one slot.
-pub fn account_assistant_tts(engine: &str) -> String {
-    format!("assistant_tts:{engine}")
-}
-
-/// Account name for a post-processing/assistant provider key, keyed by provider
+/// Account name for a post-processing provider key, keyed by provider
 /// id (e.g. `post_process:openai`).
 pub fn account_post_process(provider_id: &str) -> String {
     format!("post_process:{provider_id}")
-}
-
-/// Account name for a web-search provider key, keyed by provider id
-/// (e.g. `web_search:brave`).
-pub fn account_web_search(provider_id: &str) -> String {
-    format!("web_search:{provider_id}")
 }
 
 /// account -> cached value. `Some(None)` means "known to be absent" so repeated
@@ -259,9 +243,8 @@ mod tests {
     #[test]
     fn account_names_are_namespaced_by_kind() {
         assert_eq!(account_post_process("openai"), "post_process:openai");
-        assert_eq!(account_web_search("brave"), "web_search:brave");
-        assert_eq!(ACCOUNT_ASSISTANT_TTS, "assistant_tts");
-        // Different kinds with the same provider id must not collide.
-        assert_ne!(account_post_process("groq"), account_web_search("groq"));
+        // The prefix is what keeps a provider id from colliding with a future
+        // account kind that happens to reuse the same id.
+        assert!(account_post_process("groq").starts_with("post_process:"));
     }
 }

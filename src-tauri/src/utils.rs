@@ -25,51 +25,6 @@ pub fn cancel_current_operation(app: &AppHandle) {
     let recording_was_active = audio_manager.is_recording();
     audio_manager.cancel_recording();
 
-    // Cancel any in-flight Flow generation and ensure a cancelled recording's
-    // live-transcript watcher cannot leak into the next recording mode.
-    crate::flow::cancel_generation();
-    crate::flow::stop_prewarm_watch();
-
-    // Drop any screen frame grabbed at the start of a voice question (Immediate
-    // vision timing) so a cancelled capture never rides along with a later turn.
-    crate::assistant::clear_immediate_capture();
-
-    // Whether this cancellation belongs to the assistant: either a turn is in
-    // flight, or the recording being cancelled was routed to the assistant.
-    // Read before `request_cancel()` below, while the turn still reports busy.
-    let assistant_owns_cancel = app
-        .try_state::<crate::assistant::AssistantConversation>()
-        .map(|conversation| conversation.is_busy())
-        .unwrap_or(false)
-        || crate::assistant::is_transcribe_redirected();
-
-    // Abort any in-flight assistant turn (streaming LLM answer) and silence a
-    // spoken reply that's playing or about to play, so cancel (Esc / the pill's
-    // stop button) stops a reply mid-generation — not only a recording. All of
-    // these are no-ops when the assistant is idle.
-    if let Some(conversation) = app.try_state::<crate::assistant::AssistantConversation>() {
-        conversation.request_cancel();
-    }
-    crate::tts::stop_remote();
-    {
-        use tauri::Emitter;
-        let _ = app.emit("assistant-tts-stop", ());
-    }
-    // Reset the assistant panel/pill to idle. The panel renders purely from
-    // `assistant-state` events, so without this an in-progress capture
-    // (listening / transcribing / thinking / speaking) stays visually stuck
-    // after a cancel even though the recording and turn have actually stopped —
-    // the "I pressed cancel and nothing happened" bug. Safe/idempotent when the
-    // panel is hidden or already idle.
-    crate::assistant::emit_state(app, "idle");
-    // The compact voice overlay is transient, so cancelling an assistant turn
-    // dismisses it. Cancelling a plain dictation leaves it alone: `Esc` during
-    // dictation shouldn't close the assistant, and `hide_assistant_panel` ends
-    // the conversation for memory distillation.
-    if assistant_owns_cancel {
-        crate::assistant::dismiss_voice_overlay(app);
-    }
-
     // Update tray icon and hide overlay
     change_tray_icon(app, crate::tray::TrayIconState::Idle);
     hide_recording_overlay(app);

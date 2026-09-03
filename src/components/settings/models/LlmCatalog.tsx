@@ -7,11 +7,9 @@ import {
   Check,
   ChevronDown,
   Download,
-  Eye,
   FileQuestion,
   HardDrive,
   MemoryStick,
-  MessageSquareText,
   Search,
   Trash2,
 } from "lucide-react";
@@ -36,53 +34,23 @@ import type { ModelCardStatus } from "../../onboarding/ModelCard";
 const BUILTIN_PROVIDER_ID = "builtin";
 
 /**
- * Which job the catalog is picking a model for.
- *
- * The two roles want genuinely different models — a 0.8B cleanup fine-tune is
- * the best choice for dictation cleanup and useless as a conversational
- * assistant — so they get different featured lists and write to different
- * provider slots. They share everything else: one download list, one Hugging
- * Face importer, one "use a model I already have" flow. Splitting the component
- * instead would have meant maintaining two copies of the download UI, and
- * routing cleanup through the assistant's page (the old behaviour) meant a user
- * changing their cleanup model had to visit a page about something else.
- */
-export type LlmCatalogRole = "assistant" | "cleanup";
-
-/**
- * A deliberately small, conversation-first set. The recommendation is an
- * editorial quality/latency choice, never a hardware score.
- */
-const RECOMMENDED_ASSISTANT_MODELS = [
-  { id: "gemma-4-e2b", supportsVision: true, isRecommended: false },
-  { id: "gemma-4-e4b", supportsVision: true, isRecommended: true },
-  { id: "gemma-4-12b", supportsVision: true, isRecommended: false },
-] as const;
-
-/**
  * The cleanup shortlist: our own fine-tune, then the smallest general models
  * that can do the job. Anything larger is a waste here — cleanup runs after
  * every dictation, so latency matters more than capability, and the transform is
  * narrow enough that a specialist beats a bigger generalist.
+ *
+ * (Upstream also carried a conversation-first list here, for the assistant
+ * panel's model picker. This build has one role.)
  */
 const RECOMMENDED_CLEANUP_MODELS = [
-  { id: "speakoflow-mini", supportsVision: false, isRecommended: true },
-  { id: "gemma-3-1b", supportsVision: false, isRecommended: false },
-  { id: "gemma-4-e2b", supportsVision: true, isRecommended: false },
+  { id: "speakoflow-mini", isRecommended: true },
+  { id: "gemma-3-1b", isRecommended: false },
+  { id: "gemma-4-e2b", isRecommended: false },
 ] as const;
 
 type RecommendedModelMeta = {
   id: string;
-  supportsVision: boolean;
   isRecommended: boolean;
-};
-
-const RECOMMENDED_BY_ROLE: Record<
-  LlmCatalogRole,
-  readonly RecommendedModelMeta[]
-> = {
-  assistant: RECOMMENDED_ASSISTANT_MODELS,
-  cleanup: RECOMMENDED_CLEANUP_MODELS,
 };
 
 interface CatalogModelRowProps {
@@ -90,8 +58,6 @@ interface CatalogModelRowProps {
   status: ModelCardStatus;
   meta?: RecommendedModelMeta;
   isRecommended?: boolean;
-  /** Screen vision is meaningless for a cleanup model — don't advertise it. */
-  hideVisionPill?: boolean;
   protectedFromDelete?: boolean;
   downloadProgress?: number;
   downloadSpeed?: number;
@@ -107,7 +73,6 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
   status,
   meta,
   isRecommended = false,
-  hideVisionPill = false,
   protectedFromDelete = false,
   downloadProgress,
   downloadSpeed,
@@ -188,25 +153,9 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
             </p>
 
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              {meta && !hideVisionPill ? (
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-surface-strong px-2 py-1 text-[11px] font-medium text-muted">
-                  {meta.supportsVision ? (
-                    <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                  ) : (
-                    <MessageSquareText
-                      className="h-3.5 w-3.5"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {t(
-                    meta.supportsVision
-                      ? "onboarding.aiModel.seesScreen"
-                      : "onboarding.aiModel.textOnly",
-                  )}
-                </span>
-              ) : model.is_custom ? (
+              {model.is_custom ? (
                 <span className="inline-flex items-center rounded-md bg-surface-strong px-2 py-1 text-[11px] font-medium text-muted">
-                  {t("settings.assistant.characters.custom")}
+                  {t("settings.cleanupModels.custom")}
                 </span>
               ) : null}
               <span className="inline-flex items-center gap-1.5 rounded-md bg-surface-strong px-2 py-1 text-[11px] font-medium tabular-nums text-muted">
@@ -228,7 +177,7 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
             onClick={() => setDetailsOpen((open) => !open)}
             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted transition-colors duration-150 hover:bg-surface-strong hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           >
-            {t("settings.assistant.brain.details")}
+            {t("settings.cleanupModels.details")}
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform duration-150 motion-reduce:transition-none ${detailsOpen ? "rotate-180" : ""}`}
               aria-hidden="true"
@@ -287,7 +236,7 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
               aria-label={t("common.delete")}
               title={
                 deleteBlocked
-                  ? t("settings.assistant.brain.switchBeforeDelete")
+                  ? t("settings.cleanupModels.switchBeforeDelete")
                   : t("common.delete")
               }
               className={`inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 ${
@@ -356,14 +305,14 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
           <p className="text-xs leading-relaxed text-muted">{description}</p>
           <dl className="mt-3 grid gap-x-4 gap-y-1.5 text-[11px] sm:grid-cols-[auto_1fr]">
             <dt className="font-medium text-muted">
-              {t("settings.assistant.brain.detailFile")}
+              {t("settings.cleanupModels.detailFile")}
             </dt>
             <dd className="break-all font-mono text-muted">{fileName}</dd>
 
             {model.local_path && (
               <>
                 <dt className="font-medium text-muted">
-                  {t("settings.assistant.brain.detailLocation")}
+                  {t("settings.cleanupModels.detailLocation")}
                 </dt>
                 <dd className="break-all font-mono text-muted">
                   {model.local_path}
@@ -374,14 +323,14 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
             {quant && (
               <>
                 <dt className="font-medium text-muted">
-                  {t("settings.assistant.brain.detailFormat")}
+                  {t("settings.cleanupModels.detailFormat")}
                 </dt>
                 <dd className="font-mono text-muted">{quant}</dd>
               </>
             )}
 
             <dt className="font-medium text-muted">
-              {t("settings.assistant.brain.detailId")}
+              {t("settings.cleanupModels.detailId")}
             </dt>
             <dd className="break-all font-mono text-muted">{model.id}</dd>
           </dl>
@@ -392,14 +341,11 @@ const CatalogModelRow: React.FC<CatalogModelRowProps> = ({
 };
 
 /**
- * On-device model browser, shared by the assistant and dictation cleanup. The
- * short curated list is ordered by responsiveness and capability for the role;
- * hardware facts are shown as context only and never converted into an automatic
- * model ranking.
+ * On-device model browser for the dictation-cleanup model. The short curated
+ * list is ordered by responsiveness and capability; hardware facts are shown as
+ * context only and never converted into an automatic model ranking.
  */
-export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
-  role = "assistant",
-}) => {
+export const LlmCatalog: React.FC = () => {
   const { t } = useTranslation();
   const { settings, refreshSettings } = useSettings();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -467,49 +413,32 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
     };
   }, []);
 
-  const isCleanup = role === "cleanup";
   const activeModelId =
-    (isCleanup
-      ? settings?.post_process_models?.[BUILTIN_PROVIDER_ID]
-      : settings?.assistant_models?.[BUILTIN_PROVIDER_ID]) ?? "";
+    settings?.post_process_models?.[BUILTIN_PROVIDER_ID] ?? "";
   const providerIsBuiltin =
-    (isCleanup
-      ? settings?.post_process_provider_id
-      : settings?.assistant_provider_id) === BUILTIN_PROVIDER_ID;
-  // What the *other* role is using. Only needed to protect it from deletion:
-  // assistant and cleanup share one download list, so each can delete the
-  // other's model out from under it.
-  const otherRoleModelId =
-    (isCleanup
-      ? settings?.assistant_models?.[BUILTIN_PROVIDER_ID]
-      : settings?.post_process_models?.[BUILTIN_PROVIDER_ID]) ?? "";
+    settings?.post_process_provider_id === BUILTIN_PROVIDER_ID;
 
   const llmModels = useMemo(
     () =>
       models
-        .filter((model: ModelInfo) => {
-          if (getModelCategory(model) !== "llm") return false;
-          // A cleanup fine-tune cannot hold a conversation, so it is not offered
-          // as an assistant brain at all — hiding it is kinder than letting
-          // someone select it and conclude the assistant is broken.
-          if (!isCleanup && model.is_cleanup_specialist) return false;
-          return true;
-        })
+        .filter((model: ModelInfo) => getModelCategory(model) === "llm")
         .sort((a: ModelInfo, b: ModelInfo) =>
           getTranslatedModelName(a, t).localeCompare(
             getTranslatedModelName(b, t),
           ),
         ),
-    [models, t, isCleanup],
+    [models, t],
   );
 
   const modelById = useMemo(
     () => new Map(llmModels.map((model) => [model.id, model])),
     [llmModels],
   );
-  const recommended = RECOMMENDED_BY_ROLE[role];
+  const recommended = RECOMMENDED_CLEANUP_MODELS;
+  // Set<string>, not a set of the curated literal ids: it gets asked about the
+  // id of every model in the catalog, curated or not.
   const recommendedIds = useMemo(
-    () => new Set(recommended.map((meta) => meta.id)),
+    () => new Set<string>(recommended.map((meta) => meta.id)),
     [recommended],
   );
   const recommendedModels = recommended.flatMap((meta) => {
@@ -532,16 +461,9 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
   });
 
   const wireUpProvider = async (modelId: string) => {
-    if (isCleanup) {
-      // One command: it also keeps the selected cleanup prompt paired with the
-      // model, which two separate calls could not do atomically.
-      await commands.setCleanupLocalModel(modelId);
-    } else {
-      await commands.changeAssistantModelSetting(BUILTIN_PROVIDER_ID, modelId);
-      if (!providerIsBuiltin) {
-        await commands.setAssistantProvider(BUILTIN_PROVIDER_ID);
-      }
-    }
+    // One command: it also keeps the selected cleanup prompt paired with the
+    // model, which two separate calls could not do atomically.
+    await commands.setCleanupLocalModel(modelId);
     await refreshSettings();
   };
 
@@ -584,7 +506,7 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
             modelName,
             path: model.local_path,
           })
-        : t("settings.assistant.brain.deleteModelConfirm", { modelName }),
+        : t("settings.cleanupModels.deleteModelConfirm", { modelName }),
       {
         title: model?.local_path
           ? t("settings.models.localModel.removeTitle")
@@ -596,7 +518,7 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
 
     const deleted = await deleteModel(modelId);
     if (!deleted) {
-      toast.error(t("settings.assistant.brain.deleteModelFailed"), {
+      toast.error(t("settings.cleanupModels.deleteModelFailed"), {
         description: useModelStore.getState().error ?? undefined,
       });
       return;
@@ -627,14 +549,10 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
       status={statusFor(model)}
       meta={meta}
       isRecommended={isRecommended}
-      hideVisionPill={isCleanup}
-      // Both slots, not just this role's. The two roles point at the same engine
-      // and the same download, so a model that is in use anywhere must not be
-      // deletable from here — the backend refuses it either way, and offering a
-      // button that fails is worse than not offering it.
-      protectedFromDelete={
-        model.id === activeModelId || model.id === otherRoleModelId
-      }
+      // A model that is in use must not be deletable from here — the backend
+      // refuses it either way, and offering a button that fails is worse than
+      // not offering it.
+      protectedFromDelete={model.id === activeModelId}
       onSelect={handleSelect}
       onDownload={(modelId) => void handleDownload(modelId)}
       onDelete={(modelId) => void handleDelete(modelId)}
@@ -653,10 +571,10 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
               id="current-local-model"
               className="text-[13.5px] font-semibold tracking-tight text-ink"
             >
-              {t("settings.assistant.brain.currentModelTitle")}
+              {t("settings.cleanupModels.currentModelTitle")}
             </h2>
             <p className="mt-0.5 text-xs text-muted">
-              {t("settings.assistant.brain.currentModelDescription")}
+              {t("settings.cleanupModels.currentModelDescription")}
             </p>
           </div>
           <div className="overflow-hidden rounded-2xl border border-hairline-strong">
@@ -672,18 +590,10 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
               id="recommended-local-models"
               className="text-[13.5px] font-semibold tracking-tight text-ink"
             >
-              {t(
-                isCleanup
-                  ? "settings.dictation.aiCleanup.catalog.recommendedTitle"
-                  : "settings.assistant.brain.recommendedTitle",
-              )}
+              {t("settings.dictation.aiCleanup.catalog.recommendedTitle")}
             </h2>
             <p className="mt-0.5 max-w-[62ch] text-xs leading-relaxed text-muted">
-              {t(
-                isCleanup
-                  ? "settings.dictation.aiCleanup.catalog.recommendedDescription"
-                  : "settings.assistant.brain.recommendedDescription",
-              )}
+              {t("settings.dictation.aiCleanup.catalog.recommendedDescription")}
             </p>
           </div>
           {hardware && (
@@ -692,27 +602,27 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
               {hardware.acceleratorName && hardware.acceleratorMemoryGb
                 ? t(
                     hardware.acceleratorKind === "dedicated"
-                      ? "settings.assistant.brain.acceleratorDetectedDedicated"
+                      ? "settings.cleanupModels.acceleratorDetectedDedicated"
                       : hardware.acceleratorKind === "integrated"
-                        ? "settings.assistant.brain.acceleratorDetectedIntegrated"
-                        : "settings.assistant.brain.acceleratorDetected",
+                        ? "settings.cleanupModels.acceleratorDetectedIntegrated"
+                        : "settings.cleanupModels.acceleratorDetected",
                     {
                       name: hardware.acceleratorName,
                       memory: Number(hardware.acceleratorMemoryGb.toFixed(1)),
                     },
                   )
                 : hardware.acceleratorName
-                  ? t("settings.assistant.brain.acceleratorDetectedNoMemory", {
+                  ? t("settings.cleanupModels.acceleratorDetectedNoMemory", {
                       name: hardware.acceleratorName,
                     })
                   : hardware.systemMemoryGb > 0
                     ? t(
-                        "settings.assistant.brain.acceleratorUnknownWithMemory",
+                        "settings.cleanupModels.acceleratorUnknownWithMemory",
                         {
                           memory: hardware.systemMemoryGb,
                         },
                       )
-                    : t("settings.assistant.brain.acceleratorUnknown")}
+                    : t("settings.cleanupModels.acceleratorUnknown")}
             </span>
           )}
         </div>
@@ -720,7 +630,7 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
         {recommendedModels.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-hairline-strong px-4 py-5 text-center">
             <p className="text-xs text-muted">
-              {t("settings.assistant.brain.catalogEmpty")}
+              {t("settings.cleanupModels.catalogEmpty")}
             </p>
           </div>
         ) : (
@@ -740,7 +650,7 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
             id="hugging-face-finder"
             className="text-[13.5px] font-semibold tracking-tight text-ink"
           >
-            {t("settings.assistant.brain.finderSectionTitle")}
+            {t("settings.cleanupModels.finderSectionTitle")}
           </h2>
         </div>
         <button
@@ -753,14 +663,14 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-semibold text-ink">
-              {t("settings.assistant.brain.finderTitle")}
+              {t("settings.cleanupModels.finderTitle")}
             </span>
             <span className="mt-0.5 block text-xs leading-relaxed text-muted">
-              {t("settings.assistant.brain.finderDescription")}
+              {t("settings.cleanupModels.finderDescription")}
             </span>
           </span>
           <span className="hidden shrink-0 items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-on-primary transition-colors group-hover:bg-accent-strong sm:flex">
-            {t("settings.assistant.brain.finderAction")}
+            {t("settings.cleanupModels.finderAction")}
             <ArrowRight
               className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none"
               aria-hidden="true"
@@ -809,7 +719,7 @@ export const LlmCatalog: React.FC<{ role?: LlmCatalogRole }> = ({
               id="saved-local-models"
               className="text-[13.5px] font-semibold tracking-tight text-ink"
             >
-              {t("settings.assistant.brain.huggingFaceTitle")}
+              {t("settings.cleanupModels.huggingFaceTitle")}
             </h2>
           </div>
           <div className="overflow-hidden rounded-2xl border border-hairline-strong bg-surface divide-y divide-hairline">

@@ -7,13 +7,7 @@ import "./RecordingOverlay.css";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
-type OverlayState =
-  | "recording"
-  | "transcribing"
-  | "processing"
-  | "generating"
-  | "vision"
-  | "notice";
+type OverlayState = "recording" | "transcribing" | "processing" | "notice";
 
 /** Payload of the untyped Rust "stream-text" event (live transcription). */
 type StreamTextPayload = { committed: string; tentative: string };
@@ -23,7 +17,7 @@ type StreamTextPayload = { committed: string; tentative: string };
  * opt-in live-transcription window is active (the overlay has been enlarged to
  * the readable card); false for the compact pill (the default). `notice`
  * carries the i18n key suffix (under overlay.notices.*) for the brief "notice"
- * state — e.g. why a Flow command wasn't generated.
+ * state — e.g. that AI cleanup fell back to the raw transcript.
  */
 type ShowOverlayPayload = {
   state: OverlayState;
@@ -200,13 +194,9 @@ const RecordingOverlay: React.FC = () => {
   const busyLabel =
     state === "transcribing"
       ? t("overlay.transcribing")
-      : state === "generating"
-        ? t("overlay.generating")
-        : state === "vision"
-          ? t("overlay.vision")
-          : state === "notice"
-            ? t(`overlay.notices.${notice ?? "flowFailed"}`)
-            : t("overlay.processing");
+      : state === "notice"
+        ? t(`overlay.notices.${notice ?? "cleanupFallback"}`)
+        : t("overlay.processing");
 
   const ariaLabel = isRecording
     ? locked
@@ -285,8 +275,8 @@ const RecordingOverlay: React.FC = () => {
                  label carry the state — the card reads as busy, not frozen
                  (backport of Handy #1597). */
                 <p className="card-text card-placeholder">{visibleLabel}</p>
-              ) : null /* generating/vision/notice: the header already says it —
-                        repeating it in the body reads as a glitch. */
+              ) : null /* notice: the header already says it — repeating it in
+                        the body reads as a glitch. */
             }
           </div>
         </div>
@@ -347,23 +337,9 @@ const RecordingOverlay: React.FC = () => {
             </div>
           )}
 
-          {/* Flow working states — generation can take a while and "looking at
-            your screen" must be unmistakable, so these carry a small text
-            label instead of the anonymous frozen waveform. */}
-          {(state === "generating" || state === "vision") && (
-            <div className="pill-wave">
-              <Loader2
-                className="load-spinner"
-                size={13}
-                strokeWidth={2.5}
-                color={ICON_COLOR}
-              />
-              <span className="pill-label">{visibleLabel}</span>
-            </div>
-          )}
-
-          {/* Brief notice (e.g. why a Flow command wasn't generated) — text
-            only, auto-hidden by the backend shortly after. */}
+          {/* Brief notice (e.g. that AI cleanup fell back to the raw
+            transcript) — text only, auto-hidden by the backend shortly
+            after. */}
           {state === "notice" && (
             <div className="pill-wave">
               <span className="pill-label">{visibleLabel}</span>

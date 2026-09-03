@@ -13,7 +13,7 @@ mod handler;
 pub mod handy_keys;
 mod tauri_impl;
 
-use log::{debug, error, info, warn};
+use log::{error, info, warn};
 use serde::Serialize;
 use specta::Type;
 use tauri::{AppHandle, Emitter, Manager};
@@ -85,18 +85,6 @@ pub fn unregister_cancel_shortcut(app: &AppHandle) {
 /// Register a shortcut using the appropriate implementation
 pub fn register_shortcut(app: &AppHandle, binding: ShortcutBinding) -> Result<(), String> {
     let settings = get_settings(app);
-    // The assistant's master switch owns its two hotkeys: while it is off they
-    // stay unregistered no matter who asks. The Settings shortcut editor calls
-    // `resume_binding` when it loses focus, which re-armed them behind the
-    // switch's back — and a re-armed hotkey then drove a feature whose window
-    // had been torn down.
-    if !settings.assistant_enabled && crate::assistant::is_assistant_binding(&binding.id) {
-        debug!(
-            "Not registering '{}': the assistant is switched off",
-            binding.id
-        );
-        return Ok(());
-    }
     match settings.keyboard_implementation {
         KeyboardImplementation::Tauri => tauri_impl::register_shortcut(app, binding),
         KeyboardImplementation::HandyKeys => handy_keys::register_shortcut(app, binding),
@@ -528,21 +516,6 @@ pub fn change_tap_to_lock_key_setting(app: AppHandle, key: String) -> Result<(),
     Ok(())
 }
 
-/// Set the key that a tap converts a hold **assistant** recording to hands-free.
-/// Separate from the dictation lock key so the assistant can use a different
-/// combo (defaults to Shift). Accepts a modifier or a plain key name; empty
-/// disables it. A key that overlaps the assistant record shortcut is ignored at
-/// arm time. Persisted; takes effect on the next assistant recording (the
-/// watcher reads it fresh each time it arms).
-#[tauri::command]
-#[specta::specta]
-pub fn change_assistant_tap_to_lock_key_setting(app: AppHandle, key: String) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.assistant_tap_to_lock_key = key;
-    settings::write_settings(&app, settings);
-    Ok(())
-}
-
 #[tauri::command]
 #[specta::specta]
 pub fn change_audio_feedback_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
@@ -607,12 +580,6 @@ pub fn change_theme_setting(app: AppHandle, theme: String) -> Result<(), String>
         let _ = window.set_theme(window_theme);
     }
 
-    // The assistant panel is a separate webview that only re-reads its
-    // settings (and re-applies the appearance) when it hears this event.
-    // Without it, toggling light/dark in settings leaves the panel stuck on
-    // whatever theme it loaded with.
-    let _ = app.emit("assistant-settings-changed", ());
-
     Ok(())
 }
 
@@ -634,8 +601,8 @@ pub fn change_ui_text_size_setting(app: AppHandle, size: String) -> Result<(), S
     settings::write_settings(&app, settings);
 
     // Apply immediately (webview zoom) so the change is visible without a
-    // restart. Only the main settings window scales — the overlay and the
-    // assistant panel have their own, purpose-built sizing.
+    // restart. Only the main settings window scales — the overlay has its own,
+    // purpose-built sizing.
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.set_zoom(parsed.zoom_factor());
     }
@@ -1027,43 +994,6 @@ pub fn change_post_process_enabled_setting(app: AppHandle, enabled: bool) -> Res
         }
     }
 
-    Ok(())
-}
-
-/// Toggle "Generate with Flow" (the spoken activation-phrase generation path).
-#[tauri::command]
-#[specta::specta]
-pub fn change_flow_enabled_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.flow_enabled = enabled;
-    settings::write_settings(&app, settings);
-    Ok(())
-}
-
-/// Change the Flow activation phrase. An empty phrase resets to the default
-/// ("Hey Flow") so Flow can never end up in an untriggerable state.
-#[tauri::command]
-#[specta::specta]
-pub fn change_flow_phrase_setting(app: AppHandle, phrase: String) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    let trimmed = phrase.trim();
-    settings.flow_phrase = if trimmed.is_empty() {
-        "Hey Flow".to_string()
-    } else {
-        trimmed.to_string()
-    };
-    settings::write_settings(&app, settings);
-    Ok(())
-}
-
-/// Allow or forbid Flow's `capture_screen` tool (independent of the
-/// assistant's screen-access mode).
-#[tauri::command]
-#[specta::specta]
-pub fn change_flow_screen_access_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.flow_screen_access = enabled;
-    settings::write_settings(&app, settings);
     Ok(())
 }
 
@@ -1596,18 +1526,6 @@ pub fn change_overlay_style_setting(app: AppHandle, style: String) -> Result<(),
         }
         settings::OverlayStyle::Auto => {}
     }
-    settings::write_settings(&app, settings);
-    Ok(())
-}
-
-/// Set the assistant overlay style: none / minimal / live (or auto). Controls
-/// how the assistant surfaces a voice turn — Minimal is the pill, Live shows the
-/// transcript + streamed reply as readable text. Independent of dictation.
-#[tauri::command]
-#[specta::specta]
-pub fn change_assistant_overlay_style_setting(app: AppHandle, style: String) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.assistant_overlay_style = parse_overlay_style(&style);
     settings::write_settings(&app, settings);
     Ok(())
 }

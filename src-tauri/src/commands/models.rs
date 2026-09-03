@@ -53,25 +53,14 @@ pub async fn delete_model(
     transcription_manager: State<'_, Arc<TranscriptionManager>>,
     model_id: String,
 ) -> Result<(), String> {
-    // Never leave the built-in assistant pointing at a deleted local model.
-    // Users must switch its selection first; this also protects custom models
-    // whose catalog record would otherwise disappear entirely.
+    // Never leave AI cleanup pointing at a deleted local model. Without this
+    // guard, deleting the cleanup model from the Models page (where it is just
+    // one more language model) succeeds and leaves cleanup pointing at a file
+    // that no longer exists — which shows up later as dictation silently
+    // pasting the raw transcript, a symptom with no visible connection to the
+    // deletion. Users must switch the selection first; this also protects
+    // custom models whose catalog record would otherwise disappear entirely.
     let settings = get_settings(&app_handle);
-    if settings
-        .assistant_models
-        .get(crate::settings::BUILTIN_POST_PROCESS_PROVIDER_ID)
-        .is_some_and(|active_id| active_id == &model_id)
-    {
-        return Err(
-            "Switch the built-in assistant to another model before deleting this one.".to_string(),
-        );
-    }
-    // The same protection for AI cleanup, which has its own slot pointing at the
-    // same built-in engine. Without this the two are asymmetric: deleting the
-    // cleanup model from the assistant's catalog (or the Models page, where it is
-    // just one more language model) succeeded and left cleanup pointing at a file
-    // that no longer exists — which shows up later as dictation silently pasting
-    // the raw transcript, a symptom with no visible connection to the deletion.
     if settings
         .post_process_models
         .get(crate::settings::BUILTIN_POST_PROCESS_PROVIDER_ID)

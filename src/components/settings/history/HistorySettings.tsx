@@ -1,23 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { createPortal } from "react-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { readFile } from "@tauri-apps/plugin-fs";
 import {
   Check,
-  ChevronRight,
   Copy,
   FolderOpen,
-  Camera,
-  FileText,
-  MessageCircle,
-  MessageSquarePlus,
   Mic,
   RotateCcw,
   Sparkles,
@@ -25,12 +13,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import ReactMarkdown, { type Components } from "react-markdown";
 import { toast } from "sonner";
 import {
   commands,
   events,
-  type AssistantHistoryEntry,
   type HistoryEntry,
   type HistoryUpdatePayload,
 } from "@/bindings";
@@ -45,97 +31,7 @@ import { useSettings } from "../../../hooks/useSettings";
 import { RecordingRetentionPeriodSelector } from "../RecordingRetentionPeriod";
 import { HistoryLimit } from "../HistoryLimit";
 
-/** Must match the marker constants in src-tauri/src/assistant.rs */
-const SCREENSHOT_MARKER = "[screenshot attached]";
-const IMAGE_MARKER = "[image attached]";
-const FILE_MARKER_PREFIX = "[file attached:";
-
-/** Stable marker written by src-tauri/src/flow.rs. Existing successful Flow
- *  rows already carry this value, so they appear in the new filter too. */
-const FLOW_HISTORY_MARKER = "Generate with Flow";
-
-const isFlowHistoryEntry = (entry: HistoryEntry): boolean =>
-  entry.post_process_prompt === FLOW_HISTORY_MARKER;
-
-/** Strip the attachment markers the backend appends to stored user messages,
- *  returning the clean text plus what rode along (screen capture / files). */
-const cleanMessageContent = (
-  raw: string,
-): { text: string; screenshot: boolean; files: string[] } => {
-  let screenshot = false;
-  const files: string[] = [];
-  const kept: string[] = [];
-  for (const line of raw.split("\n")) {
-    const trimmed = line.trim();
-    if (trimmed === SCREENSHOT_MARKER) {
-      screenshot = true;
-      continue;
-    }
-    if (trimmed === IMAGE_MARKER) {
-      continue;
-    }
-    if (trimmed.startsWith(FILE_MARKER_PREFIX) && trimmed.endsWith("]")) {
-      files.push(trimmed.slice(FILE_MARKER_PREFIX.length, -1).trim());
-      continue;
-    }
-    kept.push(line);
-  }
-  return { text: kept.join("\n").trim(), screenshot, files };
-};
-
-/**
- * Markdown styling for assistant replies in the expanded conversation —
- * mirrors the assistant panel so bold, lists, code, etc. render properly
- * instead of leaking raw markdown syntax.
- */
-const assistantMarkdown: Components = {
-  p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-  ul: ({ children }) => (
-    <ul className="mb-2 list-disc space-y-1 ps-5 last:mb-0">{children}</ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="mb-2 list-decimal space-y-1 ps-5 last:mb-0">{children}</ol>
-  ),
-  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-  strong: ({ children }) => (
-    <strong className="font-semibold text-ink">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic">{children}</em>,
-  h1: ({ children }) => (
-    <p className="mb-1 mt-2 font-semibold first:mt-0">{children}</p>
-  ),
-  h2: ({ children }) => (
-    <p className="mb-1 mt-2 font-semibold first:mt-0">{children}</p>
-  ),
-  h3: ({ children }) => (
-    <p className="mb-1 mt-2 font-semibold first:mt-0">{children}</p>
-  ),
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer noopener"
-      className="underline decoration-hairline-strong underline-offset-2 hover:text-ink"
-    >
-      {children}
-    </a>
-  ),
-  code: ({ children }) => (
-    <code className="rounded bg-mid-gray/15 px-1 py-0.5 font-mono text-[0.85em]">
-      {children}
-    </code>
-  ),
-  pre: ({ children }) => (
-    <pre className="my-2 overflow-x-auto rounded-lg border border-hairline bg-mid-gray/10 p-3 text-[0.85em] [&_code]:bg-transparent [&_code]:p-0">
-      {children}
-    </pre>
-  ),
-  blockquote: ({ children }) => (
-    <blockquote className="my-2 border-s-2 border-hairline-strong ps-3 text-muted">
-      {children}
-    </blockquote>
-  ),
-};
+const PAGE_SIZE = 30;
 
 const IconButton: React.FC<{
   onClick: () => void;
@@ -156,84 +52,6 @@ const IconButton: React.FC<{
   </button>
 );
 
-/** Thumbnails of the image(s) sent with a stored message — the screen capture
- *  (badged) and/or attached pictures. Click one to pop a full-size lightbox
- *  (click anywhere, or Esc, to close). The compact thumbnails are what the app
- *  persists in history; the full-resolution frame only ever went to the model. */
-const HistoryThumbnails: React.FC<{
-  urls: string[];
-  hasScreen?: boolean;
-  isUser: boolean;
-  screenLabel: string;
-}> = ({ urls, hasScreen, isUser, screenLabel }) => {
-  const [open, setOpen] = useState<string | null>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    setShown(false);
-    const raf = requestAnimationFrame(() => setShown(true));
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  return (
-    <>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {urls.map((url, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setOpen(url)}
-            aria-label={hasScreen && i === 0 ? screenLabel : undefined}
-            className={`relative h-12 w-16 cursor-zoom-in overflow-hidden rounded-lg border transition-transform hover:-translate-y-0.5 active:scale-95 ${
-              isUser ? "border-on-primary/25" : "border-hairline"
-            }`}
-          >
-            <img
-              src={url}
-              alt=""
-              draggable={false}
-              className="h-full w-full object-cover"
-            />
-            {hasScreen && i === 0 && (
-              <span className="absolute bottom-0.5 end-0.5 flex h-3.5 w-3.5 items-center justify-center rounded bg-black/60 text-white">
-                <Camera width={9} height={9} />
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-      {open &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/70 p-10"
-            onClick={() => setOpen(null)}
-            role="button"
-            tabIndex={-1}
-          >
-            <img
-              src={open}
-              alt=""
-              draggable={false}
-              className={`max-h-full max-w-full rounded-xl shadow-2xl transition-all duration-150 ${
-                shown ? "scale-100 opacity-100" : "scale-90 opacity-0"
-              }`}
-            />
-          </div>,
-          document.body,
-        )}
-    </>
-  );
-};
-
-const PAGE_SIZE = 30;
 interface OpenRecordingsButtonProps {
   onClick: () => void;
   label: string;
@@ -256,38 +74,19 @@ const OpenRecordingsButton: React.FC<OpenRecordingsButtonProps> = ({
 );
 
 /**
- * A single item in the unified history feed. Transcriptions and assistant
- * conversations are interleaved by time; `sortTime` is the seconds-epoch used
- * for ordering (last activity for conversations, recording time otherwise).
+ * History — every dictation, newest first, with its audio, its transcript, and
+ * (when AI cleanup ran) the text that was actually pasted.
  */
-type FeedItem =
-  | { kind: "transcription"; sortTime: number; entry: HistoryEntry }
-  | { kind: "assistant"; sortTime: number; session: AssistantHistoryEntry };
-
-type HistoryFilter = "all" | "recordings" | "flow" | "assistant";
-
 export const HistorySettings: React.FC = () => {
   const { t } = useTranslation();
   const osType = useOsType();
   const { getSetting } = useSettings();
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<HistoryFilter>("all");
   const [hasMore, setHasMore] = useState(true);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const entriesRef = useRef<HistoryEntry[]>([]);
   const loadingRef = useRef(false);
-
-  // Assistant conversations are stored separately from transcriptions, so we
-  // load them as their own list and merge for display. They are few and
-  // capped on the backend, so a single fetch (no pagination) is enough.
-  const [assistantSessions, setAssistantSessions] = useState<
-    AssistantHistoryEntry[]
-  >([]);
-  const [assistantLoaded, setAssistantLoaded] = useState(false);
-  const [expandedAssistant, setExpandedAssistant] = useState<Set<number>>(
-    new Set(),
-  );
 
   // Keep ref in sync for use in IntersectionObserver callback
   useEffect(() => {
@@ -321,28 +120,12 @@ export const HistorySettings: React.FC = () => {
     }
   }, []);
 
-  const loadAssistantSessions = useCallback(async () => {
-    try {
-      const result = await commands.getAssistantHistoryEntries(null, null);
-      if (result.status === "ok") {
-        setAssistantSessions(result.data.entries);
-      }
-    } catch (error) {
-      console.error("Failed to load assistant history:", error);
-    } finally {
-      setAssistantLoaded(true);
-    }
-  }, []);
-
   // Initial load
   useEffect(() => {
     loadPage();
-    loadAssistantSessions();
-  }, [loadPage, loadAssistantSessions]);
+  }, [loadPage]);
 
-  // Infinite scroll via IntersectionObserver. Pagination tracks only
-  // transcriptions (cursor = last transcription id); assistant sessions are
-  // already fully loaded, so they just interleave into the sorted feed.
+  // Infinite scroll via IntersectionObserver (cursor = last entry id).
   useEffect(() => {
     if (loading) return;
 
@@ -385,18 +168,6 @@ export const HistorySettings: React.FC = () => {
       unlisten.then((fn) => fn());
     };
   }, []);
-
-  // Listen for assistant conversation changes (the panel is a separate window,
-  // so a turn there can't update this list directly). Refetch on each signal —
-  // expansion state is keyed by id, so it survives the reload.
-  useEffect(() => {
-    const unlisten = listen("assistant-history-updated", () => {
-      loadAssistantSessions();
-    });
-    return () => {
-      unlisten.then((fn) => fn());
-    };
-  }, [loadAssistantSessions]);
 
   // Retention commands now clean recordings immediately. Refetch the first
   // page after cleanup so deleted rows disappear without an app restart.
@@ -482,62 +253,6 @@ export const HistorySettings: React.FC = () => {
     }
   };
 
-  const toggleExpandAssistant = useCallback((id: number) => {
-    setExpandedAssistant((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
-
-  const copyConversation = useCallback(
-    (session: AssistantHistoryEntry) => {
-      const text = session.messages
-        .map((message) => {
-          const { text: body } = cleanMessageContent(message.content);
-          const label =
-            message.role === "user"
-              ? t("settings.history.roleUser")
-              : t("settings.history.roleAssistant");
-          return `${label}: ${body}`;
-        })
-        .join("\n\n");
-      void copyToClipboard(text);
-    },
-    [t],
-  );
-
-  const deleteAssistantSession = useCallback(
-    async (id: number) => {
-      // Optimistically remove
-      setAssistantSessions((prev) => prev.filter((s) => s.id !== id));
-      setExpandedAssistant((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-      const result = await commands.deleteAssistantHistoryEntry(id);
-      if (result.status !== "ok") {
-        // Reload on failure to restore the optimistic removal
-        loadAssistantSessions();
-        throw new Error(String(result.error));
-      }
-    },
-    [loadAssistantSessions],
-  );
-
-  /** Load a past conversation back into the assistant panel and open it. */
-  const resumeAssistantSession = useCallback(async (id: number) => {
-    const result = await commands.assistantResumeSession(id);
-    if (result.status !== "ok") {
-      toast.error(String(result.error));
-    }
-  }, []);
-
   const openRecordingsFolder = async () => {
     try {
       const result = await commands.openRecordingsFolder();
@@ -549,101 +264,43 @@ export const HistorySettings: React.FC = () => {
     }
   };
 
-  // Merge transcriptions and assistant conversations into a single feed,
-  // newest activity first.
-  const feed = useMemo<FeedItem[]>(() => {
-    const items: FeedItem[] = [];
-    for (const entry of entries) {
-      items.push({ kind: "transcription", sortTime: entry.timestamp, entry });
-    }
-    for (const session of assistantSessions) {
-      items.push({
-        kind: "assistant",
-        sortTime: session.updated_at,
-        session,
-      });
-    }
-    items.sort((a, b) => b.sortTime - a.sortTime);
-    return items;
-  }, [entries, assistantSessions]);
-
-  const filteredFeed = useMemo(
-    () =>
-      feed.filter((item) => {
-        if (filter === "recordings") {
-          return (
-            item.kind === "transcription" && !isFlowHistoryEntry(item.entry)
-          );
-        }
-        if (filter === "flow") {
-          return (
-            item.kind === "transcription" && isFlowHistoryEntry(item.entry)
-          );
-        }
-        if (filter === "assistant") return item.kind === "assistant";
-        return true;
-      }),
-    [feed, filter],
-  );
-
   let content: React.ReactNode;
 
-  if (loading || !assistantLoaded) {
+  if (loading) {
     content = (
       <div className="px-4 py-3 text-center text-text/60">
         {t("settings.history.loading")}
       </div>
     );
-  } else if (filteredFeed.length === 0) {
-    const emptyKey =
-      filter === "recordings"
-        ? "settings.history.emptyRecordings"
-        : filter === "flow"
-          ? "settings.history.emptyFlow"
-          : filter === "assistant"
-            ? "settings.history.emptyAssistant"
-            : "settings.history.empty";
+  } else if (entries.length === 0) {
     content = (
       <div className="px-4 py-8 text-center text-sm text-muted">
-        {t(emptyKey)}
+        {t("settings.history.empty")}
       </div>
     );
   } else {
     content = (
       <>
         <div className="divide-y divide-hairline">
-          {filteredFeed.map((item) =>
-            item.kind === "transcription" ? (
-              <HistoryEntryComponent
-                key={`t-${item.entry.id}`}
-                entry={item.entry}
-                onToggleSaved={() => toggleSaved(item.entry.id)}
-                onCopyText={() =>
-                  copyToClipboard(
-                    item.entry.post_processed_text?.trim()
-                      ? item.entry.post_processed_text
-                      : item.entry.transcription_text,
-                  )
-                }
-                getAudioUrl={getAudioUrl}
-                deleteAudio={deleteAudioEntry}
-                retryTranscription={retryHistoryEntry}
-              />
-            ) : (
-              <AssistantHistoryEntryComponent
-                key={`a-${item.session.id}`}
-                session={item.session}
-                expanded={expandedAssistant.has(item.session.id)}
-                onToggleExpand={() => toggleExpandAssistant(item.session.id)}
-                onCopyConversation={() => copyConversation(item.session)}
-                onDelete={() => deleteAssistantSession(item.session.id)}
-                onResume={() => void resumeAssistantSession(item.session.id)}
-              />
-            ),
-          )}
+          {entries.map((entry) => (
+            <HistoryEntryComponent
+              key={entry.id}
+              entry={entry}
+              onToggleSaved={() => toggleSaved(entry.id)}
+              onCopyText={() =>
+                copyToClipboard(
+                  entry.post_processed_text?.trim()
+                    ? entry.post_processed_text
+                    : entry.transcription_text,
+                )
+              }
+              getAudioUrl={getAudioUrl}
+              deleteAudio={deleteAudioEntry}
+              retryTranscription={retryHistoryEntry}
+            />
+          ))}
         </div>
-        {/* Pagination belongs to recordings; assistant sessions are loaded in one page. */}
-        {filter !== "assistant" && <div ref={sentinelRef} className="h-1" />}
+        <div ref={sentinelRef} className="h-1" />
       </>
     );
   }
@@ -669,35 +326,7 @@ export const HistorySettings: React.FC = () => {
         )}
       </SettingsGroup>
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <div
-            className="inline-flex items-center rounded-lg bg-surface-strong p-0.5"
-            role="group"
-            aria-label={t("settings.history.filters.label")}
-          >
-            {(
-              [
-                ["all", "settings.history.filters.all"],
-                ["recordings", "settings.history.filters.recordings"],
-                ["flow", "settings.history.filters.flow"],
-                ["assistant", "settings.history.filters.assistant"],
-              ] as const
-            ).map(([value, labelKey]) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={filter === value}
-                onClick={() => setFilter(value)}
-                className={`rounded-[7px] px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 ${
-                  filter === value
-                    ? "bg-surface text-ink shadow-sm"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                {t(labelKey)}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center justify-end">
           <OpenRecordingsButton
             onClick={openRecordingsFolder}
             label={t("settings.history.openFolder")}
@@ -733,7 +362,6 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
   const [retrying, setRetrying] = useState(false);
 
   const hasTranscription = entry.transcription_text.trim().length > 0;
-  const flowEntry = isFlowHistoryEntry(entry);
   const processedText = entry.post_processed_text?.trim()
     ? entry.post_processed_text
     : null;
@@ -751,12 +379,8 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
    * broken every time it worked perfectly.
    */
   const cleanupMadeNoChanges =
-    !flowEntry && processedText !== null && !hasDistinctProcessedText;
-  const secondaryText = flowEntry
-    ? processedText
-    : hasDistinctProcessedText
-      ? processedText
-      : null;
+    processedText !== null && !hasDistinctProcessedText;
+  const secondaryText = hasDistinctProcessedText ? processedText : null;
   const hasCopyableText = hasTranscription || secondaryText !== null;
 
   const handleLoadAudio = useCallback(
@@ -799,17 +423,12 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
 
   return (
     <div className="group px-4 py-3.5 flex flex-col gap-1.5">
-      {/* A Flow row is intentionally two-part: what speech recognition heard
-          first, then the exact generated text that was pasted. AI-cleaned
-          dictation uses the same pattern for original vs final text. */}
+      {/* An AI-cleaned dictation is two-part: what speech recognition heard
+          first, then the final text that was pasted. */}
       <div className="space-y-2.5">
-        {(flowEntry || secondaryText) && (
+        {secondaryText && (
           <div className="text-[11px] font-medium text-muted">
-            {t(
-              flowEntry
-                ? "settings.history.flowTranscriptLabel"
-                : "settings.history.originalTranscriptionLabel",
-            )}
+            {t("settings.history.originalTranscriptionLabel")}
           </div>
         )}
         {retrying && (
@@ -845,11 +464,7 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
           <div className="rounded-lg border border-hairline bg-surface-strong/55 px-3 py-2.5">
             <div className="mb-1 inline-flex items-center gap-1.5 text-[11px] font-medium text-muted">
               <Sparkles width={11} height={11} />
-              {t(
-                flowEntry
-                  ? "settings.history.flowOutputLabel"
-                  : "settings.history.finalTextLabel",
-              )}
+              {t("settings.history.finalTextLabel")}
             </div>
             <p className="select-text whitespace-pre-wrap break-words text-[13px] leading-relaxed text-ink">
               {secondaryText}
@@ -860,11 +475,6 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
             <Sparkles width={11} height={11} />
             {t("settings.history.cleanupNoChanges")}
           </div>
-        ) : flowEntry ? (
-          <div className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-strong/40 px-3 py-2 text-xs text-muted">
-            <Sparkles width={11} height={11} />
-            {t("settings.history.flowNoOutput")}
-          </div>
         ) : null}
       </div>
 
@@ -872,16 +482,8 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       <div className="flex items-center justify-between gap-3">
         <span className="inline-flex shrink-0 items-center gap-1.5 text-xs text-muted">
           <span className="inline-flex items-center gap-1 font-medium text-ink/75">
-            {flowEntry ? (
-              <Sparkles width={11} height={11} />
-            ) : (
-              <Mic width={11} height={11} />
-            )}
-            {t(
-              flowEntry
-                ? "settings.history.flowLabel"
-                : "settings.history.recordingLabel",
-            )}
+            <Mic width={11} height={11} />
+            {t("settings.history.recordingLabel")}
           </span>
           <span aria-hidden="true" className="text-muted-soft">
             ·
@@ -893,11 +495,9 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
             onClick={handleCopyText}
             disabled={!hasCopyableText || retrying}
             title={t(
-              flowEntry && secondaryText
-                ? "settings.history.copyFlowOutput"
-                : secondaryText
-                  ? "settings.history.copyFinalText"
-                  : "settings.history.copyToClipboard",
+              secondaryText
+                ? "settings.history.copyFinalText"
+                : "settings.history.copyToClipboard",
             )}
           >
             {showCopied ? (
@@ -948,197 +548,6 @@ const HistoryEntryComponent: React.FC<HistoryEntryProps> = ({
       </div>
 
       <AudioPlayer onLoadRequest={handleLoadAudio} className="w-full" />
-    </div>
-  );
-};
-
-interface AssistantHistoryEntryProps {
-  session: AssistantHistoryEntry;
-  expanded: boolean;
-  onToggleExpand: () => void;
-  onCopyConversation: () => void;
-  onDelete: () => Promise<void>;
-  onResume: () => void;
-}
-
-/**
- * Assistant conversations render as collapsible entries: a header with the
- * date and an "Assistant" badge, a one-line preview when collapsed, and the
- * full turn-by-turn transcript when expanded. No audio or re-transcribe
- * controls — these are chats, not recordings.
- */
-const AssistantHistoryEntryComponent: React.FC<AssistantHistoryEntryProps> = ({
-  session,
-  expanded,
-  onToggleExpand,
-  onCopyConversation,
-  onDelete,
-  onResume,
-}) => {
-  const { t, i18n } = useTranslation();
-  const [showCopied, setShowCopied] = useState(false);
-
-  const formattedDate = formatDateTime(
-    String(session.updated_at),
-    i18n.language,
-  );
-
-  const handleCopy = () => {
-    onCopyConversation();
-    setShowCopied(true);
-    setTimeout(() => setShowCopied(false), 2000);
-  };
-
-  const handleDelete = async () => {
-    try {
-      await onDelete();
-    } catch (error) {
-      console.error("Failed to delete assistant conversation:", error);
-      toast.error(t("settings.history.deleteAssistantError"));
-    }
-  };
-
-  return (
-    <div className="group px-4 py-3.5 flex flex-col gap-1.5">
-      {/* Title first — the conversation is the content. */}
-      <button
-        onClick={onToggleExpand}
-        className="text-left cursor-pointer flex items-start gap-1.5 min-w-0"
-        title={
-          expanded
-            ? t("settings.history.hideConversation")
-            : t("settings.history.showConversation")
-        }
-      >
-        <span
-          className={`mt-[3px] shrink-0 text-muted-soft transition-transform duration-150 ${
-            expanded ? "rotate-90" : ""
-          }`}
-        >
-          <ChevronRight width={13} height={13} />
-        </span>
-        <span
-          className={`text-[13px] leading-relaxed text-ink break-words ${
-            expanded ? "" : "line-clamp-2"
-          }`}
-        >
-          {session.title}
-        </span>
-      </button>
-
-      {/* Meta row — quiet caption on the left, actions surface on hover. */}
-      <div className="flex items-center justify-between gap-3 ps-[19px]">
-        <span className="inline-flex shrink-0 items-center gap-1.5 text-xs text-muted">
-          <span className="inline-flex items-center gap-1 font-medium text-ink/75">
-            <MessageCircle width={11} height={11} />
-            {t("settings.history.assistantLabel")}
-          </span>
-          <span aria-hidden="true" className="text-muted-soft">
-            ·
-          </span>
-          {formattedDate}
-          <span aria-hidden="true" className="text-muted-soft">
-            ·
-          </span>
-          <span className="inline-flex items-center gap-1">
-            {t("settings.history.messageCount", {
-              count: session.messages.length,
-            })}
-          </span>
-        </span>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
-          <IconButton
-            onClick={onResume}
-            title={t("settings.history.resumeConversation")}
-          >
-            <MessageSquarePlus width={14} height={14} />
-          </IconButton>
-          <IconButton
-            onClick={handleCopy}
-            title={t("settings.history.copyConversation")}
-          >
-            {showCopied ? (
-              <Check width={14} height={14} />
-            ) : (
-              <Copy width={14} height={14} />
-            )}
-          </IconButton>
-          <IconButton
-            onClick={handleDelete}
-            title={t("settings.history.delete")}
-          >
-            <Trash2 width={14} height={14} />
-          </IconButton>
-        </div>
-      </div>
-
-      {expanded && (
-        <div className="flex flex-col gap-2 pt-1.5 ps-[19px]">
-          {session.messages.map((message, index) => {
-            const { text, screenshot, files } = cleanMessageContent(
-              message.content,
-            );
-            const isUser = message.role === "user";
-            const thumbnails = message.images ?? [];
-            return (
-              <div
-                key={index}
-                className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={
-                    isUser
-                      ? "max-w-[85%] rounded-xl rounded-br-sm bg-accent px-3 py-2 text-[13px] leading-relaxed text-on-primary select-text whitespace-pre-wrap break-words"
-                      : "max-w-[85%] rounded-xl rounded-bl-sm bg-surface-strong px-3 py-2 text-[13px] leading-relaxed text-ink select-text break-words"
-                  }
-                >
-                  {isUser ? (
-                    text
-                  ) : (
-                    <ReactMarkdown components={assistantMarkdown}>
-                      {text}
-                    </ReactMarkdown>
-                  )}
-                  {thumbnails.length > 0 ? (
-                    <HistoryThumbnails
-                      urls={thumbnails}
-                      hasScreen={screenshot}
-                      isUser={isUser}
-                      screenLabel={t("settings.history.screenshotAttached")}
-                    />
-                  ) : (
-                    screenshot && (
-                      <span
-                        className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          isUser
-                            ? "bg-on-primary/20 text-on-primary/90"
-                            : "bg-mid-gray/15 text-muted"
-                        }`}
-                      >
-                        <Camera width={10} height={10} />
-                        {t("settings.history.screenshotAttached")}
-                      </span>
-                    )
-                  )}
-                  {files.map((name) => (
-                    <span
-                      key={name}
-                      className={`mt-1.5 me-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                        isUser
-                          ? "bg-on-primary/20 text-on-primary/90"
-                          : "bg-mid-gray/15 text-muted"
-                      }`}
-                    >
-                      <FileText width={10} height={10} />
-                      {name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };

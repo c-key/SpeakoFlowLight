@@ -71,11 +71,8 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
   } = useModelStore();
   const { settings, refreshSettings } = useSettings();
 
-  // The active local LLM is the model assigned to the built-in provider in the
-  // Assistant settings. Used to show/select the "Active" Language Model here.
-  const activeLlmId = settings?.assistant_models?.["builtin"] ?? "";
-  // A cleanup fine-tune is "active" when it is the cleanup engine — it is never
-  // the assistant brain, so checking the assistant slot would always say no.
+  // Language models have exactly one job in this build — dictation cleanup —
+  // so there is one "active" slot to compare against.
   const activeCleanupLlmId = settings?.post_process_models?.["builtin"] ?? "";
 
   // click outside handler for language dropdown
@@ -144,10 +141,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
       return "active";
     }
     if (category === "llm") {
-      const activeId = model.is_cleanup_specialist
-        ? activeCleanupLlmId
-        : activeLlmId;
-      if (modelId === activeId) {
+      if (modelId === activeCleanupLlmId) {
         return "active";
       }
     }
@@ -195,22 +189,10 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
           await downloadModel(modelId);
           return;
         }
-        // "Use model" has to mean the job the model can actually do. A cleanup
-        // fine-tune cannot hold a conversation, so assigning it as the assistant
-        // brain — which is what this page does for every other language model —
-        // would quietly break the assistant. Send it to dictation cleanup
-        // instead, which is the only thing it is for.
-        if (model.is_cleanup_specialist) {
-          await commands.setCleanupLocalModel(modelId);
-          await refreshSettings();
-          return;
-        }
-        // Assign the model to the built-in (local) assistant provider and make
-        // that provider active, mirroring the footer LLM selector.
-        await commands.changeAssistantModelSetting("builtin", modelId);
-        if (settings?.assistant_provider_id !== "builtin") {
-          await commands.setAssistantProvider("builtin");
-        }
+        // "Use model" means one thing for a language model here: run
+        // dictation cleanup on it. The command also keeps the selected cleanup
+        // prompt paired with the model, which two calls could not do atomically.
+        await commands.setCleanupLocalModel(modelId);
         await refreshSettings();
       } else {
         await selectModel(modelId);
@@ -232,8 +214,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
     const category = model ? getModelCategory(model) : "stt";
     const isActive =
       category === "llm"
-        ? modelId ===
-          (model?.is_cleanup_specialist ? activeCleanupLlmId : activeLlmId)
+        ? modelId === activeCleanupLlmId
         : modelId === currentModel;
 
     const confirmed = await ask(
@@ -327,9 +308,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
     // could show "Active" without sorting to the top.
     const isActiveForCategory = (m: ModelInfo): boolean => {
       if (categoryFilter !== "llm") return m.id === currentModel;
-      return (
-        m.id === (m.is_cleanup_specialist ? activeCleanupLlmId : activeLlmId)
-      );
+      return m.id === activeCleanupLlmId;
     };
 
     // Recommendation order key: ranked-recommended first (by rank, 1 = top),
@@ -370,7 +349,6 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
     downloadingModels,
     extractingModels,
     currentModel,
-    activeLlmId,
     activeCleanupLlmId,
     categoryFilter,
   ]);

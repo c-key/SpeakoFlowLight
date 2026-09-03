@@ -5,10 +5,9 @@ export { HistorySettings } from "./history/HistorySettings";
 export { AboutSettings } from "./about/AboutSettings";
 export { ModelsSettings } from "./models/ModelsSettings";
 export { DictationSettings } from "./dictation/DictationSettings";
-export { AssistantSettings } from "./assistant/AssistantSettings";
-export { AssistantSection } from "./assistant/AssistantSection";
-export { CharactersSettings } from "./assistant/CharactersSettings";
-export { MemorySettings } from "./assistant/MemorySettings";
+export { ProfilesSection } from "./profiles/ProfilesSection";
+export { ProfilesSettings } from "./profiles/ProfilesSettings";
+export { MemorySettings } from "./profiles/MemorySettings";
 
 // Individual setting components
 export { MicrophoneSelector } from "./MicrophoneSelector";

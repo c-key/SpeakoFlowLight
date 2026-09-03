@@ -56,22 +56,6 @@ async changeTapToLockKeySetting(key: string) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
-/**
- * Set the key that a tap converts a hold **assistant** recording to hands-free.
- * Separate from the dictation lock key so the assistant can use a different
- * combo (defaults to Shift). Accepts a modifier or a plain key name; empty
- * disables it. A key that overlaps the assistant record shortcut is ignored at
- * arm time. Persisted; takes effect on the next assistant recording (the
- * watcher reads it fresh each time it arms).
- */
-async changeAssistantTapToLockKeySetting(key: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_assistant_tap_to_lock_key_setting", { key }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
 async changeAudioFeedbackSetting(enabled: boolean) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_audio_feedback_setting", { enabled }) };
@@ -282,41 +266,6 @@ async setCleanupLocalModel(modelId: string) : Promise<Result<null, string>> {
 async restorePostProcessPrompt(id: string) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("restore_post_process_prompt", { id }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Toggle "Generate with Flow" (the spoken activation-phrase generation path).
- */
-async changeFlowEnabledSetting(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_flow_enabled_setting", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Change the Flow activation phrase. An empty phrase resets to the default
- * ("Hey Flow") so Flow can never end up in an untriggerable state.
- */
-async changeFlowPhraseSetting(phrase: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_flow_phrase_setting", { phrase }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Allow or forbid Flow's `capture_screen` tool (independent of the
- * assistant's screen-access mode).
- */
-async changeFlowScreenAccessSetting(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_flow_screen_access_setting", { enabled }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -582,19 +531,6 @@ async changeOverlayStyleSetting(style: string) : Promise<Result<null, string>> {
     else return { status: "error", error: e  as any };
 }
 },
-/**
- * Set the assistant overlay style: none / minimal / live (or auto). Controls
- * how the assistant surfaces a voice turn — Minimal is the pill, Live shows the
- * transcript + streamed reply as readable text. Independent of dictation.
- */
-async changeAssistantOverlayStyleSetting(style: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_assistant_overlay_style_setting", { style }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
 async changeAppLanguageSetting(language: string) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_app_language_setting", { language }) };
@@ -730,20 +666,20 @@ async cancelOperation() : Promise<void> {
     await TAURI_INVOKE("cancel_operation");
 },
 /**
- * Finish the current recording right now and run the normal transcribe /
- * assistant pipeline on it. This is the "done" tick on the recording overlay
- * and the finish button on the assistant panel — the keyboard-free way to end
- * a hands-free (tap-to-lock or toggle) recording. Unlike `cancel_operation`,
- * the captured audio is kept and transcribed. No-op when nothing is recording.
+ * Finish the current recording right now and run the normal transcribe
+ * pipeline on it. This is the "done" tick on the recording overlay — the
+ * keyboard-free way to end a hands-free (tap-to-lock or toggle) recording.
+ * Unlike `cancel_operation`, the captured audio is kept and transcribed.
+ * No-op when nothing is recording.
  */
 async commitRecording() : Promise<void> {
     await TAURI_INVOKE("commit_recording");
 },
 /**
  * Start/stop a plain dictation recording programmatically, for in-app
- * "dictate into this field" mic buttons (e.g. the Create-with-AI persona
- * description box). Hands-free toggle like the assistant pill mic: the first
- * call starts recording, the second stops it. Because this recording uses the
+ * "dictate into this field" mic buttons (e.g. a profile's instruction box).
+ * Hands-free toggle: the first call starts recording, the second stops it.
+ * Because this recording uses the
  * `"in-app"` source, its transcript is delivered to the webview via the
  * `dictation-transcript` event (the field listens for it) instead of being
  * pasted into the focused OS window — reliable and clipboard-free. No-op if the
@@ -1092,8 +1028,8 @@ async stopLocalLlm() : Promise<Result<null, string>> {
  * Set the context window (in tokens) for the built-in local LLM engine.
  * 
  * The value is clamped to a safe range and only read when the engine starts,
- * so any running engine is stopped here; the next assistant or post-processing
- * turn restarts it with the new size. External providers (Ollama / LM Studio /
+ * so any running engine is stopped here; the next post-processing turn
+ * restarts it with the new size. External providers (Ollama / LM Studio /
  * cloud) are unaffected — they manage their own context.
  */
 async setLocalLlmContextSize(size: number) : Promise<Result<null, string>> {
@@ -1290,218 +1226,26 @@ async updateRecordingRetentionPeriod(period: string) : Promise<Result<null, stri
 }
 },
 /**
- * Page through saved assistant conversations (newest first).
+ * Switch the active profile. Errors if the id no longer exists.
  */
-async getAssistantHistoryEntries(cursor: number | null, limit: number | null) : Promise<Result<PaginatedAssistantHistory, string>> {
+async setActiveProfile(id: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("get_assistant_history_entries", { cursor, limit }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_active_profile", { id }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Delete a single saved assistant conversation.
- */
-async deleteAssistantHistoryEntry(id: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("delete_assistant_history_entry", { id }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Send a typed message to the assistant (keyboard alternative to voice).
- */
-async assistantSendText(text: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_send_text", { text }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Send a typed message with everything the composer collected: attached
- * images (data URLs, already downscaled), text-like files, and — when screen
- * vision is armed — a fresh screenshot. A capture failure surfaces as an
- * error but doesn't sink the turn (it proceeds without the screen).
- */
-async assistantSendComposed(text: string, images: string[], files: FileAttachment[], includeScreen: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_send_composed", { text, images, files, includeScreen }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Read a text-like file (code, markdown, logs, csv…) for attachment as
- * assistant context. Rejects binaries and (for now) PDFs with a clear error.
- */
-async assistantReadFile(path: string) : Promise<Result<FileAttachment, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_read_file", { path }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Load an image file from disk as a provider-ready data URL (downscaled).
- */
-async assistantReadImage(path: string) : Promise<Result<string, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_read_image", { path }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Start the draw-a-box region screenshot flow: freeze the screen (off the
- * main thread), then open the selection overlay on the cursor's monitor.
- * Async on purpose — async commands run on a worker thread, from which Tauri
- * can create windows safely; doing it inline on the main thread inside a
- * sync command deadlocks/crashes WebView2 on Windows.
- */
-async assistantBeginRegionSnip() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_begin_region_snip") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Finish (or cancel, with `rect: None`) the region snip. Called by the snip
- * overlay webview; the cropped image reaches the panel via the
- * `assistant-region-captured` event.
- */
-async assistantFinishRegionSnip(rect: SnipRect | null) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_finish_region_snip", { rect }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async assistantGetConversation() : Promise<Result<ChatMessage[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_get_conversation") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Regenerate the latest answer (re-runs the last user message). The previous
- * variant stays saved in History under its old row — regenerating forks a new
- * one — so earlier answers remain reachable.
- */
-async assistantRegenerate() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_regenerate") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Compact the conversation into a summary that replaces the transcript
- * (the panel's `/summarize` command).
- */
-async assistantSummarize() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_summarize") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Load a past conversation from History into the panel and open it, so the
- * user can continue where they left off. Future turns update that same row.
- */
-async assistantResumeSession(id: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_resume_session", { id }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async assistantClearConversation() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_clear_conversation") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async toggleAssistantPanel() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("toggle_assistant_panel") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async hideAssistantPanel() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("hide_assistant_panel") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantProvider(providerId: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_provider", { providerId }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async changeAssistantModelSetting(providerId: string, model: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_assistant_model_setting", { providerId, model }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async changeAssistantSystemPromptSetting(prompt: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("change_assistant_system_prompt_setting", { prompt }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Switch the active character. Errors if the id no longer exists.
- */
-async setAssistantActiveCharacter(id: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_active_character", { id }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Replace the whole character list. Add / edit / reorder / duplicate / delete
+ * Replace the whole profile list. Add / edit / reorder / duplicate / delete
  * all funnel through here (like text replacements), which keeps the UI simple.
- * Enforces the invariants: the non-deletable `default` character must remain,
+ * Enforces the invariants: the non-deletable `default` profile must remain,
  * the list can't be empty, ids must be unique, and the active id must still
- * resolve. The `default` character's prompt is mirrored back into
- * `assistant_system_prompt` for backward compatibility.
+ * resolve.
  */
-async setAssistantCharacters(characters: AssistantCharacter[]) : Promise<Result<null, string>> {
+async setProfiles(profiles: Profile[]) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_characters", { characters }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_profiles", { profiles }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -1511,567 +1255,61 @@ async setAssistantCharacters(characters: AssistantCharacter[]) : Promise<Result<
  * Load an image file as a small avatar data URL (downscaled to 256px so it
  * stays compact inside the settings file).
  */
-async assistantReadAvatar(path: string) : Promise<Result<string, string>> {
+async readProfileAvatar(path: string) : Promise<Result<string, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_read_avatar", { path }) };
+    return { status: "ok", data: await TAURI_INVOKE("read_profile_avatar", { path }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Import a character from a JSON file on disk (path chosen via the UI's file
- * dialog). The imported character always gets a fresh id and is never marked
+ * Import a profile from a JSON file on disk (path chosen via the UI's file
+ * dialog). The imported profile always gets a fresh id and is never marked
  * built-in, so it can't clobber a built-in or the non-deletable default.
  */
-async assistantImportCharacter(path: string) : Promise<Result<AssistantCharacter, string>> {
+async importProfile(path: string) : Promise<Result<Profile, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_import_character", { path }) };
+    return { status: "ok", data: await TAURI_INVOKE("import_profile", { path }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Export a single character to a JSON file on disk (path chosen via the UI's
+ * Export a single profile to a JSON file on disk (path chosen via the UI's
  * save dialog).
  */
-async assistantExportCharacter(id: string, path: string) : Promise<Result<null, string>> {
+async exportProfile(id: string, path: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_export_character", { id, path }) };
+    return { status: "ok", data: await TAURI_INVOKE("export_profile", { id, path }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Draft a character from a short natural-language description using the
- * currently-configured assistant provider/model. Returns the drafted
- * name/prompt/greeting for the user to review and save.
+ * Reset a built-in profile to the version shipped with the app. Custom
+ * profiles have no shipped default, so this only works on built-in ids. This
+ * is the "reload" for a built-in whose instructions you edited (or wiped) and
+ * want back.
  */
-async assistantGenerateCharacter(description: string) : Promise<Result<GeneratedCharacter, string>> {
+async restoreBuiltinProfile(id: string) : Promise<Result<Profile, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_generate_character", { description }) };
+    return { status: "ok", data: await TAURI_INVOKE("restore_builtin_profile", { id }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Reset a built-in persona to the version shipped with the app (its original
- * name, role, prompt, greeting, avatar, and reply length). Custom personas
- * have no shipped default, so this only works on built-in ids. This is the
- * "reload" for a built-in whose prompt/details you edited (or wiped) and want
- * back.
- */
-async assistantRestoreBuiltinCharacter(id: string) : Promise<Result<AssistantCharacter, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_restore_builtin_character", { id }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Re-add any built-in personas the user deleted, leaving their custom personas
+ * Re-add any built-in profiles the user deleted, leaving their custom profiles
  * and their edits to still-present built-ins untouched. Returns how many were
  * restored (0 if none were missing).
  */
-async assistantRestoreMissingBuiltins() : Promise<Result<number, string>> {
+async restoreMissingBuiltinProfiles() : Promise<Result<number, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_restore_missing_builtins") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Master switch for the whole assistant experience.
- * 
- * Turning it off is what actually reclaims memory: the panel's WebView process
- * is destroyed (not merely hidden, which is all closing it normally does), its
- * two hotkeys are unregistered so the key combos fall through to other apps,
- * and anything in flight is cancelled. Turning it back on recreates the window
- * on demand — no restart. "Generate with Flow" and AI Correction are untouched;
- * they share the provider/model settings but not the panel.
- * 
- * Deliberately `async`: a synchronous Tauri command runs on the main thread,
- * and the teardown below talks to the keyboard engine's thread over a blocking
- * channel and kills a child process. Any of that stalling on the main thread
- * freezes the entire app — no overlay, no dictation, windows you cannot even
- * drag. So the settings write happens here and the slow work runs elsewhere.
- */
-async setAssistantEnabled(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_enabled", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantScreenAccessMode(mode: AssistantScreenAccessMode) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_screen_access_mode", { mode }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Compatibility command for older webviews/configuration callers. Enabling
- * always means Manual and can never preserve or enter Agent decides.
- */
-async setAssistantScreenshotEnabled(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_screenshot_enabled", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Choose when a screen capture is taken for a voice turn: `Immediate` (the
- * moment you start asking) or `OnSend` (when the message actually sends).
- */
-async setAssistantVisionCaptureTiming(timing: VisionCaptureTiming) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_vision_capture_timing", { timing }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsEnabled(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_enabled", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsVoice(voice: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_voice", { voice }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantResponseLength(length: AssistantResponseLength) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_response_length", { length }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantFontSize(size: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_font_size", { size }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsEngine(engine: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_engine", { engine }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsBaseUrl(baseUrl: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_base_url", { baseUrl }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsApiKey(apiKey: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_api_key", { apiKey }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsModel(model: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_model", { model }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsRemoteVoice(voice: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_remote_voice", { voice }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantTtsKokoroDtype(dtype: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_kokoro_dtype", { dtype }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Playback speed multiplier for spoken summaries (0.25x–4x). Clamped to that
- * range so a stray manual entry can't request an unusable rate. The change
- * takes effect on the next spoken clip rather than interrupting the current
- * one.
- */
-async setAssistantTtsSpeed(speed: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_speed", { speed }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantPanelOpacity(opacity: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_panel_opacity", { opacity }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Set the expanded panel size preset ("compact", "standard", or "large") and
- * resize the live panel window to match when it's currently expanded.
- */
-async setAssistantPanelSize(size: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_panel_size", { size }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Whether starting a dictation silences a still-playing assistant reply.
- */
-async setAssistantTtsStopOnDictation(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_tts_stop_on_dictation", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Mirror the panel's staged attachment chips into the backend so voice turns
- * (pill mic / hotkey) send them too.
- */
-async assistantSetPendingAttachments(images: string[], files: FileAttachment[]) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_set_pending_attachments", { images, files }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Route the dictation currently being recorded to the assistant (the STT
- * overlay's Ask-Assistant button), then commit it like a normal finish. A no-op
- * while the assistant is switched off, so the transcript is pasted as usual
- * instead of vanishing into a feature that isn't running.
- */
-async redirectTranscriptionToAssistant() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("redirect_transcription_to_assistant") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-async setAssistantPanelCollapsed(collapsed: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_panel_collapsed", { collapsed }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Current pill/expanded state of the assistant panel. The webview queries this
- * on mount so a fresh or reloaded panel renders the right layout instead of
- * showing the full panel header inside the collapsed pill window.
- */
-async getAssistantPanelCollapsed() : Promise<boolean> {
-    return await TAURI_INVOKE("get_assistant_panel_collapsed");
-},
-/**
- * Signal that the reply identified by `epoch` has no more chunks, so the sink
- * can drain and release the audio device. Closing a reply that has already been
- * superseded is a no-op, so this cannot cut a newer reply short.
- */
-async assistantFinishLocalTts(epoch: number | null) : Promise<void> {
-    await TAURI_INVOKE("assistant_finish_local_tts", { epoch });
-},
-/**
- * Stop a Kokoro chunk currently playing through the native backend. This is
- * deliberately separate from the panel event so calling it from the hook's
- * local `stop()` cannot recursively emit another stop event.
- */
-async assistantStopLocalTts() : Promise<void> {
-    await TAURI_INVOKE("assistant_stop_local_tts");
-},
-/**
- * Arm or disarm sticky Manual screen capture. Disarming is always accepted for
- * cleanup; arming is rejected unless the persisted mode is Manual.
- */
-async setAssistantScreenArmed(armed: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_screen_armed", { armed }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Restore the session-only Manual arm after a panel webview reload.
- */
-async getAssistantScreenArmed() : Promise<boolean> {
-    return await TAURI_INVOKE("get_assistant_screen_armed");
-},
-/**
- * Start/stop assistant voice recording programmatically (pill mic button).
- * Hands-free toggle: first call starts, second stops (a click can't "hold").
- */
-async assistantToggleVoice() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_toggle_voice") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Speak arbitrary text with the configured remote TTS engine (used by the
- * panel to test or replay summaries; the kokoro engine plays in-webview).
- */
-async assistantSpeak(text: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_speak", { text }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Synthesize and play a short sample with the configured remote TTS engine,
- * returning any error so the settings "Test voice" button can show it inline.
- * (The local kokoro engine is tested in-webview, not through this command.)
- */
-async assistantTestTts(text: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_test_tts", { text }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Fetch all available Azure Speech neural voices for the configured endpoint
- * and key, so the settings UI can offer a voice picker instead of guessing.
- */
-async assistantListAzureVoices() : Promise<Result<AzureVoice[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_list_azure_voices") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * List selectable voices for the currently-configured remote TTS engine
- * (OpenAI-compatible, ElevenLabs, or Azure), so the settings UI can offer a
- * searchable voice picker instead of a raw text field. Returns an error string
- * for inline display when the lookup fails (bad key, unreachable endpoint).
- */
-async assistantListTtsVoices() : Promise<Result<TtsVoice[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_list_tts_voices") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * List selectable models for the currently-configured remote TTS engine
- * (OpenAI-compatible `/models`, or ElevenLabs text-to-speech models). Azure and
- * Kokoro don't expose a model list and return an error the UI shows inline.
- */
-async assistantListTtsModels() : Promise<Result<string[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_list_tts_models") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Stop the current assistant turn: cancels in-flight generation and silences
- * any spoken summary that is playing or about to play.
- */
-async assistantStop() : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_stop") };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * How many prior messages the model receives as conversation context.
- */
-async setAssistantMaxHistoryMessages(count: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_max_history_messages", { count }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Toggle automatic conversation summarization: when on, long chats fold older
- * turns into a rolling summary instead of dropping them.
- */
-async setAssistantAutoSummarize(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_auto_summarize", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Enable or disable web search for the assistant. When enabled, a fast local
- * heuristic still decides per-question whether a search is actually run, so
- * casual chat stays instant.
- */
-async setAssistantWebSearchEnabled(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_enabled", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Prefer the provider's OWN built-in web search (currently OpenRouter's
- * `:online`) over the app's search. Providers without native search always use
- * the app's search regardless of this flag.
- */
-async setAssistantPreferProviderWebSearch(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_prefer_provider_web_search", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Choose the search backend: "serper" (default), "brave", "tavily", "exa",
- * "serpapi", or "tinyfish". All are snippet-only and use a single API key.
- */
-async setAssistantWebSearchProvider(provider: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_provider", { provider }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * How many results to feed the model (clamped to 1–10).
- */
-async setAssistantWebSearchMaxResults(count: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_max_results", { count }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Set how thorough web search is: "low" (fastest), "medium" (default), or
- * "high" (broadest single pass). This is the primary depth control.
- */
-async setAssistantSearchDepth(depth: AssistantSearchDepth) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_search_depth", { depth }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * DEPRECATED / no-op since web search became snippet-only (the Firecrawl
- * credit guard was removed). Still registered so existing bindings/settings
- * stay valid; it only writes the now-unused setting field.
- */
-async setAssistantWebSearchDailyCreditBudget(budget: number) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_daily_credit_budget", { budget }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Built-in local model only: toggle smart (LLM-planned) search decisions vs the
- * fast keyword heuristic. No effect on cloud/custom providers.
- */
-async setAssistantLocalSearchSmart(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_local_search_smart", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * DEPRECATED / no-op since web search became snippet-only (page fetching was
- * removed). Still registered so existing bindings/settings stay valid; it only
- * writes the now-unused setting field.
- */
-async setAssistantWebSearchFetchContent(enabled: boolean) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_fetch_content", { enabled }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Store the API key for a search provider ("serper", "brave", "tavily", "exa",
- * "serpapi", or "tinyfish").
- */
-async setAssistantWebSearchApiKey(provider: string, apiKey: string) : Promise<Result<null, string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_web_search_api_key", { provider, apiKey }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
-/**
- * Run a one-off web search with the current settings and return the results,
- * so the settings UI can offer a "Test search" button and surface any error
- * (missing key, rate limit) inline.
- */
-async assistantTestWebSearch(query: string) : Promise<Result<SearchResult[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_test_web_search", { query }) };
+    return { status: "ok", data: await TAURI_INVOKE("restore_missing_builtin_profiles") };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2080,32 +1318,44 @@ async assistantTestWebSearch(query: string) : Promise<Result<SearchResult[], str
 /**
  * Turn the personal-memory feature on or off. Off by default.
  */
-async setAssistantMemoryEnabled(enabled: boolean) : Promise<Result<null, string>> {
+async setMemoryEnabled(enabled: boolean) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_memory_enabled", { enabled }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_memory_enabled", { enabled }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Set how much memory is injected per turn (the token-budget dial).
+ * Set how much memory is injected per cleanup pass (the budget dial).
  */
-async setAssistantMemoryDetail(detail: MemoryDetail) : Promise<Result<null, string>> {
+async setMemoryDetail(detail: MemoryDetail) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_memory_detail", { detail }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_memory_detail", { detail }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Toggle incognito: when on, this conversation is neither remembered nor
- * personalized from memory.
+ * Toggle incognito: while on, dictations are neither personalized from memory
+ * nor learned from.
  */
-async setAssistantMemoryIncognito(incognito: boolean) : Promise<Result<null, string>> {
+async setMemoryIncognito(incognito: boolean) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_memory_incognito", { incognito }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_memory_incognito", { incognito }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Turn automatic learning from past dictations on or off. Off by default, so
+ * memory holds only what the user entered or explicitly asked for.
+ */
+async setMemoryAutoLearn(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_memory_auto_learn", { enabled }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2114,9 +1364,9 @@ async setAssistantMemoryIncognito(incognito: boolean) : Promise<Result<null, str
 /**
  * Replace the always-on "About You" summary (user-edited in Settings).
  */
-async setAssistantMemoryAboutYou(text: string) : Promise<Result<null, string>> {
+async setMemoryAboutYou(text: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("set_assistant_memory_about_you", { text }) };
+    return { status: "ok", data: await TAURI_INVOKE("set_memory_about_you", { text }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2125,9 +1375,9 @@ async setAssistantMemoryAboutYou(text: string) : Promise<Result<null, string>> {
 /**
  * Add a user-authored note (explicit → high confidence). Returns the new note.
  */
-async addAssistantMemoryNote(text: string) : Promise<Result<MemoryNote, string>> {
+async addMemoryNote(text: string) : Promise<Result<MemoryNote, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("add_assistant_memory_note", { text }) };
+    return { status: "ok", data: await TAURI_INVOKE("add_memory_note", { text }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2136,9 +1386,9 @@ async addAssistantMemoryNote(text: string) : Promise<Result<MemoryNote, string>>
 /**
  * Edit an existing note's text (keeps it user-owned; bumps its date).
  */
-async updateAssistantMemoryNote(id: string, text: string) : Promise<Result<null, string>> {
+async updateMemoryNote(id: string, text: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("update_assistant_memory_note", { id, text }) };
+    return { status: "ok", data: await TAURI_INVOKE("update_memory_note", { id, text }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2147,9 +1397,9 @@ async updateAssistantMemoryNote(id: string, text: string) : Promise<Result<null,
 /**
  * Delete a single note by id.
  */
-async deleteAssistantMemoryNote(id: string) : Promise<Result<null, string>> {
+async deleteMemoryNote(id: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("delete_assistant_memory_note", { id }) };
+    return { status: "ok", data: await TAURI_INVOKE("delete_memory_note", { id }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2159,9 +1409,9 @@ async deleteAssistantMemoryNote(id: string) : Promise<Result<null, string>> {
  * Wipe the entire personal memory (summary + all notes). Does not change the
  * enabled toggle.
  */
-async clearAssistantMemory() : Promise<Result<null, string>> {
+async clearMemory() : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("clear_assistant_memory") };
+    return { status: "ok", data: await TAURI_INVOKE("clear_memory") };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2171,9 +1421,9 @@ async clearAssistantMemory() : Promise<Result<null, string>> {
  * Export the whole memory to a JSON file on disk (path chosen via the UI's
  * save dialog). Your data, in a portable, human-readable file.
  */
-async exportAssistantMemory(path: string) : Promise<Result<null, string>> {
+async exportMemory(path: string) : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("export_assistant_memory", { path }) };
+    return { status: "ok", data: await TAURI_INVOKE("export_memory", { path }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2184,22 +1434,27 @@ async exportAssistantMemory(path: string) : Promise<Result<null, string>> {
  * replacing the current memory. Sensitive/oversized entries are filtered out
  * on the way in.
  */
-async importAssistantMemory(path: string) : Promise<Result<UserMemory, string>> {
+async importMemory(path: string) : Promise<Result<UserMemory, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("import_assistant_memory", { path }) };
+    return { status: "ok", data: await TAURI_INVOKE("import_memory", { path }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
 },
 /**
- * Distill memory from the CURRENT conversation right now (the "Update memory
- * from this chat" button). Runs the offline extraction pass immediately so the
- * user can see it work without waiting for the conversation to end.
+ * Learn from recent dictations right now (the "Update memory from my
+ * dictations" button). Reads the last [`DISTILL_HISTORY_LIMIT`] history
+ * entries and runs the extraction pass immediately, so the user can see it
+ * work instead of waiting for it to happen in the background.
+ * 
+ * Deliberately explicit: automatic learning is off by default (see
+ * `memory_auto_learn`), which makes this button the only path into memory
+ * besides typing a note by hand.
  */
-async assistantDistillMemoryNow() : Promise<Result<null, string>> {
+async distillMemoryNow() : Promise<Result<null, string>> {
     try {
-    return { status: "ok", data: await TAURI_INVOKE("assistant_distill_memory_now") };
+    return { status: "ok", data: await TAURI_INVOKE("distill_memory_now") };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -2260,18 +1515,7 @@ tap_to_lock?: boolean;
  * ("shift", "ctrl", "alt", "super"/"cmd") or a plain key name ("tab", "f8",
  * …). Only relevant while push-to-talk and Tap to Lock are on.
  */
-tap_to_lock_key?: string; 
-/**
- * The key you tap while holding a push-to-talk **assistant** recording to
- * lock it hands-free, so you can release the hotkey and keep talking to the
- * assistant. Separate from the dictation `tap_to_lock_key` so it can be a
- * different combo (defaults to Shift). Accepts a modifier ("shift", "ctrl",
- * …) or a plain key name ("tab", "f8", …). Pick a key that isn't part of
- * your assistant record shortcut — one that overlaps (e.g. Space while the
- * shortcut is ctrl+alt+space) is ignored, since the held key would instantly
- * lock the recording. Clear it (empty) to disable.
- */
-assistant_tap_to_lock_key?: string; audio_feedback: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; selected_model?: string; always_on_microphone?: boolean; 
+tap_to_lock_key?: string; audio_feedback: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; selected_model?: string; always_on_microphone?: boolean; 
 /**
  * Opt-in live/streaming transcription: while recording, feed audio into a
  * streaming transcriber and paste the merged running result at the end
@@ -2292,12 +1536,7 @@ live_transcription_window_enabled?: boolean; selected_microphone?: string | null
  * Recording (dictation) overlay style: Auto/None/Minimal/Live. Auto follows
  * the model's live-streaming support (Live if supported, else Minimal).
  */
-overlay_style?: OverlayStyle; 
-/**
- * Assistant overlay style: Auto/None/Minimal/Live. Live shows the running
- * transcript plus the streamed reply as readable text; Minimal is the pill.
- */
-assistant_overlay_style?: OverlayStyle; debug_mode?: boolean; log_level?: LogLevel; custom_words?: string[]; 
+overlay_style?: OverlayStyle; debug_mode?: boolean; log_level?: LogLevel; custom_words?: string[]; 
 /**
  * Folders the user keeps their own models in. Each is scanned recursively
  * and every `.gguf` / Whisper `.bin` found is registered as a catalog entry
@@ -2361,196 +1600,52 @@ post_process_selected_tone_id?: string | null; post_process_timeout_secs?: numbe
  * user came back, switched to cloud, and landed on some other provider with
  * their model selection apparently gone.
  */
-post_process_last_cloud_provider_id?: string | null; 
-/**
- * "Generate with Flow": when on, a dictation that begins with the
- * activation phrase becomes a one-shot AI generation command whose result
- * is pasted instead of the spoken words. Off by default.
- */
-flow_enabled?: boolean; 
-/**
- * The spoken activation phrase that triggers Flow at the start of a
- * normal dictation (matched case- and punctuation-insensitively).
- */
-flow_phrase?: string; 
-/**
- * Whether Flow may use the `capture_screen` tool for a command that
- * clearly refers to the screen. Separate from the assistant's screen
- * access mode on purpose — the two features are permissioned independently.
- */
-flow_screen_access?: boolean; mute_while_recording?: boolean; append_trailing_space?: boolean; app_language?: string; experimental_enabled?: boolean; lazy_stream_close?: boolean; keyboard_implementation?: KeyboardImplementation; show_tray_icon?: boolean; close_behavior?: CloseBehavior; paste_delay_ms?: number; typing_tool?: TypingTool; external_script_path: string | null; custom_filler_words?: string[] | null; whisper_accelerator?: WhisperAcceleratorSetting; ort_accelerator?: OrtAcceleratorSetting; whisper_gpu_device?: number; extra_recording_buffer_ms?: number; 
-/**
- * Master switch for the assistant experience: the floating panel window,
- * its two hotkeys, spoken replies, profiles and personal memory.
- * 
- * Off makes SpeakoFlow dictation-only and, crucially, never creates the
- * always-on-top panel WebView — a whole renderer process plus whatever it
- * loads (the local TTS model above all) that otherwise lives for as long as
- * the app does. Kept separate from the provider/model settings on purpose:
- * "Generate with Flow" and AI Correction share those and keep working.
- */
-assistant_enabled?: boolean; assistant_provider_id?: string; 
-/**
- * The cloud provider the assistant last used, remembered so its device ⇄
- * cloud switch restores the user's choice instead of guessing. Same
- * reasoning as `post_process_last_cloud_provider_id`.
- */
-assistant_last_cloud_provider_id?: string | null; assistant_models?: Partial<{ [key in string]: string }>; assistant_system_prompt?: string; 
-/**
- * Controls whether screen capture is off, user-triggered, or agent-decided.
- */
-assistant_screen_access_mode?: AssistantScreenAccessMode; 
-/**
- * Compatibility mirror for code that still consumes the former boolean.
- * Derived from `assistant_screen_access_mode` whenever settings are repaired
- * or written: only `Off` maps to false.
- */
-assistant_screenshot_enabled?: boolean; 
-/**
- * When a screen capture is taken for a voice turn (immediate vs at-send).
- */
-assistant_vision_capture_timing?: VisionCaptureTiming; assistant_tts_enabled?: boolean; assistant_tts_engine?: string; assistant_tts_voice?: string; assistant_tts_base_url?: string; assistant_tts_api_key?: SecretString; assistant_tts_model?: string; assistant_tts_remote_voice?: string; 
-/**
- * Per-engine remote-TTS configuration. The flat `assistant_tts_base_url`,
- * `assistant_tts_model`, `assistant_tts_remote_voice`, and
- * `assistant_tts_api_key` fields above are a denormalized MIRROR of
- * whichever engine is currently active (kept so `tts.rs` and the settings
- * UI can read a single value). These maps are the source of truth, keyed by
- * engine id ("openai" / "elevenlabs" / "azure"), so each engine keeps its
- * own endpoint, model, voice, and API key instead of sharing one slot and
- * getting wiped when the engine is switched.
- */
-assistant_tts_base_urls?: Partial<{ [key in string]: string }>; assistant_tts_models?: Partial<{ [key in string]: string }>; assistant_tts_remote_voices?: Partial<{ [key in string]: string }>; assistant_tts_api_keys?: SecretMap; assistant_tts_kokoro_dtype?: string; 
-/**
- * Playback speed multiplier for spoken assistant summaries. 1.0 is normal;
- * 0.5 is half speed, 2.0 is double, etc. Applied locally for Kokoro (via
- * the webview audio element) and natively for remote engines where the
- * API supports it.
- */
-assistant_tts_speed?: number; assistant_max_history_messages?: number; 
-/**
- * When on, once a conversation grows past the model's context window the
- * assistant folds older turns into a rolling summary (kept in context)
- * instead of dropping them, so long chats keep flowing. On by default.
- */
-assistant_auto_summarize?: boolean; 
+post_process_last_cloud_provider_id?: string | null; mute_while_recording?: boolean; append_trailing_space?: boolean; app_language?: string; experimental_enabled?: boolean; lazy_stream_close?: boolean; keyboard_implementation?: KeyboardImplementation; show_tray_icon?: boolean; close_behavior?: CloseBehavior; paste_delay_ms?: number; typing_tool?: TypingTool; external_script_path: string | null; custom_filler_words?: string[] | null; whisper_accelerator?: WhisperAcceleratorSetting; ort_accelerator?: OrtAcceleratorSetting; whisper_gpu_device?: number; extra_recording_buffer_ms?: number; 
 /**
  * Context window (in tokens) the built-in local LLM engine launches with.
  * Applied when the engine starts; ignored by external providers
  * (Ollama / LM Studio / cloud), which manage their own context.
  */
-local_llm_context_size?: number; assistant_response_length?: AssistantResponseLength; 
+local_llm_context_size?: number; 
 /**
- * Selectable assistant personas. The active one's prompt overrides
- * `assistant_system_prompt` for LLM turns. Seeded with built-ins on first
- * run (see `default_assistant_characters`).
+ * Selectable dictation profiles: each bundles a cleanup prompt, tone,
+ * extra instructions, and whether memory is injected. Seeded with
+ * built-ins on first run (see `default_profiles`).
  */
-assistant_characters?: AssistantCharacter[]; 
+profiles?: Profile[]; 
 /**
- * Id of the currently active character (defaults to `"default"`).
+ * Id of the currently active profile (defaults to `"default"`).
  */
-assistant_active_character_id?: string; 
+active_profile_id?: string; 
 /**
- * Whether the assistant keeps a local, personal memory of the user (an
+ * Whether SpeakoFlow keeps a local, personal memory of the user (an
  * always-on "About You" summary plus durable notes) and injects the
- * relevant parts into each reply. Off by default; everything stays on this
+ * relevant parts into AI cleanup. Off by default; everything stays on this
  * device and is fully user-editable in Settings → Memory.
  */
-assistant_memory_enabled?: boolean; 
+memory_enabled?: boolean; 
 /**
  * The user's personal memory: a short always-on summary + durable notes.
  */
-assistant_memory?: UserMemory; 
+memory?: UserMemory; 
 /**
- * How much memory to inject each turn (a token-budget dial). Light keeps
- * only the summary; Balanced adds a few relevant notes; Detailed adds more.
+ * How much memory to inject per cleanup pass (a character-budget dial).
+ * Light keeps only the summary; Balanced adds a few relevant notes;
+ * Detailed adds more.
  */
-assistant_memory_detail?: MemoryDetail; 
+memory_detail?: MemoryDetail; 
 /**
- * When true, this conversation is "incognito": memory is neither injected
- * into replies nor learned from the conversation. A quick switch so a
- * private chat leaves no trace in memory.
+ * When true, memory is "incognito": neither injected into cleanup nor
+ * learned from new dictations. A quick switch so private dictation leaves
+ * no trace in memory.
  */
-assistant_memory_incognito?: boolean; assistant_font_size?: string; 
+memory_incognito?: boolean; 
 /**
- * Surface opacity of the floating assistant panel (0.5–1.0). At 1.0 the
- * panel is fully opaque; lower values let the desktop blur through.
- * 
- * Note: the old `assistant_accent`, `assistant_panel_size`, and
- * `assistant_panel_theme` customization fields were removed (the panel is
- * dark-only now) — serde silently ignores those keys in previously stored
- * settings.
+ * Whether SpeakoFlow may distill new memory notes from past dictations
+ * on its own. Off by default: with it off, memory only ever holds what the
+ * user typed in Settings → Memory or asked for explicitly.
  */
-assistant_panel_opacity?: number; 
-/**
- * Overall size of the expanded floating assistant panel: "compact",
- * "standard" (default), or "large". Chosen in Panel Appearance settings and
- * applied as the window's logical width/height. A manual drag-resize still
- * overrides it for the current session.
- */
-assistant_panel_size?: string; 
-/**
- * Whether starting a plain dictation should silence an assistant reply
- * that is still being read aloud. Off by default — earphone users often
- * want to keep listening while they dictate. (Asking the assistant a NEW
- * question always interrupts the previous answer, regardless.)
- */
-assistant_tts_stop_on_dictation?: boolean; 
-/**
- * Whether the assistant may search the web. When on, an automatic
- * heuristic decides per-question whether a search is actually worthwhile
- * (factual/time-sensitive questions yes; chit-chat, code, math no), so
- * casual messages stay instant.
- */
-assistant_web_search_enabled?: boolean; 
-/**
- * Which search backend to use: "serper" (default), "brave", "tavily",
- * "exa", "serpapi", or "tinyfish". All are snippet-only and use a single
- * API key.
- */
-assistant_web_search_provider?: string; 
-/**
- * How many results to feed the model. Kept modest to bound prompt size;
- * clamped to 1–10 at search time.
- */
-assistant_web_search_max_results?: number; 
-/**
- * DEPRECATED / unused since web search became snippet-only (Firecrawl and
- * its page-scrape stage were removed). Kept so existing settings files and
- * generated bindings stay stable; no current provider reads it.
- */
-assistant_web_search_fetch_content?: boolean; 
-/**
- * How thorough web search is (Low/Medium/High). Replaces the old raw
- * "max results" number as the primary control; tuned to stay fast.
- */
-assistant_search_depth?: AssistantSearchDepth; 
-/**
- * DEPRECATED / unused since the Firecrawl credit guard was removed (search
- * is now snippet-only over per-request SERP APIs). Kept so existing
- * settings files and generated bindings stay stable.
- */
-assistant_web_search_daily_credit_budget?: number; 
-/**
- * Built-in local model ONLY: when true, decide whether to search with the
- * same LLM planner the cloud providers use (smarter, but an extra
- * generation pass — slower, especially on weak hardware). When false
- * (default), use the instant keyword heuristic. No effect on cloud/custom
- * providers, which always use the planner.
- */
-assistant_local_search_smart?: boolean; 
-/**
- * When the active assistant provider has its OWN built-in web search
- * (currently OpenRouter's `:online`), prefer it over the app's own search.
- * Providers without native search always use the app's search regardless.
- * Default true, so OpenRouter uses its built-in search out of the box.
- */
-assistant_prefer_provider_web_search?: boolean; 
-/**
- * API keys for the keyed search providers, keyed by provider id
- * ("serper", "brave", "tavily", "exa", "serpapi", "tinyfish").
- */
-web_search_api_keys?: SecretMap; theme?: Theme; ui_text_size?: UiTextSize; 
+memory_auto_learn?: boolean; theme?: Theme; ui_text_size?: UiTextSize; 
 /**
  * Remembered main-window size in logical pixels, saved when the user
  * resizes/closes the window and restored (clamped to the current monitor)
@@ -2559,135 +1654,6 @@ web_search_api_keys?: SecretMap; theme?: Theme; ui_text_size?: UiTextSize;
  * position, so the window can't reopen off-screen after a monitor change.
  */
 main_window_width?: number | null; main_window_height?: number | null }
-/**
- * A selectable assistant persona ("character"). The active character's
- * `prompt` overrides the plain `assistant_system_prompt` for LLM turns; its
- * `name`/`avatar` label the panel. Built-ins ship with the app; users can add,
- * edit, duplicate, import, AI-generate, and delete their own (the `default`
- * character can never be deleted).
- */
-export type AssistantCharacter = { 
-/**
- * Stable identifier. `"default"` is reserved for the non-deletable base
- * assistant; `"cat"` for the built-in joke character.
- */
-id: string; 
-/**
- * Display name shown in the panel header and the picker.
- */
-name: string; 
-/**
- * System prompt / persona. Ignored for `Cat`.
- */
-prompt?: string; 
-/**
- * Optional in-character opening line shown in the panel's empty state.
- */
-greeting?: string; 
-/**
- * Optional avatar as a `data:image/...;base64,...` URL (empty → initial).
- */
-avatar?: string; 
-/**
- * What powers this character's replies.
- */
-kind?: AssistantCharacterKind; 
-/**
- * True for characters shipped with the app. Built-ins may be edited or
- * duplicated; only `default` is protected from deletion.
- */
-builtin?: boolean; 
-/**
- * Optional one-line role/description shown as the card subtitle in the
- * persona picker (e.g. "Short, direct answers"). Purely cosmetic — it
- * never reaches the model.
- */
-description?: string; 
-/**
- * Optional per-persona reply-length override. `None` inherits the global
- * `assistant_response_length`; `Some(_)` wins for this persona's turns so
- * a "Concise" persona can stay short while an "In-Depth" one runs long.
- */
-response_length?: AssistantResponseLength | null }
-/**
- * What powers a character's replies. Most characters are `Llm` (their `prompt`
- * becomes the system prompt). `Cat` is a joke character that ignores the LLM
- * entirely and just meows — see `assistant::run_cat_turn`.
- */
-export type AssistantCharacterKind = 
-/**
- * Normal persona: `prompt` is used as the assistant's system prompt.
- */
-"llm" | 
-/**
- * Novelty persona with no model call — replies are random "meow"s.
- */
-"cat"
-/**
- * A persisted assistant conversation. One row per session; `messages` is the
- * ordered turn-by-turn transcript (the same `{role, content}` shape the
- * assistant panel renders).
- */
-export type AssistantHistoryEntry = { id: number; 
-/**
- * When the conversation was first saved (seconds since epoch).
- */
-timestamp: number; 
-/**
- * When the most recent turn was added (seconds since epoch).
- */
-updated_at: number; 
-/**
- * Short label derived from the first user message.
- */
-title: string; messages: ChatMessage[] }
-/**
- * Desired length of the assistant's replies. Appended as a directive to the
- * system prompt at request time, so it works with the single main prompt
- * (no separate summary layer). `Default` injects nothing.
- */
-export type AssistantResponseLength = 
-/**
- * No length directive — use the system prompt as-is.
- */
-"default" | "short" | "medium" | "long"
-/**
- * Controls who may initiate screen capture for assistant turns.
- */
-export type AssistantScreenAccessMode = 
-/**
- * Screen capture is disabled.
- */
-"off" | 
-/**
- * The user explicitly attaches or requests each capture.
- */
-"manual" | 
-/**
- * The assistant may decide when the current turn needs a capture.
- */
-"agent_decides"
-/**
- * How thorough a web search should be. This is the single dial that replaces
- * the old raw "max results" number: it controls how many queries run, how many
- * pages get scraped, and how much source text the model receives. All three
- * tiers are tuned to stay fast (one retrieval pass, heavy parallelism, tight
- * timeouts) — this is "answer-with-search like ChatGPT/Gemini do in seconds",
- * not minutes-long deep research.
- */
-export type AssistantSearchDepth = 
-/**
- * Fastest. One query, snippets + a couple of scraped pages. Quick facts.
- */
-"low" | 
-/**
- * Balanced default. A few queries, rerank, scrape the top handful.
- */
-"medium" | 
-/**
- * Broadest single pass. More queries/sources, scrape more winners.
- */
-"high"
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AvailableAccelerators = { whisper: string[]; ort: string[]; gpu_devices: GpuDeviceOption[]; 
@@ -2698,26 +1664,6 @@ export type AvailableAccelerators = { whisper: string[]; ort: string[]; gpu_devi
  * GPU-device dial, so there is no separate device setting.
  */
 transcribe_cpp_devices: GpuDeviceOption[] }
-/**
- * A neural voice returned by the Azure Speech `voices/list` endpoint.
- */
-export type AzureVoice = { 
-/**
- * e.g. "en-US-JennyNeural" — this is what goes in the Voice name field.
- */
-short_name: string; 
-/**
- * Friendly display name, e.g. "Jenny".
- */
-local_name: string; 
-/**
- * e.g. "en-US".
- */
-locale: string; 
-/**
- * "Male" / "Female".
- */
-gender: string }
 export type BindingResponse = { success: boolean; binding: ShortcutBinding | null; error: string | null }
 /**
  * Case transform applied to the output of a text replacement rule.
@@ -2739,16 +1685,6 @@ export type Capitalization =
  * Capitalize the first character of the replacement.
  */
 "capitalize"
-export type ChatMessage = { role: string; content: string; 
-/**
- * Small JPEG **display thumbnails** (data URLs) for any images that rode
- * along with this message — a screen capture and/or user-attached pictures.
- * Display + history only: these are never sent to the model (the full-res
- * copy is sent once, for that turn), they just let the panel show and
- * hover-enlarge what was sent, and survive restarts. Older history rows
- * (and text-only turns) simply have an empty list.
- */
-images?: string[] }
 export type ClipboardHandling = "dont_modify" | "copy_to_clipboard"
 /**
  * What happens when the user closes the main window.
@@ -2783,17 +1719,6 @@ export type EngineType = "Whisper" | "Parakeet" | "Moonshine" | "MoonshineStream
  * Not a transcription engine.
  */
 "Kokoro"
-/**
- * A text-like file attached to a turn as context (content extracted in the
- * webview or by `assistant_read_file`).
- */
-export type FileAttachment = { name: string; content: string }
-/**
- * A persona drafted by the model from a short description. Not persisted by
- * the backend — the UI shows it for review, then saves it via
- * `set_assistant_characters`.
- */
-export type GeneratedCharacter = { name: string; prompt: string; greeting: string }
 /**
  * One compute device. `Deserialize` is needed by the Linux out-of-process
  * probe, which parses this back out of the child's JSON.
@@ -2902,20 +1827,20 @@ export type LocalModelImport = { added: ModelInfo[]; failed: LocalModelFailure[]
 export type LogLevel = "trace" | "debug" | "info" | "warn" | "error"
 /**
  * How sure we are about a remembered fact. Facts the user stated explicitly
- * are `High`; facts the model inferred from a conversation are `Low`. Feeds
+ * are `High`; facts the model inferred from dictations are `Low`. Feeds
  * pruning (low-confidence notes fade first) and injection ordering.
  */
 export type MemoryConfidence = "low" | "medium" | "high"
 /**
- * How much memory to inject each turn — a token-budget dial. `Light` keeps
- * only the summary; `Balanced` adds a few relevant notes; `Detailed` adds
- * more. Keeps memory cost flat regardless of how much has been learned.
+ * How much memory to inject per cleanup pass — a token-budget dial. `Light`
+ * keeps only the summary; `Balanced` adds a few relevant notes; `Detailed`
+ * adds more. Keeps memory cost flat regardless of how much has been learned.
  */
 export type MemoryDetail = "light" | "balanced" | "detailed"
 /**
- * A single durable fact the assistant has learned (or been told) about the
- * user. Notes are pulled into a turn by relevance, within a token budget —
- * never all at once — and are fully user-editable in Settings → Memory.
+ * A single durable fact SpeakoFlow has learned (or been told) about the user.
+ * Notes are pulled into a cleanup pass by relevance, within a character budget
+ * — never all at once — and are fully user-editable in Settings → Memory.
  */
 export type MemoryNote = { 
 /**
@@ -2937,7 +1862,7 @@ updated?: string;
 confidence?: MemoryConfidence; 
 /**
  * Where the note came from: `"user"` (typed/dictated explicitly) or
- * `"auto"` (distilled from a conversation). Purely informational.
+ * `"auto"` (distilled from past dictations). Purely informational.
  */
 source?: string }
 export type ModelInfo = { id: string; name: string; description: string; filename: string; url: string | null; sha256: string | null; size_mb: number; is_downloaded: boolean; is_downloading: boolean; partial_size: number; is_directory: boolean; engine_type: EngineType; accuracy_score: number; speed_score: number; supports_translation: boolean; supports_streaming: boolean; is_recommended: boolean; 
@@ -2975,19 +1900,17 @@ export type ModelUnloadTimeout = "never" | "immediately" | "min_2" | "min_5" | "
 export type OrtAcceleratorSetting = "auto" | "cpu" | "cuda" | "directml" | "rocm"
 export type OverlayPosition = "none" | "top" | "bottom"
 /**
- * How the recording / assistant overlay presents itself while active.
+ * How the recording overlay presents itself while active.
  * `Auto` follows the model: Live when the selected model supports live
  * streaming transcription, otherwise Minimal — the user can override to a
  * concrete choice. `None` shows nothing, `Minimal` is the compact pill, and
- * `Live` is the enlarged readable card (running transcript + — for the
- * assistant — the streamed reply).
+ * `Live` is the enlarged readable card (running transcript).
  */
 export type OverlayStyle = "auto" | "none" | "minimal" | "live"
-export type PaginatedAssistantHistory = { entries: AssistantHistoryEntry[]; has_more: boolean }
 export type PaginatedHistory = { entries: HistoryEntry[]; has_more: boolean }
 export type PasteMethod = "ctrl_v" | "direct" | "none" | "shift_insert" | "ctrl_shift_v" | "external_script"
 export type PermissionAccess = "allowed" | "denied" | "unknown"
-export type PostProcessConfigSource = "dedicated_cleanup_selection" | "assistant_fallback"
+export type PostProcessConfigSource = "dedicated_cleanup_selection"
 export type PostProcessProvider = { id: string; label: string; base_url: string; allow_base_url_edit?: boolean; models_endpoint?: string | null; supports_structured_output?: boolean }
 export type PostProcessReadiness = { state: "ready"; source: PostProcessConfigSource; provider_id: string; provider_label: string; model: string } | { state: "unavailable"; reason: PostProcessUnavailableReason; source: PostProcessConfigSource | null; provider_id: string | null; provider_label: string | null }
 /**
@@ -2999,6 +1922,63 @@ export type PostProcessReadiness = { state: "ready"; source: PostProcessConfigSo
  */
 export type PostProcessTone = "none" | "formal" | "casual" | "professional" | "friendly" | "concise"
 export type PostProcessUnavailableReason = "no_providers" | "selected_provider_missing" | "no_model_configured" | "no_prompt_selected" | "selected_prompt_missing" | "selected_prompt_empty" | "missing_api_key"
+/**
+ * A dictation profile: one switch that carries a whole AI-cleanup setup.
+ * 
+ * Upstream shipped these as assistant personas ("characters") for the floating
+ * chat panel. This build has no panel, so a profile does the job that actually
+ * matters for dictation: it bundles the cleanup prompt template, the tone, an
+ * extra instruction layer, and whether personal memory is injected — so
+ * switching from "work email" to "chat message" is one choice instead of
+ * three separate settings.
+ * 
+ * Built-ins ship with the app; users can add, edit, duplicate, import, and
+ * delete their own. The `default` profile can never be deleted.
+ */
+export type Profile = { 
+/**
+ * Stable identifier. `"default"` is reserved for the non-deletable base
+ * profile.
+ */
+id: string; 
+/**
+ * Display name shown in the picker and the tray.
+ */
+name: string; 
+/**
+ * Extra style/context instructions layered onto the cleanup prompt (after
+ * the tone directive, before the output contract). Empty adds nothing.
+ */
+instructions?: string; 
+/**
+ * Which cleanup prompt template this profile selects. Empty keeps whatever
+ * `post_process_selected_prompt_id` is set to globally.
+ */
+prompt_id?: string; 
+/**
+ * Built-in tone id or a `CustomPostProcessTone.id` applied on top of the
+ * prompt. Empty keeps the global `post_process_selected_tone_id`.
+ */
+tone_id?: string; 
+/**
+ * Whether personal memory is injected while this profile is active. Off
+ * for profiles where the user's personal context is irrelevant.
+ */
+use_memory?: boolean; 
+/**
+ * Optional avatar as a `data:image/...;base64,...` URL (empty → initial).
+ */
+avatar?: string; 
+/**
+ * True for profiles shipped with the app. Built-ins may be edited or
+ * duplicated; only `default` is protected from deletion.
+ */
+builtin?: boolean; 
+/**
+ * One-line subtitle shown on the profile card (e.g. "Short, direct
+ * answers"). Purely cosmetic — it never reaches the model.
+ */
+description?: string }
 export type RecordingRetentionPeriod = "never" | "preserve_limit" | "days_3" | "weeks_2" | "months_3"
 /**
  * A single deterministic find/replace rule applied to the transcript.
@@ -3038,23 +2018,8 @@ trim_after?: boolean;
  * Case transform applied to this rule's output.
  */
 capitalization?: Capitalization }
-/**
- * A single web result handed to the model. `content` holds scraped page text
- * (markdown) when available; `snippet` is the short description that's always
- * present. The model prefers `content` and falls back to `snippet`.
- */
-export type SearchResult = { title: string; url: string; snippet: string; 
-/**
- * Full page content (markdown) when available; empty otherwise.
- */
-content?: string }
 export type SecretMap = Partial<{ [key in string]: string }>
-export type SecretString = string
 export type ShortcutBinding = { id: string; name: string; description: string; default_binding: string; current_binding: string }
-/**
- * Rectangle chosen in the snip overlay, in that window's logical pixels.
- */
-export type SnipRect = { x: number; y: number; width: number; height: number }
 export type SoundTheme = 
 /**
  * SpeakoFlow's own start/stop cues — the default. Ships a matching lock
@@ -3067,20 +2032,6 @@ export type SoundTheme =
  * "system") to match the `data-theme` attribute the frontend sets on <html>.
  */
 export type Theme = "light" | "dark" | "system"
-/**
- * A voice option handed to the settings UI for any remote TTS engine, so the
- * user can pick from a loaded list instead of typing an opaque id.
- */
-export type TtsVoice = { 
-/**
- * Value written to settings (OpenAI voice name / ElevenLabs voice_id /
- * Azure short name).
- */
-id: string; 
-/**
- * Friendly label for the picker.
- */
-label: string }
 export type TypingTool = "auto" | "wtype" | "kwtype" | "dotool" | "ydotool" | "xdotool"
 /**
  * UI text size for the main window. Applied as a webview zoom factor so the
@@ -3091,8 +2042,8 @@ export type UiTextSize = "small" | "default" | "large" | "extra_large"
 /**
  * The user's personal, local-first memory: a short always-on "About You"
  * summary plus a list of durable notes. Stored on-device in settings and
- * injected (in part) into assistant turns only when
- * `assistant_memory_enabled` is on and the conversation isn't incognito.
+ * injected (in part) into an AI-cleanup pass only when `memory_enabled` is on,
+ * incognito is off, and the active profile opts in.
  */
 export type UserMemory = { 
 /**
@@ -3104,32 +2055,6 @@ about_you?: string;
  * Durable facts, selected by relevance within the detail budget.
  */
 notes?: MemoryNote[] }
-/**
- * When a screen capture is taken for an assistant turn.
- * 
- * This only changes the timing for **voice** questions (where there's a real
- * gap between starting and finishing the question); typed messages always
- * capture at send, since the panel is already on screen either way.
- * 
- * It applies to both ways a capture can happen: a Manual capture the user
- * armed, and an Agent-decides capture the model asks for mid-turn. In the agent
- * case `Immediate` is purely a speed setting — the frame is held locally and is
- * only ever sent if the model actually calls the screen tool.
- */
-export type VisionCaptureTiming = 
-/**
- * Capture the moment you start asking (voice: at hotkey/mic press), so it
- * grabs what you were looking at when you began — not what's on screen
- * after you finish talking. This is the default, and it is also what makes
- * an agent-decided screen look instant instead of costing a screenshot
- * inside the wait.
- */
-"immediate" | 
-/**
- * Capture when the message is actually sent (voice: after you stop talking
- * and it transcribes). The original behaviour.
- */
-"on_send"
 export type WhisperAcceleratorSetting = "auto" | "cpu" | "gpu"
 export type WindowsMicrophonePermissionStatus = { supported: boolean; overall_access: PermissionAccess; device_access: PermissionAccess; app_access: PermissionAccess; desktop_app_access: PermissionAccess }
 

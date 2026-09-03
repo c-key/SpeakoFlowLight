@@ -64,20 +64,23 @@ const CollapsibleSection: React.FC<{
 
 /**
  * Personal memory ("About You") — the Memory sub-page. A local-first,
- * user-owned profile the assistant can draw on: an always-on summary plus a
- * list of durable notes. Everything here is inspectable, editable, exportable,
- * and off by default. Distillation (learning from a chat) runs on the backend;
- * this page is the transparency + control surface.
+ * user-owned profile that AI cleanup can draw on: an always-on summary plus a
+ * list of durable notes. It exists so cleanup keeps the names, terms, and
+ * wording you actually use instead of "correcting" them into something else.
+ *
+ * Everything here is inspectable, editable, exportable, and off by default.
+ * Learning from past dictations runs on the backend; this page is the
+ * transparency + control surface.
  */
 export const MemorySettings: React.FC = () => {
   const { t } = useTranslation();
   const { settings, refreshSettings } = useSettings();
 
-  const enabled = settings?.assistant_memory_enabled ?? false;
-  const incognito = settings?.assistant_memory_incognito ?? false;
-  const detail = (settings?.assistant_memory_detail ??
-    "balanced") as MemoryDetail;
-  const memory = settings?.assistant_memory;
+  const enabled = settings?.memory_enabled ?? false;
+  const incognito = settings?.memory_incognito ?? false;
+  const autoLearn = settings?.memory_auto_learn ?? false;
+  const detail = (settings?.memory_detail ?? "balanced") as MemoryDetail;
+  const memory = settings?.memory;
   const notes = memory?.notes ?? [];
 
   const [aboutDraft, setAboutDraft] = useState("");
@@ -115,21 +118,28 @@ export const MemorySettings: React.FC = () => {
 
   const toggleEnabled = useCallback(
     (value: boolean) => {
-      void run(() => commands.setAssistantMemoryEnabled(value));
+      void run(() => commands.setMemoryEnabled(value));
     },
     [run],
   );
 
   const toggleIncognito = useCallback(
     (value: boolean) => {
-      void run(() => commands.setAssistantMemoryIncognito(value));
+      void run(() => commands.setMemoryIncognito(value));
+    },
+    [run],
+  );
+
+  const toggleAutoLearn = useCallback(
+    (value: boolean) => {
+      void run(() => commands.setMemoryAutoLearn(value));
     },
     [run],
   );
 
   const changeDetail = useCallback(
     (value: string) => {
-      void run(() => commands.setAssistantMemoryDetail(value as MemoryDetail));
+      void run(() => commands.setMemoryDetail(value as MemoryDetail));
     },
     [run],
   );
@@ -137,13 +147,13 @@ export const MemorySettings: React.FC = () => {
   const saveAbout = useCallback(() => {
     const next = aboutDraft.trim();
     if (next === (memory?.about_you ?? "").trim()) return;
-    void run(() => commands.setAssistantMemoryAboutYou(next));
+    void run(() => commands.setMemoryAboutYou(next));
   }, [aboutDraft, memory?.about_you, run]);
 
   const addNote = useCallback(async () => {
     const text = newNote.trim();
     if (!text) return;
-    const ok = await run(() => commands.addAssistantMemoryNote(text));
+    const ok = await run(() => commands.addMemoryNote(text));
     if (ok) setNewNote("");
   }, [newNote, run]);
 
@@ -151,20 +161,20 @@ export const MemorySettings: React.FC = () => {
     (note: MemoryNote, text: string) => {
       const next = text.trim();
       if (!next || next === note.text.trim()) return;
-      void run(() => commands.updateAssistantMemoryNote(note.id, next));
+      void run(() => commands.updateMemoryNote(note.id, next));
     },
     [run],
   );
 
   const deleteNote = useCallback(
     (id: string) => {
-      void run(() => commands.deleteAssistantMemoryNote(id));
+      void run(() => commands.deleteMemoryNote(id));
     },
     [run],
   );
 
   const wipe = useCallback(async () => {
-    const ok = await run(() => commands.clearAssistantMemory());
+    const ok = await run(() => commands.clearMemory());
     if (ok) setConfirmWipe(false);
   }, [run]);
 
@@ -172,7 +182,7 @@ export const MemorySettings: React.FC = () => {
     setDistilling(true);
     setError(null);
     try {
-      const res = await commands.assistantDistillMemoryNow();
+      const res = await commands.distillMemoryNow();
       if (res.status === "error") {
         setError(res.error);
         return;
@@ -192,7 +202,7 @@ export const MemorySettings: React.FC = () => {
         filters: [{ name: "Memory", extensions: ["json"] }],
       });
       if (!path) return;
-      await run(() => commands.exportAssistantMemory(path));
+      await run(() => commands.exportMemory(path));
     } catch (err) {
       setError(String(err));
     }
@@ -206,7 +216,7 @@ export const MemorySettings: React.FC = () => {
         filters: [{ name: "Memory", extensions: ["json"] }],
       });
       if (typeof path !== "string") return;
-      await run(() => commands.importAssistantMemory(path));
+      await run(() => commands.importMemory(path));
     } catch (err) {
       setError(String(err));
     }
@@ -249,6 +259,13 @@ export const MemorySettings: React.FC = () => {
             onChange={toggleIncognito}
             label={t("settings.personalMemory.incognito.label")}
             description={t("settings.personalMemory.incognito.description")}
+            grouped
+          />
+          <ToggleSwitch
+            checked={autoLearn}
+            onChange={toggleAutoLearn}
+            label={t("settings.personalMemory.autoLearn.label")}
+            description={t("settings.personalMemory.autoLearn.description")}
             grouped
           />
         </div>

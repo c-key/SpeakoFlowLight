@@ -1,7 +1,7 @@
 [package]
 name = "speakoflow"
 version = "1.4.0"
-description = "SpeakoFlow"
+description = "SpeakoFlow Light"
 authors = ["AbhishekBarali"]
 edition = "2021"
 license = "MIT"
@@ -97,7 +97,6 @@ specta = "=2.0.0-rc.22"
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 tauri-plugin-dialog = "2.6"
-xcap = { version = "0.9.6", default-features = false, features = ["image"] }
 base64 = "0.22.1"
 image = { version = "0.25.10", default-features = false, features = ["png", "jpeg"] }
 
@@ -164,7 +163,6 @@ transcribe-cpp = { version = "0.1.2", default-features = false }
 # features are additive and unified: a feature enabled in this table could never
 # be turned back off for one architecture.
 [target.'cfg(target_os = "macos")'.dependencies]
-tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
 # Secure API-key storage via the macOS Keychain. `apple-native` uses the
 # system Security framework (no extra C/system build dependency).
 keyring = { version = "3", features = ["apple-native"] }

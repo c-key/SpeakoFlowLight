@@ -44,9 +44,8 @@ tauri_panel! {
 const OVERLAY_WIDTH: f64 = 128.0;
 const OVERLAY_HEIGHT: f64 = 40.0;
 
-// Labeled pill states (Flow generating / looking at the screen / a brief
-// notice) carry a short text line, so the transparent frame is widened; the
-// pill itself still hugs its content.
+// The labeled pill state (a brief notice) carries a short text line, so the
+// transparent frame is widened; the pill itself still hugs its content.
 const OVERLAY_LABEL_WIDTH: f64 = 260.0;
 
 // The opt-in live-transcription window (see `live_transcription_window_enabled`)
@@ -58,11 +57,11 @@ const OVERLAY_STREAM_WIDTH: f64 = 400.0;
 const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
 
 /// Payload of the "show-overlay" event. Carries the visual `state`
-/// (recording / transcribing / processing / generating / vision / notice)
-/// plus whether the larger live-transcription card should be rendered
-/// (`streaming_window`). `notice` carries an i18n key suffix for the brief
-/// `notice` state (e.g. a Flow error). Serialized camelCase so the overlay
-/// reads `event.payload.streamingWindow`.
+/// (recording / transcribing / processing / notice) plus whether the larger
+/// live-transcription card should be rendered (`streaming_window`). `notice`
+/// carries an i18n key suffix for the brief `notice` state (e.g. a cleanup
+/// error). Serialized camelCase so the overlay reads
+/// `event.payload.streamingWindow`.
 #[derive(Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ShowOverlayPayload {
@@ -197,9 +196,9 @@ fn force_overlay_keep_above(overlay_window: &tauri::webview::WebviewWindow) {
 }
 
 /// Returns the `tauri::Monitor` currently under the mouse cursor (fallback:
-/// primary). Shared by the recording overlay and the assistant region-snip
-/// overlay so both place their windows with the same proven, multi-monitor-safe
-/// logic (see `calculate_overlay_position` for why logical coords matter).
+/// primary). Placing the overlay this way is what keeps it correct on a
+/// multi-monitor setup (see `calculate_overlay_position` for why logical
+/// coords matter).
 pub(crate) fn get_monitor_with_cursor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     if let Some(mouse_location) = input::get_cursor_position(app_handle) {
         if let Ok(monitors) = app_handle.available_monitors() {
@@ -416,8 +415,8 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
 
 /// Whether the currently selected transcription model supports native
 /// live-streaming. Read-only capability lookup (via the model catalog) used to
-/// resolve `OverlayStyle::Auto` into Live vs Minimal, for both the recording
-/// overlay and the assistant. Returns false if the model info isn't available.
+/// resolve `OverlayStyle::Auto` into Live vs Minimal for the recording
+/// overlay. Returns false if the model info isn't available.
 pub fn selected_model_supports_live(app: &AppHandle) -> bool {
     let selected = settings::get_settings(app).selected_model;
     app.try_state::<std::sync::Arc<crate::managers::model::ModelManager>>()
@@ -452,7 +451,7 @@ fn show_overlay_state_with_notice(app_handle: &AppHandle, state: &str, notice: O
 
     let (width, height) = if streaming_window {
         (OVERLAY_STREAM_WIDTH, OVERLAY_STREAM_HEIGHT)
-    } else if matches!(state, "generating" | "vision" | "notice") {
+    } else if state == "notice" {
         (OVERLAY_LABEL_WIDTH, OVERLAY_HEIGHT)
     } else {
         (OVERLAY_WIDTH, OVERLAY_HEIGHT)
@@ -505,17 +504,7 @@ pub fn show_processing_overlay(app_handle: &AppHandle) {
     show_overlay_state(app_handle, "processing");
 }
 
-/// Shows the overlay in the "generating" state (Flow is writing).
-pub fn show_generating_overlay(app_handle: &AppHandle) {
-    show_overlay_state(app_handle, "generating");
-}
-
-/// Shows the overlay in the "vision" state (Flow is looking at the screen).
-pub fn show_vision_overlay(app_handle: &AppHandle) {
-    show_overlay_state(app_handle, "vision");
-}
-
-/// Shows a brief text notice on the overlay (e.g. a Flow error), then hides
+/// Shows a brief text notice on the overlay (e.g. a cleanup error), then hides
 /// it after a short delay. `notice_key` is the i18n suffix under
 /// `overlay.notices.*` in the webview.
 pub fn show_overlay_notice(app_handle: &AppHandle, notice_key: &str) {
@@ -600,9 +589,8 @@ pub fn emit_levels(app_handle: &AppHandle, levels: &Vec<f32>) {
     LAST_EMIT_MS.store(now, Ordering::Relaxed);
 
     // A single global broadcast reaches every window that registered a
-    // `mic-level` listener (currently the recording overlay AND the assistant
-    // panel) and, thanks to Tauri's listener filtering, does not evaluate script
-    // in windows without one. This replaces the old pair of `.emit()` calls that
-    // delivered the event to the overlay twice per frame.
+    // `mic-level` listener (currently just the recording overlay) and, thanks
+    // to Tauri's listener filtering, does not evaluate script in windows
+    // without one.
     let _ = app_handle.emit("mic-level", levels);
 }

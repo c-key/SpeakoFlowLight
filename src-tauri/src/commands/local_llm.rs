@@ -39,8 +39,8 @@ pub async fn stop_local_llm(local_llm: State<'_, Arc<LocalLlmManager>>) -> Resul
 /// Set the context window (in tokens) for the built-in local LLM engine.
 ///
 /// The value is clamped to a safe range and only read when the engine starts,
-/// so any running engine is stopped here; the next assistant or post-processing
-/// turn restarts it with the new size. External providers (Ollama / LM Studio /
+/// so any running engine is stopped here; the next post-processing turn
+/// restarts it with the new size. External providers (Ollama / LM Studio /
 /// cloud) are unaffected — they manage their own context.
 #[tauri::command]
 #[specta::specta]
@@ -60,8 +60,8 @@ pub fn set_local_llm_context_size(
     if let Some(cleanup) = app.try_state::<CleanupLlm>() {
         cleanup.0.stop();
     }
-    // Mirror the assistant settings commands so the panel webview refreshes.
-    let _ = app.emit("assistant-settings-changed", ());
+    // Mirror the other settings commands so open webviews refresh.
+    let _ = app.emit("settings-changed", ());
     Ok(())
 }
 

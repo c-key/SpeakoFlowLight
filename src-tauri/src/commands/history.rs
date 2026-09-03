@@ -1,10 +1,10 @@
 use crate::actions::process_transcription_output;
 use crate::managers::{
-    history::{HistoryManager, PaginatedAssistantHistory, PaginatedHistory},
+    history::{HistoryManager, PaginatedHistory},
     transcription::TranscriptionManager,
 };
 use std::sync::Arc;
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{AppHandle, Emitter, State};
 
 #[tauri::command]
 #[specta::specta]
@@ -93,21 +93,10 @@ pub async fn retry_history_entry_transcription(
         return Err("Recording contains no speech".to_string());
     }
 
-    let is_flow_entry =
-        entry.post_process_prompt.as_deref() == Some(crate::flow::FLOW_HISTORY_MARKER);
-    let (post_processed_text, post_process_prompt) = if is_flow_entry {
-        // Re-running speech recognition should repair only the transcript. A
-        // Flow output is a completed generated artifact; keep it and its marker
-        // instead of silently converting the row into ordinary dictation.
-        (
-            entry.post_processed_text.clone(),
-            entry.post_process_prompt.clone(),
-        )
-    } else {
-        let processed =
-            process_transcription_output(&app, &transcription, entry.post_process_requested).await;
-        (processed.post_processed_text, processed.post_process_prompt)
-    };
+    let processed =
+        process_transcription_output(&app, &transcription, entry.post_process_requested).await;
+    let (post_processed_text, post_process_prompt) =
+        (processed.post_processed_text, processed.post_process_prompt);
 
     history_manager
         .update_transcription(id, transcription, post_processed_text, post_process_prompt)
@@ -163,42 +152,5 @@ pub async fn update_recording_retention_period(
     app.emit("history-retention-applied", ())
         .map_err(|e| e.to_string())?;
 
-    Ok(())
-}
-
-/// Page through saved assistant conversations (newest first).
-#[tauri::command]
-#[specta::specta]
-pub async fn get_assistant_history_entries(
-    _app: AppHandle,
-    history_manager: State<'_, Arc<HistoryManager>>,
-    cursor: Option<i64>,
-    limit: Option<usize>,
-) -> Result<PaginatedAssistantHistory, String> {
-    history_manager
-        .get_assistant_history_entries(cursor, limit)
-        .await
-        .map_err(|e| e.to_string())
-}
-
-/// Delete a single saved assistant conversation.
-#[tauri::command]
-#[specta::specta]
-pub async fn delete_assistant_history_entry(
-    app: AppHandle,
-    history_manager: State<'_, Arc<HistoryManager>>,
-    id: i64,
-) -> Result<(), String> {
-    history_manager
-        .delete_assistant_session(id)
-        .map_err(|e| e.to_string())?;
-
-    // If this was the conversation currently open in the panel, detach it so
-    // the next turn re-saves instead of updating the deleted row.
-    if let Some(conversation) = app.try_state::<crate::assistant::AssistantConversation>() {
-        conversation.forget_session_if(id);
-    }
-
-    let _ = app.emit("assistant-history-updated", ());
     Ok(())
 }

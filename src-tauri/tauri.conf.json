@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "SpeakoFlow",
+  "productName": "SpeakoFlow Light",
   "version": "1.4.0",
-  "identifier": "com.abhishekbarali.speakoflow",
+  "identifier": "com.speakoflow.light",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",

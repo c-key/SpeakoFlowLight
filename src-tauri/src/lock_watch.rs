@@ -47,6 +47,7 @@ struct LockCombo {
 }
 
 /// Map a modifier alias to its handy-keys flag, or `None` for non-modifiers.
+#[allow(dead_code)]
 fn modifier_bit(token: &str) -> Option<Modifiers> {
     match token {
         "shift" => Some(Modifiers::SHIFT),
@@ -76,6 +77,7 @@ fn normalize_key_name(name: &str) -> String {
 
 /// Parse a captured shortcut string (e.g. `"shift"`, `"ctrl+shift"`, `"tab"`)
 /// into a [`LockCombo`]. Returns `None` for empty/blank input (tap-to-lock off).
+#[allow(dead_code)]
 fn parse_lock_combo(raw: &str) -> Option<LockCombo> {
     if raw.trim().is_empty() {
         return None;
@@ -129,6 +131,7 @@ impl LockWatch {
 
     /// Start listening: a tap of `shortcut` will now lock the current hold
     /// recording. A blank/unparseable shortcut leaves the watcher disarmed.
+    #[allow(dead_code)]
     pub fn arm(&self, shortcut: &str) {
         if let Ok(mut guard) = self.armed.lock() {
             *guard = parse_lock_combo(shortcut);

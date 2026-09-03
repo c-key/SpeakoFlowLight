@@ -18,7 +18,7 @@ use crate::TranscriptionCoordinator;
 /// This function contains the shared logic for:
 /// - Looking up the action in ACTION_MAP
 /// - Handling the cancel binding (only fires when recording)
-/// - Routing transcribe/assistant bindings to the coordinator, resolving the
+/// - Routing transcribe bindings to the coordinator, resolving the
 ///   recording mode (push-to-talk hold vs hands-free lock) from the setting and
 ///   whether the fired shortcut is the Shift "lock" variant
 ///
@@ -41,21 +41,13 @@ pub fn handle_shortcut_event(
         None => (binding_id, false),
     };
 
-    // The assistant is switched off: its hotkeys do nothing. They are also
-    // unregistered at the OS level when the setting changes, so this is the
-    // belt-and-braces path (a shortcut that was already in flight, or an engine
-    // that keeps its own derived variants registered).
-    if crate::assistant::is_assistant_binding(base_id) && !get_settings(app).assistant_enabled {
-        return;
-    }
-
-    // Transcribe/assistant bindings are handled by the coordinator. The base
-    // shortcut uses the default mode (push-to-talk hold by default); tapping the
-    // lock key on top converts a hold to hands-free mid-recording.
+    // Transcribe bindings are handled by the coordinator. The base shortcut
+    // uses the default mode (push-to-talk hold by default); tapping the lock key
+    // on top converts a hold to hands-free mid-recording.
     if is_transcribe_binding(base_id) {
         if let Some(coordinator) = app.try_state::<TranscriptionCoordinator>() {
-            // Every recording shortcut — dictation, dictation + post-processing,
-            // and the assistant — follows the single Push-to-talk setting:
+            // Both recording shortcuts — dictation and dictation +
+            // post-processing — follow the single Push-to-talk setting:
             //   • Push-to-talk ON  → hold the shortcut to record, release to stop.
             //   • Push-to-talk OFF → tap once to start, tap again to stop.
             // Escape cancels. There is no separate tap-to-lock; this is the
@@ -76,16 +68,12 @@ pub fn handle_shortcut_event(
         return;
     };
 
-    // Cancel binding: fires while recording, while the assistant is generating
-    // an answer, OR while Flow is starting/generating, so Esc can stop every
-    // long-running voice operation after recording ends. Only on key-press.
+    // Cancel binding: only fires while something is recording, and only on
+    // key-press. (The AI-cleanup pass that follows a recording has its own
+    // timeout and is not cancellable from here.)
     if base_id == "cancel" {
         let audio_manager = app.state::<Arc<AudioRecordingManager>>();
-        let assistant_busy = app
-            .try_state::<crate::assistant::AssistantConversation>()
-            .map_or(false, |c| c.is_busy());
-        let flow_busy = crate::flow::is_generation_active();
-        if is_pressed && (audio_manager.is_recording() || assistant_busy || flow_busy) {
+        if is_pressed && audio_manager.is_recording() {
             action.start(app, base_id, hotkey_string);
         }
         return;

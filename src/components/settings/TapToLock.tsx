@@ -16,12 +16,12 @@ interface TapToLockProps {
   grouped?: boolean;
   icon?: SettingIcon;
   tone?: SettingTone;
-  /** Which setting this control edits. Defaults to the dictation lock key, so
-   *  existing call sites keep working; the assistant passes its own key. */
-  settingKey?: "tap_to_lock_key" | "assistant_tap_to_lock_key";
+  /** Which setting this control edits. Only the dictation lock key is left --
+   *  upstream's second call site was the assistant's own key. */
+  settingKey?: "tap_to_lock_key";
   /** Display fallback before settings load / when the value is unset. */
   fallback?: string;
-  /** i18n keys, so one control serves both the dictation and assistant rows. */
+  /** i18n keys, kept overridable so callers can reword the row. */
   labelKey?: string;
   infoKey?: string;
   offKey?: string;

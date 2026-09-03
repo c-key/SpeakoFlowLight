@@ -1,14 +1,13 @@
 mod actions;
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 mod apple_intelligence;
-mod assistant;
 mod audio_feedback;
 pub mod audio_toolkit;
+mod avatar;
 mod catalog;
 pub mod cli;
 mod clipboard;
 mod commands;
-mod flow;
 mod helpers;
 mod huggingface;
 mod input;
@@ -18,18 +17,14 @@ mod managers;
 mod memory;
 mod overlay;
 pub mod portable;
-mod screenshot;
 mod secret_store;
 mod settings;
 mod shortcut;
 mod signal_handle;
-mod speech_stream;
 mod transcription_coordinator;
 mod tray;
 mod tray_i18n;
-mod tts;
 mod utils;
-mod web_search;
 
 pub use cli::CliArgs;
 
@@ -41,17 +36,16 @@ pub use cli::CliArgs;
 /// directory. So every `WebviewWindowBuilder` in this app MUST pass exactly this
 /// string via `.additional_browser_args(crate::WEBVIEW2_BROWSER_ARGS)`.
 ///
-/// - Preserves wry's defaults (`--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection`),
-///   which `additional_browser_args` would otherwise REPLACE.
-/// - `--enable-unsafe-webgpu` lets the in-panel Kokoro TTS run on the GPU (fp32)
-///   instead of the robotic wasm/q8 fallback. If the GPU/driver can't do WebGPU,
-///   kokoro-js safely falls back to wasm exactly as before (no regression).
-/// - `--autoplay-policy=no-user-gesture-required` lets a spoken reply start
-///   without a prior click (otherwise the WebView blocks TTS audio silently).
+/// Preserves wry's defaults (`--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection`),
+/// which `additional_browser_args` would otherwise REPLACE. Upstream also passed
+/// `--enable-unsafe-webgpu` and `--autoplay-policy=no-user-gesture-required` for
+/// the assistant panel's in-webview Kokoro TTS; this build has no TTS and no
+/// panel, so neither is needed.
 ///
 /// Has no effect on macOS (WKWebView) or Linux (WebKitGTK) — those backends
 /// ignore this attribute — so it is safe to pass unconditionally.
-pub const WEBVIEW2_BROWSER_ARGS: &str = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --enable-unsafe-webgpu --autoplay-policy=no-user-gesture-required";
+pub const WEBVIEW2_BROWSER_ARGS: &str =
+    "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
 #[cfg(debug_assertions)]
 use specta_typescript::{BigIntExportBehavior, Typescript};
 use tauri_specta::{collect_commands, collect_events, Builder};
@@ -145,9 +139,9 @@ fn show_main_window(app: &AppHandle) {
 /// Persist the main window's current size (logical px) so it reopens at the
 /// size the user left it. Called when the window loses focus or is closed to
 /// the tray — natural, low-frequency save points, so there's no write churn
-/// during a resize drag. Only the "main" window is remembered (the assistant
-/// panel and overlays manage their own geometry); minimized states and no-op
-/// writes are skipped.
+/// during a resize drag. Only the "main" window is remembered (the recording
+/// overlay manages its own geometry); minimized states and no-op writes are
+/// skipped.
 fn save_main_window_size(window: &tauri::Window) {
     if window.label() != "main" {
         return;
@@ -230,11 +224,11 @@ fn initialize_core_logic(app_handle: &AppHandle) {
             .expect("Failed to initialize local LLM manager"),
     );
 
-    // A SECOND engine instance, dedicated to dictation AI cleanup. Sharing one
-    // engine with the assistant meant a different model on either side evicted
-    // the other on every use, so each dictation paid a full model load. Separate
-    // processes also let cleanup run leaner (no vision projector, thinking off,
-    // small context, CPU for small models) and keep their own residency policy.
+    // A SECOND engine instance, dedicated to dictation AI cleanup. Upstream
+    // needed the split because sharing one engine with the assistant meant a
+    // different model on either side evicted the other on every use. It is kept
+    // here because cleanup runs leaner on its own process (thinking off, small
+    // context, CPU for small models) with its own residency policy.
     let cleanup_llm_manager = Arc::new(
         managers::local_llm::LocalLlmManager::new_for_role(
             app_handle,
@@ -518,31 +512,6 @@ pub fn run(cli_args: CliArgs) {
     // Detect portable mode before anything else
     portable::init();
 
-    // Allow the assistant panel to play TTS audio without a user gesture
-    // (WebView2 reads this env var at creation time).
-    #[cfg(target_os = "windows")]
-    {
-        let mut args = std::env::var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS").unwrap_or_default();
-        if !args.contains("--autoplay-policy") {
-            if !args.is_empty() {
-                args.push(' ');
-            }
-            args.push_str("--autoplay-policy=no-user-gesture-required");
-        }
-        // Keep audio and timers alive when the panel is hidden or occluded.
-        // Without this, WebView2 marks the (frequently hidden) panel window as
-        // occluded and suspends its media, so Kokoro TTS only played when the
-        // panel happened to be visible/foreground — e.g. right after opening it
-        // via the shortcut — and stayed silent otherwise.
-        if !args.contains("CalculateNativeWinOcclusion") {
-            if !args.is_empty() {
-                args.push(' ');
-            }
-            args.push_str("--disable-features=CalculateNativeWinOcclusion");
-        }
-        std::env::set_var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", args);
-    }
-
     // Parse console logging directives from RUST_LOG, falling back to info-level logging
     // when the variable is unset
     let console_filter = build_console_filter();
@@ -554,7 +523,6 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_ptt_setting,
             shortcut::change_tap_to_lock_setting,
             shortcut::change_tap_to_lock_key_setting,
-            shortcut::change_assistant_tap_to_lock_key_setting,
             shortcut::change_audio_feedback_setting,
             shortcut::change_audio_feedback_volume_setting,
             shortcut::change_sound_theme_setting,
@@ -580,9 +548,6 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_post_process_enabled_setting,
             shortcut::set_cleanup_local_model,
             shortcut::restore_post_process_prompt,
-            shortcut::change_flow_enabled_setting,
-            shortcut::change_flow_phrase_setting,
-            shortcut::change_flow_screen_access_setting,
             shortcut::change_post_process_tone_setting,
             shortcut::add_post_process_custom_tone,
             shortcut::update_post_process_custom_tone,
@@ -612,7 +577,6 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_live_transcription_enabled_setting,
             shortcut::change_live_transcription_window_enabled_setting,
             shortcut::change_overlay_style_setting,
-            shortcut::change_assistant_overlay_style_setting,
             shortcut::change_app_language_setting,
             shortcut::change_update_checks_setting,
             shortcut::change_keyboard_implementation_setting,
@@ -692,88 +656,25 @@ pub fn run(cli_args: CliArgs) {
             commands::history::retry_history_entry_transcription,
             commands::history::update_history_limit,
             commands::history::update_recording_retention_period,
-            commands::history::get_assistant_history_entries,
-            commands::history::delete_assistant_history_entry,
-            commands::assistant::assistant_send_text,
-            commands::assistant::assistant_send_composed,
-            commands::assistant::assistant_read_file,
-            commands::assistant::assistant_read_image,
-            commands::assistant::assistant_begin_region_snip,
-            commands::assistant::assistant_finish_region_snip,
-            commands::assistant::assistant_get_conversation,
-            commands::assistant::assistant_regenerate,
-            commands::assistant::assistant_summarize,
-            commands::assistant::assistant_resume_session,
-            commands::assistant::assistant_clear_conversation,
-            commands::assistant::toggle_assistant_panel,
-            commands::assistant::hide_assistant_panel,
-            commands::assistant::set_assistant_provider,
-            commands::assistant::change_assistant_model_setting,
-            commands::assistant::change_assistant_system_prompt_setting,
-            commands::assistant::set_assistant_active_character,
-            commands::assistant::set_assistant_characters,
-            commands::assistant::assistant_read_avatar,
-            commands::assistant::assistant_import_character,
-            commands::assistant::assistant_export_character,
-            commands::assistant::assistant_generate_character,
-            commands::assistant::assistant_restore_builtin_character,
-            commands::assistant::assistant_restore_missing_builtins,
-            commands::assistant::set_assistant_enabled,
-            commands::assistant::set_assistant_screen_access_mode,
-            commands::assistant::set_assistant_screenshot_enabled,
-            commands::assistant::set_assistant_vision_capture_timing,
-            commands::assistant::set_assistant_tts_enabled,
-            commands::assistant::set_assistant_tts_voice,
-            commands::assistant::set_assistant_response_length,
-            commands::assistant::set_assistant_font_size,
-            commands::assistant::set_assistant_tts_engine,
-            commands::assistant::set_assistant_tts_base_url,
-            commands::assistant::set_assistant_tts_api_key,
-            commands::assistant::set_assistant_tts_model,
-            commands::assistant::set_assistant_tts_remote_voice,
-            commands::assistant::set_assistant_tts_kokoro_dtype,
-            commands::assistant::set_assistant_tts_speed,
-            commands::assistant::set_assistant_panel_opacity,
-            commands::assistant::set_assistant_panel_size,
-            commands::assistant::set_assistant_tts_stop_on_dictation,
-            commands::assistant::assistant_set_pending_attachments,
-            commands::assistant::redirect_transcription_to_assistant,
-            commands::assistant::set_assistant_panel_collapsed,
-            commands::assistant::get_assistant_panel_collapsed,
-            commands::assistant::assistant_finish_local_tts,
-            commands::assistant::assistant_stop_local_tts,
-            commands::assistant::set_assistant_screen_armed,
-            commands::assistant::get_assistant_screen_armed,
-            commands::assistant::assistant_toggle_voice,
-            commands::assistant::assistant_speak,
-            commands::assistant::assistant_test_tts,
-            commands::assistant::assistant_list_azure_voices,
-            commands::assistant::assistant_list_tts_voices,
-            commands::assistant::assistant_list_tts_models,
-            commands::assistant::assistant_stop,
-            commands::assistant::set_assistant_max_history_messages,
-            commands::assistant::set_assistant_auto_summarize,
-            commands::assistant::set_assistant_web_search_enabled,
-            commands::assistant::set_assistant_prefer_provider_web_search,
-            commands::assistant::set_assistant_web_search_provider,
-            commands::assistant::set_assistant_web_search_max_results,
-            commands::assistant::set_assistant_search_depth,
-            commands::assistant::set_assistant_web_search_daily_credit_budget,
-            commands::assistant::set_assistant_local_search_smart,
-            commands::assistant::set_assistant_web_search_fetch_content,
-            commands::assistant::set_assistant_web_search_api_key,
-            commands::assistant::assistant_test_web_search,
-            commands::memory::set_assistant_memory_enabled,
-            commands::memory::set_assistant_memory_detail,
-            commands::memory::set_assistant_memory_incognito,
-            commands::memory::set_assistant_memory_about_you,
-            commands::memory::add_assistant_memory_note,
-            commands::memory::update_assistant_memory_note,
-            commands::memory::delete_assistant_memory_note,
-            commands::memory::clear_assistant_memory,
-            commands::memory::export_assistant_memory,
-            commands::memory::import_assistant_memory,
-            commands::memory::assistant_distill_memory_now,
+            commands::profiles::set_active_profile,
+            commands::profiles::set_profiles,
+            commands::profiles::read_profile_avatar,
+            commands::profiles::import_profile,
+            commands::profiles::export_profile,
+            commands::profiles::restore_builtin_profile,
+            commands::profiles::restore_missing_builtin_profiles,
+            commands::memory::set_memory_enabled,
+            commands::memory::set_memory_detail,
+            commands::memory::set_memory_incognito,
+            commands::memory::set_memory_auto_learn,
+            commands::memory::set_memory_about_you,
+            commands::memory::add_memory_note,
+            commands::memory::update_memory_note,
+            commands::memory::delete_memory_note,
+            commands::memory::clear_memory,
+            commands::memory::export_memory,
+            commands::memory::import_memory,
+            commands::memory::distill_memory_now,
             helpers::clamshell::is_laptop,
         ])
         .events(collect_events![managers::history::HistoryUpdatePayload,]);
@@ -786,28 +687,10 @@ pub fn run(cli_args: CliArgs) {
         )
         .expect("Failed to export typescript bindings");
 
-    // Almost every command is typed and registered through tauri-specta. The one
-    // exception streams Kokoro's audio in as a *raw* binary body, which the
-    // bindings generator cannot describe (`tauri::ipc::Request` has no
-    // `specta::Type`). Tauri allows a single invoke handler, so the two are
-    // composed by command name: each invocation goes to exactly one of them, and
-    // ownership is handed over without cloning.
-    //
-    // A named function rather than a `let` binding, so the runtime type is
-    // concrete instead of needing inference through the macro.
-    fn raw_body_handler(invoke: tauri::ipc::Invoke<tauri::Wry>) -> bool {
-        let handler: fn(tauri::ipc::Invoke<tauri::Wry>) -> bool =
-            tauri::generate_handler![commands::assistant::assistant_play_local_tts_chunk];
-        handler(invoke)
-    }
-    let specta_handler = specta_builder.invoke_handler();
-    let invoke_handler = move |invoke: tauri::ipc::Invoke<tauri::Wry>| {
-        if invoke.message.command() == "assistant_play_local_tts_chunk" {
-            raw_body_handler(invoke)
-        } else {
-            specta_handler(invoke)
-        }
-    };
+    // Every command is typed and registered through tauri-specta. (Upstream
+    // also composed in a raw-binary handler here, for streaming Kokoro TTS
+    // audio into the assistant panel — neither exists in this build.)
+    let invoke_handler = specta_builder.invoke_handler();
 
     #[allow(unused_mut)]
     let mut builder = tauri::Builder::default()
@@ -855,8 +738,6 @@ pub fn run(cli_args: CliArgs) {
                 signal_handle::send_transcription_input(app, "transcribe", "CLI");
             } else if args.iter().any(|a| a == "--toggle-post-process") {
                 signal_handle::send_transcription_input(app, "transcribe_with_post_process", "CLI");
-            } else if args.iter().any(|a| a == "--toggle-assistant") {
-                signal_handle::send_transcription_input(app, "assistant", "CLI");
             } else if args.iter().any(|a| a == "--cancel") {
                 crate::utils::cancel_current_operation(app);
             } else {
@@ -1015,18 +896,7 @@ pub fn run(cli_args: CliArgs) {
             if should_start_lock_watch {
                 app.manage(lock_watch::LockWatch::new(app_handle.clone()));
             }
-            app.manage(assistant::AssistantConversation::new());
-
             initialize_core_logic(&app_handle);
-
-            // Create the assistant panel window (hidden until first use). Skipped
-            // entirely when the assistant is switched off: that saves a whole
-            // WebView renderer process, and everything it would have loaded, for
-            // people who only want dictation. Enabling it later creates it on
-            // demand (see `commands::assistant::set_assistant_enabled`).
-            if settings::get_settings(&app_handle).assistant_enabled {
-                assistant::create_assistant_panel(&app_handle);
-            }
 
             // Pre-warm GPU/accelerator enumeration on a background thread.
             // The first call into transcribe_rs::whisper_cpp::gpu::list_gpu_devices

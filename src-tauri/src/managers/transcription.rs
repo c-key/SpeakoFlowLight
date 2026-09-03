@@ -112,7 +112,7 @@ pub struct StreamRouter {
     tx: Mutex<Option<mpsc::Sender<StreamCmd>>>,
     /// Monotonic stream session identity. Opening starts a fresh generation;
     /// finalize/cancel invalidates it immediately so queued old audio cannot
-    /// affect a later recording's Flow prewarm watcher.
+    /// affect a later recording.
     generation: AtomicU64,
     /// Number of `Feed` frames enqueued but not yet consumed by the worker.
     /// Gates `feed()` so the channel can never grow past
@@ -224,6 +224,8 @@ impl StreamRouter {
         self.tx.lock().unwrap().take()
     }
 
+    // Only the removed Flow live-phrase watcher polled this.
+    #[allow(dead_code)]
     fn is_generation_current(&self, generation: u64) -> bool {
         self.open.load(Ordering::Acquire) && self.generation.load(Ordering::Acquire) == generation
     }
@@ -656,9 +658,9 @@ impl TranscriptionManager {
                 );
                 LoadedEngine::TranscribeCpp(session)
             }
-            // Not transcription engines — these are handled by their own
-            // subsystems (LocalLlmManager / the assistant webview) and must
-            // never be loaded as the active recording model.
+            // Not transcription engines — LlamaCpp models belong to
+            // LocalLlmManager (AI cleanup) and must never be loaded as the
+            // active recording model.
             EngineType::LlamaCpp | EngineType::Kokoro => {
                 let error_msg = format!(
                     "Model {} is not a transcription model and cannot be loaded for recording",
@@ -1093,7 +1095,7 @@ impl TranscriptionManager {
     ///   `finalize_stream()` routes to the batch `transcribe()` path.
     ///
     /// Always returns the leased engine to the mutex before replying.
-    fn run_stream_worker(&self, rx: mpsc::Receiver<StreamCmd>, stream_generation: u64) {
+    fn run_stream_worker(&self, rx: mpsc::Receiver<StreamCmd>, _stream_generation: u64) {
         // Wait for any in-progress model load to finish (mirrors transcribe()).
         {
             let mut is_loading = self.is_loading.lock().unwrap();
@@ -1190,10 +1192,6 @@ impl TranscriptionManager {
                     recognition_words(&settings)
                 };
                 let live_threshold = settings.word_correction_threshold;
-                let live_phrase = settings
-                    .flow_enabled
-                    .then(|| settings.flow_phrase.trim().to_string())
-                    .filter(|p| !p.is_empty());
                 let stream_opts = transcribe_cpp::StreamOptions {
                     commit_policy: transcribe_cpp::CommitPolicy::Auto,
                     ..Default::default()
@@ -1223,20 +1221,7 @@ impl TranscriptionManager {
                                                         &text.committed,
                                                         &live_hints,
                                                         live_threshold,
-                                                        live_phrase.as_deref(),
                                                     );
-                                                    // Flow watches the live text
-                                                    // for its activation phrase
-                                                    // (early local-model prewarm).
-                                                    if self
-                                                        .stream_router
-                                                        .is_generation_current(stream_generation)
-                                                    {
-                                                        crate::flow::note_live_transcript(
-                                                            &self.app_handle,
-                                                            &display,
-                                                        );
-                                                    }
                                                     let _ = self.app_handle.emit(
                                                         "stream-text",
                                                         StreamTextPayload {
@@ -1279,7 +1264,6 @@ impl TranscriptionManager {
                                                         &text.committed,
                                                         &live_hints,
                                                         live_threshold,
-                                                        live_phrase.as_deref(),
                                                     ),
                                                     tentative: text.tentative.clone(),
                                                 },
@@ -1404,10 +1388,6 @@ impl TranscriptionManager {
                     recognition_words(&settings)
                 };
                 let live_threshold = settings.word_correction_threshold;
-                let live_phrase = settings
-                    .flow_enabled
-                    .then(|| settings.flow_phrase.trim().to_string())
-                    .filter(|p| !p.is_empty());
                 let model: &mut dyn SpeechModel = match engine {
                     LoadedEngine::Whisper(e) => e,
                     LoadedEngine::Parakeet(e) => e,
@@ -1447,19 +1427,7 @@ impl TranscriptionManager {
                                             &committed,
                                             &live_hints,
                                             live_threshold,
-                                            live_phrase.as_deref(),
                                         );
-                                        // Flow watches the live text for its
-                                        // activation phrase (early prewarm).
-                                        if self
-                                            .stream_router
-                                            .is_generation_current(stream_generation)
-                                        {
-                                            crate::flow::note_live_transcript(
-                                                &self.app_handle,
-                                                &display,
-                                            );
-                                        }
                                         let _ = self.app_handle.emit(
                                             "stream-text",
                                             StreamTextPayload {
@@ -1683,62 +1651,37 @@ fn transcribe_cpp_backend_options(
 
 /// The user's custom words plus safe temporary correction hints.
 ///
-/// The app name is distinctive enough for fuzzy correction. The Flow activation
-/// phrase is deliberately excluded here: correction runs over the whole
-/// transcript, so including "Hey Flow" could rewrite ordinary mid-sentence
-/// speech such as "hey flaw". Flow's leading-phrase matcher handles recognition
-/// near-misses independently.
+/// The app's own name is added because it is distinctive enough that fuzzy
+/// correction cannot drag ordinary speech toward it. Short or common words must
+/// never be added here: correction runs over the whole transcript, so a hint
+/// like "Flow" would rewrite ordinary mid-sentence speech such as "hey flaw".
 pub fn recognition_words(settings: &crate::settings::AppSettings) -> Vec<String> {
     let mut words = settings.custom_words.clone();
-    if settings.flow_enabled
-        && !words
-            .iter()
-            .any(|word| word.eq_ignore_ascii_case("SpeakoFlow"))
+    if !words
+        .iter()
+        .any(|word| word.eq_ignore_ascii_case("SpeakoFlow"))
     {
         words.push("SpeakoFlow".to_string());
     }
     words
 }
 
-/// Decoder-only prompts can safely include the full activation phrase because
-/// they bias recognition without rewriting text after the fact. Used only by
-/// Whisper-family engines that support an initial prompt.
+/// Decoder-only prompts bias recognition without rewriting text after the
+/// fact, so they can carry the same hint list. Used only by Whisper-family
+/// engines that support an initial prompt.
 fn recognition_prompt_words(settings: &crate::settings::AppSettings) -> Vec<String> {
-    let mut words = recognition_words(settings);
-    let phrase = settings.flow_phrase.trim();
-    if settings.flow_enabled
-        && !phrase.is_empty()
-        && !words.iter().any(|word| word.eq_ignore_ascii_case(phrase))
-    {
-        words.push(phrase.to_string());
-    }
-    words
+    recognition_words(settings)
 }
 
 /// Cosmetic pass for the LIVE overlay text: the same safe custom-word /
-/// recognition-hint correction the final transcript receives, plus — when
-/// Flow is on — an exact rewrite of the leading activation phrase to its
-/// configured spelling ("Hey Flo," reads as "Hey Flow," while still
-/// speaking). Display-only; the final transcript is corrected independently
-/// on finalize. The phrase rewrite is surgical (byte-range replacement), so
-/// unlike fuzzy n-gram hints it can never absorb neighboring words.
-fn correct_live_display(
-    text: &str,
-    hints: &[String],
-    threshold: f64,
-    flow_phrase: Option<&str>,
-) -> String {
-    let mut out = if text.is_empty() || hints.is_empty() {
+/// recognition-hint correction the final transcript receives. Display-only;
+/// the final transcript is corrected independently on finalize.
+fn correct_live_display(text: &str, hints: &[String], threshold: f64) -> String {
+    if text.is_empty() || hints.is_empty() {
         text.to_string()
     } else {
         apply_custom_words(text, hints, threshold)
-    };
-    if let Some(phrase) = flow_phrase {
-        if let Some(fixed) = crate::flow::canonicalize_leading_phrase(&out, phrase) {
-            out = fixed;
-        }
     }
-    out
 }
 
 /// Build transcribe.cpp `RunOptions` for a batch (or, later, streaming) run from
@@ -2431,15 +2374,12 @@ mod tests {
     }
 
     #[test]
-    fn flow_recognition_hints_do_not_rewrite_ordinary_words() {
-        let mut settings = crate::settings::get_default_settings();
-        settings.flow_enabled = true;
-        settings.flow_phrase = "Hey Flow".to_string();
+    fn recognition_hints_do_not_rewrite_ordinary_words() {
+        let settings = crate::settings::get_default_settings();
 
         let correction_hints = recognition_words(&settings);
         assert!(correction_hints.iter().any(|hint| hint == "SpeakoFlow"));
-        assert!(!correction_hints.iter().any(|hint| hint == "Hey Flow"));
-        assert!(!correction_hints.iter().any(|hint| hint == "Flow"));
+        // The app's own name must not drag unrelated words toward it.
         assert_eq!(
             apply_custom_words(
                 "I said hey flaw yesterday.",
@@ -2448,9 +2388,6 @@ mod tests {
             ),
             "I said hey flaw yesterday."
         );
-
-        let decoder_hints = recognition_prompt_words(&settings);
-        assert!(decoder_hints.iter().any(|hint| hint == "Hey Flow"));
     }
 
     #[test]

@@ -34,10 +34,9 @@ const comparableName = (value: string): string =>
  * A dropdown was the wrong control here: it showed a filename and nothing that
  * helps choose (what the model is for, how big it is, whether it is ours), and
  * it could only list models that were *already downloaded* — so the only way to
- * get a new one was to leave Dictation entirely and go find the assistant's
- * page. This card carries the decision-making facts and owns the route to the
- * catalog, so choosing a cleanup model never starts on a page about something
- * else.
+ * get a new one was to leave Dictation entirely. This card carries the
+ * decision-making facts and owns the route to the catalog, so choosing a
+ * cleanup model never starts on a page about something else.
  */
 export const CleanupModelRow: React.FC<CleanupModelRowProps> = ({
   model,

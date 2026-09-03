@@ -55,9 +55,8 @@ export const AiCleanupGroup: React.FC<AiCleanupGroupProps> = ({
   // reasonably assume the long default prompt is helping when it is not.
   //
   // Read from readiness first, because that is the model the backend actually
-  // resolved: cleanup falls back to the assistant's provider when the dedicated
-  // selection is incomplete, so the stored selection alone can disagree with what
-  // will really run. The stored selection is the fallback for the moment before
+  // resolved, which can lag the stored selection by a moment. The stored
+  // selection is the fallback for the moment before
   // the first readiness check lands.
   const resolvedModel =
     postProcessReadiness?.state === "ready"

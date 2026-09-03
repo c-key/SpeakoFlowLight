@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Mic, MessageCircle } from "lucide-react";
+import { Loader2, Mic, Sparkles } from "lucide-react";
 import { platform } from "@tauri-apps/plugin-os";
 import { commands, type ModelInfo } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
@@ -70,7 +70,7 @@ const ShortcutCard: React.FC<{
 /**
  * Step 3 of the welcome flow: "You're ready."
  *
- * Shows the two shortcuts that matter — dictation and the assistant — as real
+ * Shows the two dictation shortcuts — plain, and with AI cleanup — as real
  * keycaps with a one-line explanation each, plus warm status lines for anything
  * still downloading in the background. No live try-it here: the voice model may
  * still be on its way down, so the promise is the shortcuts, not an instant
@@ -101,16 +101,17 @@ const ReadyStep: React.FC<ReadyStepProps> = ({ onComplete }) => {
   const osType = useMemo(resolveOsType, []);
   const transcribeBinding =
     settings?.bindings?.transcribe?.current_binding ?? "";
-  const assistantBinding = settings?.bindings?.assistant?.current_binding ?? "";
+  const cleanupBinding =
+    settings?.bindings?.transcribe_with_post_process?.current_binding ?? "";
 
   const dictateKeys = useMemo(() => {
     const formatted = formatKeyCombination(transcribeBinding, osType);
     return formatted ? formatted.split(" + ") : [];
   }, [transcribeBinding, osType]);
-  const assistantKeys = useMemo(() => {
-    const formatted = formatKeyCombination(assistantBinding, osType);
+  const cleanupKeys = useMemo(() => {
+    const formatted = formatKeyCombination(cleanupBinding, osType);
     return formatted ? formatted.split(" + ") : [];
-  }, [assistantBinding, osType]);
+  }, [cleanupBinding, osType]);
 
   const activeIds = useMemo(
     () =>
@@ -132,7 +133,7 @@ const ReadyStep: React.FC<ReadyStepProps> = ({ onComplete }) => {
     );
     const category = model ? getModelCategory(model) : "stt";
     if (category === "llm") {
-      return t("onboarding.ready.downloadingAssistant", { percentage: pct });
+      return t("onboarding.ready.downloadingCleanup", { percentage: pct });
     }
     if (category === "stt") {
       return t("onboarding.ready.downloadingVoice", { percentage: pct });
@@ -173,14 +174,14 @@ const ReadyStep: React.FC<ReadyStepProps> = ({ onComplete }) => {
               />
             </div>
           )}
-          {assistantKeys.length > 0 && (
+          {cleanupKeys.length > 0 && (
             <div className="anim-rise anim-delay-2">
               <ShortcutCard
-                icon={<MessageCircle size={19} />}
+                icon={<Sparkles size={19} />}
                 tone="violet"
-                label={t("onboarding.ready.assistantKeysLabel")}
-                caption={t("onboarding.ready.assistantKeysCaption")}
-                parts={assistantKeys}
+                label={t("onboarding.ready.cleanupKeysLabel")}
+                caption={t("onboarding.ready.cleanupKeysCaption")}
+                parts={cleanupKeys}
               />
             </div>
           )}

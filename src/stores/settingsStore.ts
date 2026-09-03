@@ -142,8 +142,6 @@ const settingUpdaters: {
   tap_to_lock: (value) => commands.changeTapToLockSetting(value as boolean),
   tap_to_lock_key: (value) =>
     commands.changeTapToLockKeySetting(value as string),
-  assistant_tap_to_lock_key: (value) =>
-    commands.changeAssistantTapToLockKeySetting(value as string),
   selected_microphone: (value) =>
     commands.setSelectedMicrophone(
       (value as string) === "Default" || value === null
@@ -169,8 +167,6 @@ const settingUpdaters: {
   overlay_position: (value) =>
     commands.changeOverlayPositionSetting(value as string),
   overlay_style: (value) => commands.changeOverlayStyleSetting(value as string),
-  assistant_overlay_style: (value) =>
-    commands.changeAssistantOverlayStyleSetting(value as string),
   debug_mode: (value) => commands.changeDebugModeSetting(value as boolean),
   custom_words: (value) => commands.updateCustomWords(value as string[]),
   spoken_emojis_enabled: (value) =>
@@ -195,10 +191,6 @@ const settingUpdaters: {
   history_limit: (value) => commands.updateHistoryLimit(value as number),
   post_process_enabled: (value) =>
     commands.changePostProcessEnabledSetting(value as boolean),
-  flow_enabled: (value) => commands.changeFlowEnabledSetting(value as boolean),
-  flow_phrase: (value) => commands.changeFlowPhraseSetting(value as string),
-  flow_screen_access: (value) =>
-    commands.changeFlowScreenAccessSetting(value as boolean),
   post_process_selected_prompt_id: (value) =>
     commands.setPostProcessSelectedPrompt(value as string),
   post_process_tone: (value) =>

@@ -78,8 +78,8 @@ enum Command {
         is_pressed: bool,
         mode: RecordingMode,
     },
-    /// Finish the active recording and transcribe it (overlay "done" tick /
-    /// assistant panel finish button). No-op unless something is recording.
+    /// Finish the active recording and transcribe it (the overlay's "done"
+    /// tick). No-op unless something is recording.
     Commit,
     /// Convert the active push-to-talk (hold) recording to hands-free (lock)
     /// mode without stopping it — the runtime "tap Shift to lock" gesture. No-op
@@ -115,7 +115,7 @@ pub struct TranscriptionCoordinator {
 }
 
 pub fn is_transcribe_binding(id: &str) -> bool {
-    id == "transcribe" || id == "transcribe_with_post_process" || id == "assistant"
+    id == "transcribe" || id == "transcribe_with_post_process"
 }
 
 impl TranscriptionCoordinator {
@@ -215,9 +215,9 @@ impl TranscriptionCoordinator {
                             }
                         }
                         Command::Commit => {
-                            // Finish + transcribe whatever is recording. Used by
-                            // the overlay tick and the assistant finish button so
-                            // a hands-free recording can end without the keyboard.
+                            // Finish + transcribe whatever is recording. Used
+                            // by the overlay tick, so a hands-free recording can
+                            // end without the keyboard.
                             if let Stage::Recording { binding_id, .. } = &stage {
                                 let id = binding_id.clone();
                                 stop(&app, &mut stage, &id, "commit");
@@ -226,9 +226,8 @@ impl TranscriptionCoordinator {
                         Command::Lock => {
                             // Tap-to-lock: flip an active push-to-talk hold to
                             // hands-free so the user can release the keys and keep
-                            // talking. Ignored unless a hold recording is active.
-                            // Works for both dictation and the assistant (each has
-                            // its own configured lock shortcut).
+                            // talking. Ignored unless a hold recording is
+                            // active.
                             if let Stage::Recording { mode, .. } = &mut stage {
                                 if *mode == RecordingMode::Hold {
                                     *mode = RecordingMode::Lock;
@@ -339,8 +338,8 @@ impl TranscriptionCoordinator {
     }
 
     /// Finish + transcribe the active recording, if any. Drives the overlay's
-    /// "done" tick and the assistant panel's finish button so a hands-free
-    /// recording can be ended without touching the keyboard.
+    /// "done" tick so a hands-free recording can be ended without touching the
+    /// keyboard.
     pub fn notify_commit(&self) {
         if self.tx.send(Command::Commit).is_err() {
             warn!("Transcription coordinator channel closed");

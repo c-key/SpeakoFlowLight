@@ -1,9 +1,9 @@
-pub mod assistant;
 pub mod audio;
 pub mod history;
 pub mod local_llm;
 pub mod memory;
 pub mod models;
+pub mod profiles;
 pub mod transcription;
 
 use crate::settings::{get_settings, write_settings, AppSettings, LogLevel};
@@ -17,11 +17,11 @@ pub fn cancel_operation(app: AppHandle) {
     cancel_current_operation(&app);
 }
 
-/// Finish the current recording right now and run the normal transcribe /
-/// assistant pipeline on it. This is the "done" tick on the recording overlay
-/// and the finish button on the assistant panel — the keyboard-free way to end
-/// a hands-free (tap-to-lock or toggle) recording. Unlike `cancel_operation`,
-/// the captured audio is kept and transcribed. No-op when nothing is recording.
+/// Finish the current recording right now and run the normal transcribe
+/// pipeline on it. This is the "done" tick on the recording overlay — the
+/// keyboard-free way to end a hands-free (tap-to-lock or toggle) recording.
+/// Unlike `cancel_operation`, the captured audio is kept and transcribed.
+/// No-op when nothing is recording.
 #[tauri::command]
 #[specta::specta]
 pub fn commit_recording(app: AppHandle) {
@@ -31,9 +31,9 @@ pub fn commit_recording(app: AppHandle) {
 }
 
 /// Start/stop a plain dictation recording programmatically, for in-app
-/// "dictate into this field" mic buttons (e.g. the Create-with-AI persona
-/// description box). Hands-free toggle like the assistant pill mic: the first
-/// call starts recording, the second stops it. Because this recording uses the
+/// "dictate into this field" mic buttons (e.g. a profile's instruction box).
+/// Hands-free toggle: the first call starts recording, the second stops it.
+/// Because this recording uses the
 /// `"in-app"` source, its transcript is delivered to the webview via the
 /// `dictation-transcript` event (the field listens for it) instead of being
 /// pasted into the focused OS window — reliable and clipboard-free. No-op if the

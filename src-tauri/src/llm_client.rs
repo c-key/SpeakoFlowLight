@@ -1,3 +1,10 @@
+//! Deliberately kept whole: the SSE streaming and tool-calling half of this
+//! module has no caller left in this build -- AI cleanup and the memory
+//! distiller both want one complete answer -- but upstream develops this file
+//! actively, and deleting the unused half would make every merge of it
+//! conflict. See FORK.md.
+#![allow(dead_code)]
+
 use crate::settings::PostProcessProvider;
 use futures_util::StreamExt;
 use log::debug;
@@ -58,7 +65,7 @@ struct ChatCompletionRequest {
     reasoning_effort: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning: Option<ReasoningConfig>,
-    /// Sampling temperature. Left unset for the assistant, where the provider's
+    /// Sampling temperature. Left unset by the memory distiller, where the provider's
     /// own default is the right creative behaviour, and pinned to 0 for cleanup,
     /// which is a deterministic transform.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -333,7 +340,7 @@ fn is_gemini_provider(provider: &PostProcessProvider) -> bool {
 /// bare ids — just work. Strip the prefix for Gemini so it behaves like the
 /// rest. No-op for every other provider and for values that are already bare.
 ///
-/// Applies to both the Assistant and the dictation AI-cleanup path, since both
+/// Applies to both the memory distiller and the dictation AI-cleanup path, since both
 /// share this client and the provider table.
 fn normalize_model_name(provider: &PostProcessProvider, model: &str) -> String {
     if is_gemini_provider(provider) {
@@ -534,7 +541,7 @@ pub(crate) async fn send_chat_completion_with_schema_typed(
 }
 
 /// Send a chat completion request with structured output support.
-/// Existing assistant/memory callers retain the historical string error API;
+/// Existing memory callers retain the historical string error API;
 /// cleanup uses the typed inner function above for safe classification.
 pub async fn send_chat_completion_with_schema(
     provider: &PostProcessProvider,
@@ -555,9 +562,9 @@ pub async fn send_chat_completion_with_schema(
         json_schema,
         reasoning_effort,
         reasoning,
-        // Assistant/memory callers keep the provider's default temperature.
+        // Memory callers keep the provider's default temperature.
         None,
-        // Assistant/memory callers keep the historical folding behavior.
+        // Memory callers keep the historical folding behavior.
         false,
     )
     .await

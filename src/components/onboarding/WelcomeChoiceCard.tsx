@@ -49,7 +49,7 @@ interface WelcomeChoiceCardProps {
 
 /**
  * The single card used across the welcome flow — the two featured speech-to-text
- * options in Step 1 and the three assistant-brain tiers in Step 2. It stays
+ * options in Step 1 and the cleanup model in Step 2. It stays
  * deliberately plain (name + one line + size), and when a download is running it
  * morphs the bottom row into a progress bar in place, so the user never has to
  * watch a spinner before moving on.
