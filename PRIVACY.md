@@ -2,9 +2,14 @@
 
 **Effective date:** July 19, 2026
 
-SpeakoFlow is a free, open-source desktop voice assistant for Windows, macOS, and
-Linux. It is designed to be **local-first**: your voice is processed on your own
-computer, and the app works without an account, sign-in, or any tracking.
+SpeakoFlow Light is a free, open-source desktop dictation app for Windows,
+macOS, and Linux. It is designed to be **local-first**: your voice is processed
+on your own computer, and the app works without an account, sign-in, or any
+tracking.
+
+This build is a fork of SpeakoFlow with the assistant removed, which also
+removed several of the outbound paths the upstream policy describes: there is no
+screen capture, no text-to-speech, and no web search. See [FORK.md](FORK.md).
 
 This policy explains, in plain language, exactly what does and does not leave
 your device. If anything here is unclear, please open an issue on our
@@ -35,8 +40,6 @@ the developer. Specifically, we never collect or transmit to ourselves:
 
 - Your voice recordings or transcripts
 - The text you dictate or paste
-- Your conversations with the AI assistant
-- Screenshots or screen contents
 - Your API keys or credentials
 - Your settings, personal memory, or history
 - Any identifier, IP-based profile, location, or usage statistics
@@ -56,11 +59,13 @@ The following is stored **locally on your computer** and never sent to us:
 - **Speech-to-text processing.** Transcription runs entirely on your machine
   (on your CPU or GPU) using local models. Your audio never leaves the device for
   transcription.
-- **Transcription history** and any "Flow" generations.
-- **Personal memory** (an optional feature that is **off by default**): notes the
-  assistant learns about how you like to work. It is stored on-device, fully
-  viewable and editable by you, and can be exported or erased in
-  Settings → Memory. It is never uploaded to us.
+- **Transcription history.**
+- **Dictation profiles** — the cleanup prompt, tone, and instructions you
+  switch between.
+- **Personal memory** (an optional feature that is **off by default**): the
+  names, terms, and writing habits AI cleanup should keep. It is stored
+  on-device, fully viewable and editable by you, and can be exported or erased
+  in Settings → Personalization → Memory. It is never uploaded to us.
 - **Settings and preferences.**
 - **API keys and secrets.** Any keys you enter for third-party providers are
   stored in your operating system's secure credential store (the OS keychain /
@@ -91,11 +96,12 @@ GitHub. The local AI engine (llama.cpp) may likewise be fetched from GitHub. The
 are plain file downloads of publicly available software; no personal data or
 content is sent, though the host can see your IP address like any download.
 
-### 3. The AI assistant and AI cleanup (optional)
+### 3. AI cleanup (optional)
 
-If you use the assistant or the AI text-cleanup feature, your message (and
-conversation context) is sent to the **model provider you have configured**. You
-control which provider that is:
+If you use the AI text-cleanup feature, the transcript being cleaned up — plus
+your active profile's instructions and, if you switched it on, the relevant part
+of your personal memory — is sent to the **model provider you have configured**.
+You control which provider that is:
 
 - a **fully offline, built-in model** that runs on your machine (nothing leaves
   your device), or
@@ -107,26 +113,16 @@ SpeakoFlow does not proxy or copy this traffic — it goes directly from your
 machine to the provider you selected. What that provider does with the data is
 governed by **their** privacy policy.
 
-### 4. Screen vision (optional, on request)
+### 4. Removed in this build
 
-When you explicitly ask the assistant about your screen, SpeakoFlow captures a
-screenshot and includes it with that request to your chosen AI provider. It only
-captures when you ask, and — like all assistant traffic — it goes only to the
-provider you configured. If you use the offline built-in model, the screenshot
-never leaves your device.
+Upstream also sent data out for screen vision (a screenshot with your question),
+text-to-speech (the reply text), and web search (your query). **None of those
+features exist here** — the code that made those requests was deleted, so there
+is nothing to switch off.
 
-### 5. Text-to-speech (optional)
-
-If you have spoken replies enabled, the assistant's answer text is converted to
-audio either **locally** (the built-in Kokoro voice) or by a **TTS provider you
-choose** (e.g. an OpenAI-compatible service, ElevenLabs, or Azure) using your own
-key. Only the answer text needed to synthesize speech is sent to that provider.
-
-### 6. Web search (optional, off by default)
-
-If you enable web search, the assistant can send a search query to the **search
-provider you configure** (e.g. Serper, Brave, Tavily, Exa, SerpAPI, or TinyFish) using your
-own key, to fetch current information. This is off until you turn it on.
+Memory learning is an on-device summarization pass over your own dictation
+history. It runs on the same cleanup provider you configured, so on the
+recommended local setup it never leaves the machine either.
 
 ---
 
@@ -136,8 +132,8 @@ The optional cloud features above rely on services you choose and authenticate
 with your own credentials. SpeakoFlow is not affiliated with these providers and
 has no visibility into the data you exchange with them. When you use such a
 service, its own terms and privacy policy apply. If you prefer that nothing ever
-leaves your machine, you can run SpeakoFlow with only local models and keep every
-optional cloud feature disabled.
+leaves your machine, keep the cleanup provider set to **On my device**: the only
+outbound traffic left is then model downloads and the update check.
 
 ---
 

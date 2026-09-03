@@ -1,12 +1,16 @@
 # Contributing to SpeakoFlow
 
-Thank you for your interest in contributing to SpeakoFlow! This guide will help you get started with contributing to this open source, local-first voice assistant.
+Thank you for your interest in contributing to SpeakoFlow Light! This guide will help you get started with contributing to this open source, local-first dictation app.
+
+If your change touches something this fork removed, read [FORK.md](FORK.md)
+first — it is the list of what went, what moved, and how upstream commits are
+merged in.
 
 SpeakoFlow started as a fork of [Handy](https://github.com/cjpais/Handy) by CJ Pais — see [README.md](README.md#credits--license) for full attribution. Anything below describing project history or philosophy refers to SpeakoFlow going forward, not the upstream project.
 
 ## 📖 Philosophy
 
-SpeakoFlow aims to be a forkable, well-patterned voice assistant. The goal is to create both a useful tool and a foundation for others to build upon—a simple codebase that serves the community. We prioritize:
+SpeakoFlow aims to be a forkable, well-patterned voice app — this repo is itself a fork of it. The goal is to create both a useful tool and a foundation for others to build upon—a simple codebase that serves the community. We prioritize:
 
 - **Simplicity**: Clear, maintainable code over clever solutions
 - **Extensibility**: Make it easy for others to fork and customize

@@ -5,11 +5,11 @@
   <img src="Logo/final-v2/png/lockup-h256.png" alt="SpeakoFlow" width="340" />
 </picture>
 
-# SpeakoFlow: free voice dictation and an AI assistant for Windows, macOS, and Linux
+# SpeakoFlow Light: free, local voice dictation for Windows, macOS, and Linux
 
 ### You think faster than you type.
 
-**A free, local voice assistant for your desktop. Dictation, writing, and an AI assistant, all by voice.**
+**Dictation, transcription, translation, and AI cleanup — all on your machine.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/Windows%20%7C%20macOS%20%7C%20Linux-informational)](#install)
@@ -34,8 +34,7 @@
 
 ## Contents
 
-- [What is SpeakoFlow?](#what-is-speakoflow)
-- [Why SpeakoFlow](#why-speakoflow)
+- [What is SpeakoFlow Light?](#what-is-speakoflow-light)
 - [Features](#features)
 - [Default hotkeys](#default-hotkeys)
 - [Install](#install)
@@ -43,126 +42,80 @@
 - [Tech stack](#tech-stack)
 - [Privacy](#privacy)
 - [Troubleshooting](#troubleshooting)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 - [Credits](#credits)
 
-## What is SpeakoFlow?
+## What is SpeakoFlow Light?
 
-SpeakoFlow turns your voice into text, right where you're working. Press a hotkey and talk, and your words are typed into whatever app you're using. Say "Hey Flow" to turn what you say into a finished reply or email, or open a floating assistant panel to chat by voice and get answers read back to you.
+SpeakoFlow Light turns your voice into text, right where you're working. Press a
+hotkey and talk, and your words are typed into whatever app you're using.
 
-Speech-to-text runs locally on your machine, so your voice never leaves your device. The AI assistant runs on any model you choose, from a fully offline built-in model to your own local server or a cloud provider with your own key. You decide how much stays on your machine.
+Everything runs on your machine: speech-to-text, translation, and the optional
+AI cleanup pass that tidies up what you said. Nothing leaves the device except
+model downloads.
 
-I built it while studying alone for exams. I was paying for dictation software that stopped at typing: it could hear me, but it couldn't help me.
-
-## Why SpeakoFlow
-
-Most dictation tools stop at typing. Wispr Flow, Superwhisper, and Handy all turn
-speech into text well. None of them can look at what you are working on and write
-the reply for you.
-
-SpeakoFlow does both. It's also the only one of the four that's free, open source,
-and runs on all three desktop platforms.
-
-- **Compared with Wispr Flow.** Wispr Flow is closed source, transcribes in the
-  cloud, has no Linux build, and caps its free tier at 2,000 words per week
-  ($15/month after that). SpeakoFlow is MIT licensed, transcribes on your own
-  machine, and has no cap. Full breakdown:
-  [SpeakoFlow vs Wispr Flow](https://www.speakoflow.com/blog/speakoflow-vs-wispr-flow).
-- **Compared with Superwhisper.** Superwhisper is a capable closed-source app on
-  macOS, Windows, and iOS, with Pro at $8.49/month or $249.99 for a lifetime
-  licence. SpeakoFlow is free, MIT licensed, and also runs on Linux.
-- **Built on Handy.** SpeakoFlow's dictation core comes from
-  [Handy](https://github.com/cjpais/Handy), the more established project and a
-  genuinely good pure-dictation tool. SpeakoFlow takes that core further:
-  spoken-instruction writing, on-device translation, text-to-speech, personal
-  memory, and a screen-aware assistant.
-
-If all you need is dictation, Handy is a solid choice. If you want your computer
-to answer you, keep reading. See also:
-[the best free and open-source Wispr Flow alternatives](https://www.speakoflow.com/blog/best-free-open-source-wispr-flow-alternatives).
+This is a fork of [SpeakoFlow](https://github.com/AbhishekBarali/SpeakoFlow)
+with the assistant removed — no floating chat panel, no screen capture, no
+spoken replies, no web search, no "Hey Flow" generation. What is left is the
+dictation half, plus the profiles and personal memory re-pointed at AI cleanup.
+See [FORK.md](FORK.md) for exactly what changed and how this repo tracks
+upstream.
 
 ## Features
 
-### Generate with Flow: say "Hey Flow" and it writes the reply
-
-Begin a dictation with "Hey Flow" and SpeakoFlow acts on what you said instead of
-transcribing it. Describe the email, reply, or draft you want and it writes the
-finished text and pastes it where your cursor is. The trigger phrase is renameable,
-and it works in any app that accepts text. This is the part plain dictation tools
-don't do.
-
-### Screen vision: ask about what's on your screen
-
-Ask a question about whatever you're looking at and the assistant answers with that
-context: the error in your terminal, the contract in your browser, the chart in your
-spreadsheet. Combined with Generate with Flow, it can write a reply based on what's
-on screen rather than on what you dictate. It only captures when you ask it to, the
-capture goes only to the model provider you chose, and only a small thumbnail is
-kept locally.
-
 ### Dictation: type into any app with your voice
 
-Press a hotkey and talk. Words type into any app, live as you speak or all at once
-when you stop. Transcription runs on your GPU or CPU with whisper.cpp or Parakeet,
-fully offline.
-
-### Assistant panel: a floating voice chat over your work
-
-A floating always-on-top chat you open with a hotkey. Ask by voice or text, get
-streaming answers, and have them read back aloud. Collapses to a pill when you
-don't need it.
+Press a hotkey and talk. Words type into any app, live as you speak or all at
+once when you stop. Transcription runs on your GPU or CPU with whisper.cpp or
+Parakeet, fully offline.
 
 ### Translate: speak any language, get clean English, offline
 
-Speak another language and get clean English, on your device, with a Whisper model.
-No cloud round-trip.
+Speak another language and get clean English, on your device, with a Whisper
+model. No cloud round-trip.
 
-### AI cleanup, by a model we trained for it
+### AI cleanup, by a model trained for it
 
-SpeakoFlow Mini is our own model, and it does one thing, turning what you said
-into clean text. It strips filler, fixes grammar and punctuation, and applies
-spoken edits, so saying "new paragraph" or "scratch that" mid-dictation does what
-you meant instead of getting typed out. It is a 795 MB download, it runs on your
-machine, and it handles English only for now. Layer a writing style on top:
-Professional, Friendly, Concise, or your own instruction. Any other local or
-cloud model can do the job instead if you would rather use one you already trust.
+SpeakoFlow Mini does one thing: turn what you said into clean text. It strips
+filler, fixes grammar and punctuation, and applies spoken edits, so saying "new
+paragraph" or "scratch that" mid-dictation does what you meant instead of
+getting typed out. It is a 795 MB download, it runs on your machine, and it
+handles English only for now. Layer a writing style on top: Professional,
+Friendly, Concise, or your own instruction.
+
+### Profiles: one switch per writing situation
+
+A profile carries a whole cleanup setup — which cleanup prompt, which tone, an
+extra instruction layer, and whether personal memory is used. Switching from
+"work email" to "quick chat message" is one choice instead of three. Ships with
+Default, Email, Chat, and Notes; add your own, or import and export them as
+JSON.
+
+### Personal memory: cleanup that knows your words
+
+Optional, on-device, and off by default. Memory holds a short "About You"
+summary plus durable notes — the names, product terms, and phrasing you
+actually use — and feeds the relevant parts into a cleanup pass, so the model
+keeps them instead of "correcting" them into something else. Everything is
+visible, editable, exportable, and erasable in Settings → Personalization →
+Memory. It only learns on its own if you switch that on.
 
 ### Use the models you already have
 
 If a model is already on your disk, SpeakoFlow will use it where it sits. Add a
 `.gguf` or a Whisper `.bin`, or link a folder and every model inside it appears,
 subfolders included. Nothing is copied, nothing is moved, and removing an entry
-only takes it off the list. Downloads that do happen are faster now, roughly
-0.5 MB/s to 19 MB/s on the same connection, because they fetch eight chunks at
-once and resume where they stopped.
-
-### Web search, profiles, and personal memory
-
-Optional web search so the assistant can look things up for current, factual
-answers. Profiles switch it between personas, each with its own voice and reply
-length. Personal memory is on-device and optional, so it learns how you like to
-work. It's off until you turn it on, and you can edit or erase it at any time.
+only takes it off the list.
 
 Everything lives in Settings, and every hotkey is rebindable.
 
-Full documentation for each: [Generate with Flow](https://www.speakoflow.com/docs/writing/generate-with-flow),
-[screen vision](https://www.speakoflow.com/docs/assistant/screen-vision),
-[dictation](https://www.speakoflow.com/docs/dictation/basics),
-[the assistant panel](https://www.speakoflow.com/docs/assistant/panel),
-[languages and translation](https://www.speakoflow.com/docs/models/languages),
-[AI cleanup](https://www.speakoflow.com/docs/writing/ai-cleanup),
-[web search](https://www.speakoflow.com/docs/assistant/web-search),
-[profiles](https://www.speakoflow.com/docs/personalize/profiles), and
-[memory](https://www.speakoflow.com/docs/personalize/memory).
-
 ## Default hotkeys
 
-| Action            | Windows                  | macOS                   | Linux                |
-| ----------------- | ------------------------ | ----------------------- | -------------------- |
-| Dictate           | `Left Ctrl + Left Super` | `Option + Space`        | `Ctrl + Space`       |
-| Ask the assistant | `Left Ctrl + Left Alt`   | `Option + Ctrl + Space` | `Ctrl + Alt + Space` |
+| Action                | Windows                   | macOS                    | Linux                  |
+| --------------------- | ------------------------- | ------------------------ | ---------------------- |
+| Dictate               | `Left Ctrl + Left Super`  | `Option + Space`         | `Ctrl + Space`         |
+| Dictate + AI cleanup  | `Ctrl + Shift + Space`    | `Option + Shift + Space` | `Ctrl + Shift + Space` |
 
 Hold the shortcut to talk and release to type it out, or switch **Recording behavior** to Tap in Settings so one press starts and the next press stops. Tap is the hands-free option. The choice applies to every recording shortcut, and all shortcuts are rebindable.
 
@@ -170,7 +123,12 @@ Every shortcut and its default, on all three platforms: [Keyboard shortcuts](htt
 
 ## Install
 
-Download the latest build for Windows, macOS, or Linux from the [Releases](https://github.com/AbhishekBarali/SpeakoFlow/releases) page. A short setup wizard helps you pick a transcription model and, optionally, a local model for the assistant.
+This fork publishes no releases — [build it from source](#build-from-source).
+A short setup wizard helps you pick a transcription model and, optionally, the
+small local model that does AI cleanup.
+
+The install notes below come from upstream and still apply to a build you make
+yourself.
 
 ### Windows
 
@@ -271,11 +229,13 @@ Intel step.
 
 </details>
 
-To use the assistant, choose a provider in Settings:
+AI cleanup needs a model. Choose one in Settings → Dictation:
 
-- **Built-in (offline).** Download a small local model and run it fully on your machine, no key needed.
+- **On my device (offline).** Download SpeakoFlow Mini — 795 MB, no key needed.
+  This is the recommended setup and the only one that keeps everything local.
 - **Local server.** Point SpeakoFlow at Ollama or LM Studio.
-- **Cloud.** Bring your own API key for any OpenAI-compatible provider.
+- **Cloud.** Bring your own API key for any OpenAI-compatible provider. Inert
+  unless you configure it; see [FORK.md](FORK.md) on staying local-only.
 
 ## Build from source
 
@@ -307,12 +267,19 @@ See [BUILD.md](BUILD.md) for platform-specific setup.
 
 - **App:** [Tauri 2](https://tauri.app) with a Rust backend and a React and TypeScript frontend.
 - **Speech-to-text:** whisper.cpp and Parakeet with GPU acceleration, plus Silero VAD for voice detection.
-- **Assistant:** a built-in llama.cpp engine, or any OpenAI-compatible provider you configure.
-- **Text-to-speech:** [Kokoro](https://github.com/hexgrad/kokoro) locally, with OpenAI-compatible, ElevenLabs, and Azure options.
+- **AI cleanup:** a built-in llama.cpp engine running SpeakoFlow Mini, or any OpenAI-compatible provider you configure.
 
 ## Privacy
 
-Your voice is transcribed on your device and never uploaded. The assistant only contacts the model provider you choose, which can be a fully local one. There is no telemetry and no account. Optional features like web search and personal memory are off until you turn them on, and memory is stored on your device where you can view, edit, or erase it.
+Your voice is transcribed on your device and never uploaded. AI cleanup runs on
+the model provider you choose, which on the recommended setup is the built-in
+local engine — nothing leaves the machine. There is no telemetry and no account.
+Personal memory is off until you turn it on, is stored on your device, and can be
+viewed, edited, exported, or erased at any time.
+
+This fork removed every other network path: web search and remote text-to-speech
+are gone entirely. The only outbound traffic left is model downloads and the
+update check.
 
 Full detail on what is stored and where: [the privacy page](https://www.speakoflow.com/docs/reference/privacy).
 
@@ -343,7 +310,7 @@ SpeakoFlow handles this automatically: when it detects GNOME on Wayland it runs 
 
 <br />
 
-If dictation and the assistant hotkeys don't respond on Linux and you see the log
+If the dictation hotkeys don't respond on Linux and you see the log
 repeating `rdev grab error: ... PermissionDenied` (errno 13), the app can't read
 your input devices. This affects the **handy-keys** keyboard engine, which reads
 `/dev/input/event*` and needs your user to be in the `input` group.
@@ -401,13 +368,15 @@ Released under the [MIT License](LICENSE).
 
 ## Credits
 
-SpeakoFlow builds on the dictation core from [Handy](https://github.com/cjpais/Handy)
-by CJ Pais, used under the MIT licence. Thanks to CJ for making it open. The
-assistant, screen vision, Generate with Flow, translation, text-to-speech, and
-memory layers are SpeakoFlow's own.
+This is a fork of [SpeakoFlow](https://github.com/AbhishekBarali/SpeakoFlow) by
+Abhishek Barali, used under the MIT licence — all of the work below is theirs;
+this repo only removes parts of it (see [FORK.md](FORK.md)).
 
-Thanks also to [Tauri](https://tauri.app), whisper.cpp, llama.cpp, Silero VAD, and
-[Kokoro](https://github.com/hexgrad/kokoro).
+SpeakoFlow in turn builds on the dictation core from
+[Handy](https://github.com/cjpais/Handy) by CJ Pais, also MIT. The translation,
+AI-cleanup, profile, and memory layers are SpeakoFlow's own.
+
+Thanks also to [Tauri](https://tauri.app), whisper.cpp, llama.cpp, and Silero VAD.
 
 <div align="center">
 

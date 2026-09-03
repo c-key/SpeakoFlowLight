@@ -55,9 +55,58 @@ any release. See [issue #19](https://github.com/AbhishekBarali/SpeakoFlow/issues
 
 #### Windows
 
-- Microsoft C++ Build Tools
-- Visual Studio 2019/2022 with C++ development tools
-- Or Visual Studio Build Tools 2019/2022
+- **MSVC with the C++ workload.** Visual Studio 2019/2022 with "Desktop
+  development with C++", or the standalone Build Tools:
+
+  ```powershell
+  winget install Microsoft.VisualStudio.2022.BuildTools --override `
+    "--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+  ```
+
+  A Visual Studio install *without* that workload is not enough. Watch for two
+  specific symptoms: `VC\Tools\MSVC\<ver>` with no `include\` directory and
+  only `lib\onecore\` (the CRT headers and desktop import libs are missing),
+  and a missing `VC\Auxiliary\Build\vcvarsall.bat` (so `vcvars64.bat` fails).
+- **cmake** — `whisper-rs-sys` and `transcribe-cpp-sys` invoke it from their
+  build scripts: `scoop install cmake` or `winget install Kitware.CMake`.
+- **LLVM/libclang** — `bindgen` needs it: `scoop install llvm` or
+  `winget install LLVM.LLVM`, then set `LIBCLANG_PATH` to its `bin` directory
+  if the build cannot find `libclang.dll`.
+- **Vulkan SDK** — the x86_64 build enables ggml's Vulkan backend, whose shader
+  step needs `glslc` plus the Vulkan headers and import lib:
+  `scoop install vulkan`, or
+  [LunarG's installer](https://vulkan.lunarg.com/sdk/home#windows). Set
+  `VULKAN_SDK` to the install root if cmake reports
+  `Could NOT find Vulkan (missing: Vulkan_LIBRARY Vulkan_INCLUDE_DIR glslc)`.
+
+`scripts/dev-env.win.bat` sets all of this up and runs whatever you pass it
+(`scriptsdev-env.win.bat cargo check`). Adjust the five paths at the top for
+your machine.
+
+Run `cargo` from a *Developer Command Prompt* (or after calling
+`vcvars64.bat`). A plain Git Bash shell puts its own `link` ahead of MSVC's
+`link.exe` on `PATH`, which fails as `LNK1104`.
+
+Two more Windows settings worth making before the first backend build. Both
+concern the same two crates — `transcribe-cpp-sys` and `whisper-rs-sys` — and
+changing either one afterwards means deleting
+`target/*/build/transcribe-cpp-sys-*` and `whisper-rs-sys-*` first, because
+the choice is baked into their CMake caches:
+
+- `set CMAKE_GENERATOR=Ninja` (`scoop install ninja`). Left alone, cmake picks
+  the newest Visual Studio instance it can see, which fails outright if that
+  one lacks the C++ workload (*"could not find any instance of Visual
+  Studio"*); and under a Visual Studio generator, ggml's nested
+  `vulkan-shaders-gen` project re-configures from inside MSBuild and reports
+  *"No CMAKE_C_COMPILER could be found"*. Under Ninja it inherits the `cl.exe`
+  already on `PATH`.
+- `set CARGO_TARGET_DIR=C:ctsfl` (any short path). `vulkan-shaders-gen`
+  nests its build directory deep enough that the PDB path inside its compiler
+  probe crosses 260 characters, and MSVC reports that as
+  `fatal error C1041: cannot open program database` — misleadingly, since the
+  same error normally means parallel `cl.exe` writes and is answered with
+  `/FS`. A short target directory is the actual fix. This matters most when
+  the repo itself sits several directories deep.
 
 #### Linux
 
@@ -88,8 +137,8 @@ any release. See [issue #19](https://github.com/AbhishekBarali/SpeakoFlow/issues
 ### 1. Clone the Repository
 
 ```bash
-git clone git@github.com:AbhishekBarali/SpeakoFlow.git
-cd SpeakoFlow
+git clone <this fork>
+cd SpeakoFlow-Light
 ```
 
 ### 2. Install Dependencies
