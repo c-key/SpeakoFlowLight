@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "一般",
     "dictation": "語音輸入",
-    "assistant": "助理",
     "history": "歷史紀錄",
     "about": "關於",
     "debug": "偵錯",
-    "characters": "角色",
     "memory": "記憶",
     "collapse": "收合側邊欄",
-    "expand": "展開側邊欄"
+    "expand": "展開側邊欄",
+    "profiles": "角色"
   },
   "window": {
     "minimize": "最小化",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "快捷鍵、麥克風，以及應用程式的外觀。",
-    "dictation": "將您的語音轉成文字的模型，以及文字的整理方式。",
-    "assistant": "設定助理，再調整語音、螢幕視覺與網路搜尋。",
-    "history": "您最近的語音輸入、Flow 生成與助理對話，都儲存在這台裝置上。",
     "about": "版本、應用程式語言、資料位置與致謝。",
     "debug": "診斷資訊與開發者工具。"
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "正在背景下載您的模型。"
     },
     "aiModel": {
-      "title": "新增本機 AI 模型",
-      "subtitle": "依回應速度與能力選擇。E4B 是均衡的預設選項；12B 更聰明但較慢。",
       "tiers": {
         "small": {
           "description": "任何電腦都能執行。很適合用來整理您寫的文字。"
@@ -90,9 +84,6 @@
           "description": "回答最精準，還能看見您的螢幕。"
         }
       },
-      "seesScreen": "可看見螢幕",
-      "textOnly": "僅支援文字",
-      "recommendedForAssistant": "推薦用於助理",
       "download": "下載模型",
       "useDownloaded": "使用已下載的模型",
       "skip": "暫時略過",
@@ -114,11 +105,8 @@
       "subtitle": "您只需要兩個快捷鍵。按下、說話、完成。",
       "dictateLabel": "隨處語音輸入",
       "dictateCaption": "按住、說話、放開。您說的話會自動輸入。",
-      "assistantKeysLabel": "詢問助理",
-      "assistantKeysCaption": "按住並提問。它甚至能看見您的螢幕。",
       "changeAnytime": "這些都可以隨時在「設定」中變更。",
       "hotkeyLabel": "您的語音輸入按鍵",
-      "downloadingAssistant": "您的助理正在入住，已完成 {{percentage}}%。",
       "downloadingVoice": "您的語音模型即將就緒，已完成 {{percentage}}%。",
       "downloadingGeneric": "仍在下載，已完成 {{percentage}}%。",
       "signOff": "就是這樣。去說點什麼吧。",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "記住我",
-        "description": "讓助理保存並使用個人記憶。預設為關閉。"
-      },
-      "incognito": {
-        "label": "無痕對話",
-        "description": "這次對話不使用記憶，也不學習任何新內容。"
-      },
       "detail": {
         "label": "記憶詳細程度",
-        "description": "每次回覆要加入多少記憶。越詳細內容越豐富，但速度會稍慢。",
         "options": {
           "light": "精簡",
           "balanced": "平衡",
@@ -350,7 +329,6 @@
         "add": "新增",
         "addPlaceholder": "新增要記住的內容…",
         "delete": "刪除筆記",
-        "learned": "已學習",
         "added": "由您新增"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "管理"
-      },
-      "distill": {
-        "label": "立即從這次對話學習",
-        "description": "立即從目前的對話中擷取值得長期保存的事實，存入記憶。",
-        "button": "更新記憶"
       },
       "export": "匯出",
       "import": "匯入",
@@ -937,16 +910,6 @@
         "title": "語音表情符號",
         "description": "說出「happy emoji」或「thumbs up emoji」即可插入 😊 或 👍。常見別名和輕微的語音轉文字錯誤會在裝置上處理；無法辨識的名稱會保留為文字。"
       },
-      "flow": {
-        "groupTitle": "使用 Flow 生成",
-        "enableLabel": "使用 Flow 生成",
-        "enableDescription": "以啟動語句開始語音輸入，讓 AI 幫您寫出結果——說「Hey Flow，寫一封客氣的信詢問改期」，就會貼上寫好的信件。",
-        "phraseLabel": "啟動語句",
-        "phraseDescription": "只有在語音輸入以這句話開頭時，Flow 才會啟動。出現在其他位置時，同樣的字會當成一般語音輸入貼上。使用您的助理模型；留空即可重設為「Hey Flow」。",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "允許存取螢幕",
-        "screenDescription": "當指令明確提到您的螢幕時，例如「看一下這封信並草擬回覆」，讓 Flow 擷取一張畫面。是否需要由模型判斷。此設定與助理的螢幕存取分開。"
-      },
       "output": {
         "title": "輸出選項"
       }
@@ -957,29 +920,14 @@
         "title": "錄音儲存",
         "description": "這些設定會影響語音輸入與 Flow 的錄音。已儲存的錄音一律保留。助理對話另外儲存。"
       },
-      "filters": {
-        "label": "歷史紀錄類型",
-        "all": "全部",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "助理對話"
-      },
       "openFolder": "開啟錄音資料夾",
       "loading": "載入歷史紀錄中…",
       "empty": "這裡還沒有內容。您的語音輸入、Flow 生成與助理對話會顯示在這裡。",
-      "emptyRecordings": "還沒有語音輸入。",
-      "emptyFlow": "還沒有 Flow 生成紀錄。",
-      "emptyAssistant": "還沒有助理對話。",
       "recordingLabel": "語音輸入",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "您說的話",
       "originalTranscriptionLabel": "原始轉錄",
-      "flowOutputLabel": "Flow 輸出",
       "finalTextLabel": "最終文字",
       "cleanupNoChanges": "已執行 AI 整理，沒有需要修改的地方",
-      "flowNoOutput": "沒有產生 Flow 輸出。",
       "copyToClipboard": "複製轉錄到剪貼簿",
-      "copyFlowOutput": "複製 Flow 輸出",
       "copyFinalText": "複製最終文字",
       "save": "儲存轉錄",
       "unsave": "從已儲存中移除",
@@ -988,18 +936,7 @@
       "retranscribe": "重新轉錄",
       "retranscribeError": "重新轉錄失敗，請重試。",
       "transcribing": "轉錄中…",
-      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。",
-      "assistantLabel": "助理對話",
-      "copyConversation": "複製對話",
-      "resumeConversation": "在助理中繼續這段對話",
-      "showConversation": "顯示對話",
-      "hideConversation": "隱藏對話",
-      "roleUser": "您",
-      "roleAssistant": "助理",
-      "screenshotAttached": "視覺",
-      "messageCount_one": "{{count}} 則訊息",
-      "messageCount_other": "{{count}} 則訊息",
-      "deleteAssistantError": "無法刪除這段對話，請重試。"
+      "transcriptionFailed": "轉錄失敗。您可以使用重試圖示重新轉錄。"
     },
     "debug": {
       "title": "偵錯",
@@ -1113,324 +1050,60 @@
         "button": "捐贈"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "助理",
-        "label": "啟用助理",
-        "description": "關閉後，SpeakoFlow 只做語音輸入。浮動面板會關閉且不再載入，它的快捷鍵會釋放，佔用的記憶體也會歸還。使用 Flow 生成 與 AI 整理仍可正常使用。"
-      },
-      "shortcuts": {
-        "title": "快捷鍵"
-      },
-      "brain": {
-        "title": "助理大腦",
-        "whereLabel": "執行位置",
-        "onDevice": "在我的裝置上",
-        "cloud": "雲端供應商",
-        "downloadModel": "瀏覽並下載模型",
-        "downloadModelDescription": "挑選推薦的模型，或搜尋 Hugging Face。",
-        "downloadModelAction": "瀏覽模型",
-        "catalogTitle": "選擇一個裝置端模型",
-        "catalogDescription": "下載私密的本機模型。它只留在這台電腦上，不需要 API 金鑰。",
-        "currentModelTitle": "目前的模型",
-        "currentModelDescription": "已為這台裝置上的內建助理選用。",
-        "recommendedTitle": "推薦模型",
-        "recommendedDescription": "三個以對話為優先的選擇：最快、推薦，以及能力更強但較慢。",
-        "acceleratorDetected": "{{name}} · 回報的顯示記憶體 {{memory}} GB",
-        "acceleratorDetectedDedicated": "{{name}} · 專用 VRAM {{memory}} GB",
-        "acceleratorDetectedIntegrated": "{{name}} · 共用顯示記憶體 {{memory}} GB",
-        "acceleratorDetectedNoMemory": "已偵測到 {{name}} · 未回報顯示記憶體",
-        "acceleratorUnknownWithMemory": "無法取得顯示記憶體 · 改用 CPU 時可用系統記憶體 {{memory}} GB",
-        "acceleratorUnknown": "無法取得顯示記憶體 · 無法預估回應速度",
-        "details": "詳細資訊",
-        "detailFile": "檔案",
-        "detailLocation": "位置",
-        "detailFormat": "格式",
-        "detailId": "模型 ID",
-        "switchBeforeDelete": "請先將內建助理切換到其他模型，再刪除這一個。",
-        "deleteModelConfirm": "要刪除 {{modelName}} 嗎？其下載的檔案與已儲存的項目都會一併移除。",
-        "deleteModelFailed": "無法刪除模型。",
-        "finderSectionTitle": "更多裝置端模型",
-        "finderTitle": "瀏覽 Hugging Face",
-        "finderDescription": "搜尋數千個 GGUF 模型，直接下載到 SpeakoFlow。",
-        "finderAction": "尋找模型",
-        "huggingFaceTitle": "我的模型",
-        "catalogEmpty": "目前沒有可用的推薦本機模型。"
-      },
-      "subpages": {
-        "profilesCaption": "切換助理的名稱、身分與個性。",
-        "memoryCaption": "助理在不同對話之間記住的關於您的內容。"
-      },
-      "tapToLock": {
-        "label": "輕按鎖定",
-        "info": "按住助理快捷鍵時輕按這個鍵，即可鎖定免持模式，放開手也能繼續說話。請選擇不屬於助理快捷鍵的按鍵（重疊的按鍵會被忽略），或清除以關閉此功能。",
-        "off": "關閉",
-        "clear": "清除"
-      },
-      "provider": {
-        "title": "助理供應商",
-        "saveFailed": "無法切換助理供應商。",
-        "providerLabel": "供應商",
-        "providerDescription": "負責回答助理問題的供應商。",
-        "baseUrlLabel": "基礎網址",
-        "baseUrlDescription": "相容 OpenAI 的基礎網址。Azure 網址會自動正規化。",
-        "apiKeyLabel": "API 金鑰",
-        "apiKeyDescription": "與 AI 整理共用。",
-        "apiKeyPlaceholder": "輸入 API 金鑰…",
-        "modelLabel": "模型",
-        "modelDescription": "用於助理回答的模型或部署名稱。",
-        "modelPlaceholder": "例如 gpt-4o-mini",
-        "modelSearchPlaceholder": "搜尋或輸入模型…",
-        "modelUse": "使用「{{model}}」",
-        "loadModels": "載入模型",
-        "loadingModels": "載入中…",
-        "noModelsFound": "沒有取得任何模型。請改為直接輸入模型名稱。",
-        "builtinModelDescription": "選擇已下載的本機模型。它會在您的電腦上執行，不需要 API 金鑰。",
-        "builtinModelPlaceholder": "選擇已下載的模型",
-        "builtinNoModels": "您的電腦上還沒有模型——請從下方下載一個。",
-        "builtinReady": "完全在您的電腦上執行。不需要 API 金鑰，也不需要設定。",
-        "builtinEngineMissing": "首次使用時會自動下載一個小型本機引擎（僅此一次），之後即可完全離線執行。無需任何設定。",
-        "builtinEngineDownloading": "正在下載本機引擎… {{percent}}%",
-        "builtinEnginePreparing": "正在下載本機引擎…",
-        "builtinEngineExtracting": "正在安裝本機引擎…",
-        "builtinEngineReady": "本機引擎已就緒。",
-        "contextSizeLabel": "上下文視窗",
-        "contextSizeDescription": "本機模型一次能記住多少內容——包含系統指令、您的對話紀錄、任何螢幕截圖（單張圖片就可能佔掉一大塊），以及它的回覆。設得越大能容納越多，也讓螢幕視覺與網路搜尋更可靠，但會用掉更多記憶體。預設為 8192；若您的電腦記憶體充裕，16384 是不錯的升級。之後也可以調低以節省記憶體。",
-        "unloadTimeoutLabel": "多久後從記憶體卸載",
-        "unloadTimeoutDescription": "本機模型閒置達此時間後將其卸載以釋放記憶體。下次使用時會自動重新載入。"
-      },
-      "systemPrompt": {
-        "title": "系統提示詞",
-        "label": "助理系統提示詞",
-        "description": "設定助理的行為。"
-      },
-      "characters": {
-        "title": "角色",
-        "description": "以任務為導向的角色，可隨時切換。使用中的角色會決定助理的名稱、身分與指令，以及回覆的長度。隨時都能從面板標題列切換。",
-        "galleryLabel": "您的角色",
-        "editSection": "編輯角色",
-        "avatarLabel": "頭像",
-        "active": "使用中",
-        "meowsOnly": "只會喵喵叫",
-        "builtin": "內建",
-        "custom": "自訂",
-        "new": "新增",
-        "newName": "新角色",
-        "copyName": "{{name}} 複本",
-        "createAi": "用 AI 建立",
-        "import": "匯入",
-        "aiTitle": "描述您的角色",
-        "aiClose": "關閉",
-        "aiPlaceholder": "例如：擅長寫精簡發行說明的人，或會逐步解說的耐心家教",
-        "aiDictate": "用語音輸入描述",
-        "aiDictateStop": "停止語音輸入",
-        "generate": "生成",
-        "avatarUpload": "上傳圖片",
-        "avatarRemove": "移除",
-        "nameLabel": "名稱",
-        "roleLabel": "身分",
-        "rolePlaceholder": "顯示在卡片上的簡短說明（選填）",
-        "promptLabel": "指令（系統提示詞）",
-        "responseLength": {
-          "label": "回覆長度",
-          "hint": "這個角色的回覆長度。「沿用」會依照您的助理全域設定。",
-          "options": {
-            "inherit": "沿用全域設定",
-            "short": "短",
-            "medium": "中",
-            "long": "長"
-          }
-        },
-        "greetingLabel": "問候語（選填）",
-        "greetingPlaceholder": "選填：對話為空時顯示的開場句",
-        "catNote": "這隻貓完全不理 AI——只會喵喵叫。這裡沒有需要設定的項目。",
-        "duplicate": "複製",
-        "export": "匯出",
-        "restoreDefault": "還原預設",
-        "restoreBuiltins": "還原內建角色",
-        "moreActions": "更多動作",
-        "expand": "展開",
-        "collapse": "收合",
-        "delete": "刪除",
-        "deleteConfirm": "要刪除這個角色嗎？此動作無法復原。",
-        "emptyState": "還沒有任何角色。建立第一個角色，賦予助理個性。"
-      },
-      "behavior": {
-        "title": "行為"
-      },
-      "memory": {
-        "label": "對話記憶",
-        "description": "每次對話要送出多少則近期訊息作為上下文。設為 0 表示停用記憶。"
-      },
-      "autoSummarize": {
-        "label": "摘要長對話",
-        "description": "當對話超出模型的上下文視窗時，自動把較舊的訊息壓縮成持續更新的摘要，讓對話保留脈絡而不會忘記開頭。執行時會顯示一個低調的指示。"
-      },
-      "responseLength": {
-        "label": "回覆長度",
-        "description": "偏好的回覆長度。「不影響」會完全不改動您的提示詞。",
-        "options": {
-          "default": "不影響",
-          "short": "短",
-          "medium": "中",
-          "long": "長"
-        }
-      },
-      "vision": {
-        "title": "螢幕視覺",
-        "modeLabel": "螢幕存取",
-        "modes": {
-          "off": "關閉",
-          "manual": "手動",
-          "agentDecides": "由代理決定",
-          "descriptions": {
-            "off": "已停用螢幕擷取。相機與範圍選取控制項會隱藏。",
-            "manual": "由您決定何時附上整個螢幕或某個範圍。語音擷取時機的設定同樣適用。",
-            "agent_decides": "模型在需要目前的視覺脈絡時，可能會要求擷取螢幕。送出的每張截圖都會顯示在對話中。"
-          }
-        },
-        "timing": {
-          "label": "擷取時機",
-          "description": "語音提問時：在您開始提問的那一刻擷取，或等到訊息送出時再擷取。以文字輸入的訊息一律在送出時擷取。",
-          "descriptionAgent": "兩個選項都會事先準備好螢幕截圖，因此助理絕不會讓您等待。差別在於圖片的內容：「開始提問時」擷取的是您開始說話時的螢幕，「訊息送出時」擷取的是目前的螢幕。無論選哪一個，圖片都留在您的裝置上，只有助理確實要求查看時才會傳送。",
-          "options": {
-            "immediate": "開始提問時",
-            "on_send": "訊息送出時"
-          }
-        },
-        "screenRecording": {
-          "description": "螢幕視覺需要 macOS 的「螢幕錄製」權限。請在「系統設定」中授予權限，然後重新啟動 SpeakoFlow 才會生效。",
-          "grant": "開啟系統設定"
-        }
-      },
-      "webSearch": {
-        "title": "網路搜尋",
-        "enableLabel": "允許網路搜尋",
-        "enableDescription": "當問題需要最新資訊時，讓助理搜尋網路。",
-        "openRouterNativeLabel": "使用 OpenRouter 內建的搜尋",
-        "openRouterNativeDescription": "開啟時，OpenRouter 會自行執行搜尋（其 :online 模式），並消耗您的 OpenRouter 額度。關閉時，應用程式會使用下方您設定的搜尋供應商。",
-        "providerLabel": "搜尋供應商",
-        "providerDescription": "Serper 是不錯的預設選擇。每家供應商都有免費額度，TinyFish 免費且免綁卡。",
-        "providers": {
-          "serper": "Serper（Google，速度快）",
-          "brave": "Brave Search",
-          "tavily": "Tavily（AI 搜尋）",
-          "exa": "Exa（神經網路）",
-          "serpapi": "SerpAPI（Google）",
-          "tinyfish": "TinyFish（免費，免綁卡）"
-        },
-        "apiKeyLabel": "API 金鑰",
-        "apiKeyDescription": "所選搜尋供應商的金鑰。",
-        "apiKeyPlaceholder": "輸入 API 金鑰…",
-        "fetchContentLabel": "讀取完整網頁（品質最佳）",
-        "fetchContentDescription": "讀取每筆結果的全文，而不只是摘要片段。答案更好，但速度較慢。",
-        "maxResultsLabel": "使用的來源數",
-        "maxResultsDescription": "要讀取幾筆結果（1–10）。",
-        "depthLabel": "搜尋深度",
-        "depthDescription": "「快速」適合簡單事實，「標準」適合多數問題，「深入」適合困難的問題。",
-        "depthOptions": {
-          "low": "快速",
-          "medium": "標準",
-          "high": "深入"
-        },
-        "localSmartLabel": "智慧判斷是否搜尋（本機模型）",
-        "localSmartDescription": "讓本機模型決定何時搜尋。關閉時會改用快速的關鍵字判斷。",
-        "creditBudgetLabel": "每日 Firecrawl 額度上限",
-        "creditBudgetDescription": "每日可用的 Firecrawl 額度上限，達到後搜尋會暫停。0 = 無限制。",
-        "testLabel": "測試搜尋",
-        "testDescription": "使用目前的供應商與金鑰執行一次範例搜尋。",
-        "testButton": "測試搜尋",
-        "testing": "搜尋中…",
-        "testResult": "取得 {{count}} 筆結果。"
-      },
-      "tts": {
-        "title": "語音輸出",
-        "enableLabel": "朗讀回覆",
-        "enableDescription": "將助理的回覆朗讀出來。",
-        "stopOnDictationLabel": "開始語音輸入時停止朗讀",
-        "stopOnDictationDescription": "當您開始語音輸入時，停止仍在播放的回覆。",
-        "engineLabel": "引擎",
-        "engineDescription": "Kokoro 在本機執行且免費。其他引擎會使用您的 API 金鑰。",
-        "kokoroSetupLabel": "Kokoro 語音模型",
-        "kokoroSetupDescription": "下載一次之後，朗讀回覆就會在這台裝置上私密執行。",
-        "kokoroDownload": "下載 Kokoro",
-        "kokoroDownloading": "正在下載 Kokoro",
-        "kokoroReady": "已在這台裝置上就緒",
-        "kokoroRetry": "重新嘗試下載",
-        "engines": {
-          "kokoro": "Kokoro（本機，免費）",
-          "openai": "相容 OpenAI",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "語音",
-        "voiceDescription": "朗讀回覆時使用的 Kokoro 語音。",
-        "dtypeLabel": "Kokoro 精度",
-        "dtypeDescription": "fp32 品質最高；q8 在 CPU 上較快。變更後會重新載入模型。",
-        "speedLabel": "播放速度",
-        "speedDescription": "1× 為正常速度。ElevenLabs 僅支援 0.7×–1.2×。",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "自訂播放速度",
-        "testLabel": "測試語音",
-        "testDescription": "以目前的設定播放一段簡短範例。",
-        "testButton": "測試語音",
-        "testing": "測試中…",
-        "testOk": "已播放 ✓",
-        "testPhrase": "您好！這是 SpeakoFlow 語音輸出的測試。",
-        "downloadStart": "正在下載 Kokoro 語音…",
-        "downloadProgress": "正在下載 Kokoro 語音… {{progress}}%",
-        "downloadReady": "Kokoro 語音已就緒 ✓",
-        "downloadError": "無法下載 Kokoro 語音模型",
-        "baseUrlLabel": "基礎網址",
-        "baseUrlDescription": "相容 OpenAI 的 TTS 網址。填基礎網址或完整的 /audio/speech 網址都可以。",
-        "azureBaseUrlLabel": "語音服務網址",
-        "azureBaseUrlDescription": "您在入口網站取得的 Azure Speech 網址，例如 https://eastus2.tts.speech.microsoft.com。",
-        "apiKeyLabel": "API 金鑰",
-        "apiKeyDescription": "與助理的金鑰分開。",
-        "modelLabel": "模型",
-        "modelDescription": "模型或部署名稱，例如 gpt-4o-mini-tts（OpenAI/Azure）或 eleven_flash_v2_5（ElevenLabs）。",
-        "remoteVoiceLabel": "語音名稱",
-        "remoteVoiceDescription": "相容 OpenAI 的 TTS 所用語音，例如 alloy、echo、nova、shimmer。",
-        "azureVoiceLabel": "語音名稱",
-        "azureVoiceDescription": "Azure 語音名稱，例如 en-US-JennyNeural。點選「載入語音」即可瀏覽。",
-        "loadVoices": "載入語音",
-        "voicesLoading": "載入中…",
-        "voicesPick": "從 {{count}} 種語音中挑選…",
-        "loadModels": "載入模型",
-        "modelsLoading": "載入中…",
-        "modelsPick": "從 {{count}} 個模型中挑選…",
-        "modelsUse": "使用「{{model}}」",
-        "voicesUse": "使用「{{voice}}」",
-        "elevenVoiceLabel": "語音 ID",
-        "elevenVoiceDescription": "ElevenLabs 的語音 ID（可在其控制台的 Voices 分頁中取得）。",
-        "promptLabel": "摘要提示詞",
-        "promptDescription": "用於為每個回答生成簡短口語摘要的指令。"
-      },
-      "appearance": {
-        "title": "面板外觀",
-        "previewLabel": "預覽",
-        "previewDescription": "依您的文字大小與不透明度即時預覽面板。",
-        "previewUser": "嗨，你能做什麼？",
-        "previewAssistant": "很多喔！什麼都可以問我——我甚至能看您的螢幕。",
-        "fontSizeLabel": "文字大小",
-        "fontSizeDescription": "助理面板中對話文字的大小。",
-        "fontSizes": {
-          "small": "小",
-          "medium": "中",
-          "large": "大"
-        },
-        "panelSizeLabel": "面板大小",
-        "panelSizeDescription": "助理浮動面板的整體大小。您也可以拖曳邊緣來調整大小。",
-        "panelSizes": {
-          "mini": "小",
-          "compact": "精簡",
-          "standard": "標準",
-          "large": "大"
-        },
-        "opacityLabel": "面板不透明度",
-        "opacityDescription": "浮動面板的不透明程度。100% 為完全不透明；數值越低，越能透出模糊的桌面。"
+    "profiles": {
+      "active": "使用中",
+      "add": "新增",
+      "newName": "新角色",
+      "copyName": "{{name}} 複本",
+      "import": "匯入",
+      "export": "匯出",
+      "duplicate": "複製",
+      "delete": "刪除",
+      "restore": "還原預設",
+      "restoreMissing": "還原內建角色",
+      "more": "更多動作",
+      "edit": "展開",
+      "close": "收合",
+      "fields": {
+        "avatar": "上傳圖片",
+        "avatarClear": "移除"
       }
+    },
+    "cleanupModels": {
+      "title": "助理大腦",
+      "whereLabel": "執行位置",
+      "onDevice": "在我的裝置上",
+      "cloud": "雲端供應商",
+      "downloadModel": "瀏覽並下載模型",
+      "downloadModelDescription": "挑選推薦的模型，或搜尋 Hugging Face。",
+      "downloadModelAction": "瀏覽模型",
+      "catalogTitle": "選擇一個裝置端模型",
+      "catalogDescription": "下載私密的本機模型。它只留在這台電腦上，不需要 API 金鑰。",
+      "currentModelTitle": "目前的模型",
+      "currentModelDescription": "已為這台裝置上的內建助理選用。",
+      "recommendedTitle": "推薦模型",
+      "recommendedDescription": "三個以對話為優先的選擇：最快、推薦，以及能力更強但較慢。",
+      "acceleratorDetected": "{{name}} · 回報的顯示記憶體 {{memory}} GB",
+      "acceleratorDetectedDedicated": "{{name}} · 專用 VRAM {{memory}} GB",
+      "acceleratorDetectedIntegrated": "{{name}} · 共用顯示記憶體 {{memory}} GB",
+      "acceleratorDetectedNoMemory": "已偵測到 {{name}} · 未回報顯示記憶體",
+      "acceleratorUnknownWithMemory": "無法取得顯示記憶體 · 改用 CPU 時可用系統記憶體 {{memory}} GB",
+      "acceleratorUnknown": "無法取得顯示記憶體 · 無法預估回應速度",
+      "details": "詳細資訊",
+      "detailFile": "檔案",
+      "detailLocation": "位置",
+      "detailFormat": "格式",
+      "detailId": "模型 ID",
+      "switchBeforeDelete": "請先將內建助理切換到其他模型，再刪除這一個。",
+      "deleteModelConfirm": "要刪除 {{modelName}} 嗎？其下載的檔案與已儲存的項目都會一併移除。",
+      "deleteModelFailed": "無法刪除模型。",
+      "finderSectionTitle": "更多裝置端模型",
+      "finderTitle": "瀏覽 Hugging Face",
+      "finderDescription": "搜尋數千個 GGUF 模型，直接下載到 SpeakoFlow。",
+      "finderAction": "尋找模型",
+      "huggingFaceTitle": "我的模型",
+      "catalogEmpty": "目前沒有可用的推薦本機模型。",
+      "custom": "自訂"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "錄製中",
     "transcribing": "正在轉錄…",
     "processing": "處理中…",
-    "generating": "Flow 正在撰寫…",
-    "vision": "正在查看您的螢幕…",
     "notices": {
-      "flowNotConfigured": "Flow 需要助理模型——已改以一般語音輸入貼上",
-      "flowFailed": "Flow 無法生成——未貼上任何內容",
-      "flowEmpty": "請在啟動語句後說出指令",
       "cleanupFallback": "AI 整理未執行——已貼上原始文字"
     },
     "listening": "正在聆聽…",
     "locked": "免持錄製中——再按一次快捷鍵即可停止",
     "cancel": "取消",
-    "done": "完成",
-    "askAssistant": "改用助理提問，而不是把這段話輸入出來"
-  },
-  "assistant": {
-    "title": "助理",
-    "character": {
-      "switch": "切換角色"
-    },
-    "empty": "用助理快捷鍵以語音提問，\n或在下方輸入文字。",
-    "inputPlaceholder": "訊息…",
-    "inputPlaceholderScreen": "詢問您的螢幕內容…",
-    "queuedUntilReady": "已排入佇列——這則回覆結束後立即傳送。",
-    "send": "送出",
-    "stop": "停止",
-    "cancel": "取消",
-    "finish": "結束並送出",
-    "clear": "清除對話",
-    "hide": "隱藏面板",
-    "copy": "複製",
-    "copyCode": "複製程式碼",
-    "regenerate": "重新生成回答（舊的會保留在歷史紀錄中）",
-    "summarizing": "正在摘要先前的訊息…",
-    "screenAttached": "螢幕",
-    "attachScreen": "螢幕視覺——在關閉之前，每則訊息都會附上您的螢幕畫面",
-    "detachScreen": "關閉螢幕視覺",
-    "attach": {
-      "file": "附加圖片或檔案",
-      "snip": "擷取螢幕的某個範圍",
-      "image": "圖片",
-      "imageCount": "{{count}} 張圖片",
-      "imageCount_other": "{{count}} 張圖片",
-      "remove": "移除附件",
-      "dropHint": "放開即可附加"
-    },
-    "snip": {
-      "hint": "拖曳以擷取範圍——按 Esc 取消"
-    },
-    "webSearch": {
-      "enable": "啟用網路搜尋",
-      "disable": "停用網路搜尋"
-    },
-    "tts": {
-      "enable": "啟用語音摘要",
-      "disable": "停用語音摘要",
-      "loading": "正在載入 Kokoro 語音模型...",
-      "loadingShort": "語音模型 {{progress}}%"
-    },
-    "pill": {
-      "talk": "點選開始說話",
-      "stop": "停止並送出",
-      "idle": "助理",
-      "expand": "展開面板",
-      "collapse": "收合為膠囊",
-      "close": "關閉助理",
-      "cancel": "取消且不送出",
-      "cancelTurn": "取消",
-      "dismiss": "關閉",
-      "disarmScreen": "螢幕視覺已開啟——點選即可關閉",
-      "armScreen": "螢幕視覺已關閉——點選即可開啟"
-    },
-    "status": {
-      "listening": "正在聆聽…",
-      "locked": "聆聽中",
-      "transcribing": "正在轉錄…",
-      "searching": "正在搜尋網路...",
-      "thinking": "正在思考...",
-      "speaking": "正在朗讀..."
-    },
-    "tool": {
-      "search": "正在搜尋網路",
-      "screen": "正在查看您的螢幕",
-      "working": "正在處理",
-      "elapsed": "{{seconds}}秒"
-    },
-    "errors": {
-      "generic": "發生錯誤，請重試。",
-      "genericShort": "發生錯誤",
-      "no_provider": "尚未設定任何助理模型。請在「設定」→「助理」中選擇供應商。",
-      "no_providerShort": "尚未設定模型",
-      "no_model": "您的供應商尚未選擇模型。請在「設定」→「助理」中選擇一個。",
-      "no_modelShort": "未選擇模型",
-      "engine_start": "內建模型無法啟動。請重試，或在「設定」→「助理」中改選其他模型。",
-      "engine_startShort": "模型無法啟動",
-      "provider": "模型無法回答。請檢查您的 API 金鑰與網路連線後重試。",
-      "providerShort": "無法取得回答",
-      "empty_reply": "模型結束了卻沒有寫出回答。請再問一次，或在「設定」→「助理」中改選其他模型。",
-      "empty_replyShort": "回答為空",
-      "vision_unsupported": "此模型無法讀取您的螢幕。請在「設定」→「助理」中選擇支援視覺的模型，或在不使用螢幕視覺的情況下再提問。",
-      "vision_unsupportedShort": "模型無法看圖片",
-      "screenshot_too_large": "螢幕擷取的畫面對此供應商來說太大。請重試——系統會以更高的壓縮率處理。",
-      "screenshot_too_largeShort": "螢幕擷取畫面過大",
-      "screen_capture": "無法擷取螢幕。請重試，或在不使用螢幕視覺的情況下提問。",
-      "screen_captureShort": "螢幕擷取失敗",
-      "transcription": "無法轉錄您的語音，請再說一次。",
-      "transcriptionShort": "轉錄失敗",
-      "tts": "朗讀回覆失敗。請檢查您的 TTS 設定，或直接在面板中閱讀回答。",
-      "ttsShort": "語音回覆失敗",
-      "tts_local": "本機語音無法載入。請檢查網路連線，或在「設定」中更換 TTS 引擎。",
-      "tts_localShort": "語音無法載入",
-      "tts_blocked": "您的系統阻止語音自動播放。請點選面板任一處以聽取回覆。",
-      "tts_blockedShort": "輕點面板即可聽取",
-      "tts_playback": "無法在您的輸出裝置上播放語音。請檢查喇叭／輸出設定後重試。",
-      "tts_playbackShort": "語音播放失敗",
-      "mic_denied": "麥克風存取已被封鎖。請在系統隱私權設定中允許。",
-      "mic_deniedShort": "麥克風存取被封鎖",
-      "mic_unavailable": "找不到麥克風。請連接後重試。",
-      "mic_unavailableShort": "找不到麥克風",
-      "mic_error": "麥克風無法啟動，可能正被其他應用程式使用。",
-      "mic_errorShort": "麥克風無法啟動",
-      "file_read": "無法附加該檔案。",
-      "file_readShort": "無法附加檔案"
-    },
-    "notices": {
-      "web_search_failed": "網路搜尋沒有取得結果——將不使用搜尋結果作答。",
-      "web_search_failedShort": "沒有網路搜尋結果"
-    },
-    "engineSetup": {
-      "downloading": "正在設定本機引擎（首次執行）… {{percent}}%",
-      "preparing": "正在設定本機引擎（首次執行）…",
-      "extracting": "正在安裝本機引擎…",
-      "short": "正在設定引擎…"
-    }
+    "done": "完成"
   }
 }

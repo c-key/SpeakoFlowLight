@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "Chung",
     "dictation": "Đọc chính tả",
-    "assistant": "Trợ lý",
     "history": "Lịch sử",
     "about": "Giới thiệu",
     "debug": "Gỡ lỗi",
-    "characters": "Hồ sơ",
     "memory": "Bộ nhớ",
     "collapse": "Thu gọn thanh bên",
-    "expand": "Mở rộng thanh bên"
+    "expand": "Mở rộng thanh bên",
+    "profiles": "Hồ sơ"
   },
   "window": {
     "minimize": "Thu nhỏ",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "Phím tắt, micrô và giao diện của ứng dụng.",
-    "dictation": "Mô hình biến giọng nói của bạn thành văn bản, và cách văn bản được dọn dẹp.",
-    "assistant": "Thiết lập trợ lý, rồi tinh chỉnh giọng nói, khả năng xem màn hình và tìm kiếm web.",
-    "history": "Các nội dung đọc chính tả, nội dung do Flow tạo và trò chuyện với trợ lý gần đây của bạn, được lưu trên thiết bị này.",
     "about": "Phiên bản, ngôn ngữ ứng dụng, vị trí dữ liệu và ghi công.",
     "debug": "Công cụ chẩn đoán và dành cho nhà phát triển."
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "Đang tải mô hình của bạn ở chế độ nền."
     },
     "aiModel": {
-      "title": "Thêm mô hình AI cục bộ",
-      "subtitle": "Hãy chọn theo tốc độ trả lời và khả năng. E4B là mặc định cân bằng; 12B sắc sảo hơn nhưng chậm hơn.",
       "tiers": {
         "small": {
           "description": "Chạy được trên mọi máy. Rất tốt để chỉnh gọn câu chữ."
@@ -90,9 +84,6 @@
           "description": "Câu trả lời sắc sảo nhất, và nó xem được màn hình của bạn."
         }
       },
-      "seesScreen": "Xem được màn hình",
-      "textOnly": "Chỉ văn bản",
-      "recommendedForAssistant": "Đề xuất cho trợ lý",
       "download": "Tải mô hình",
       "useDownloaded": "Dùng mô hình đã tải",
       "skip": "Bỏ qua bây giờ",
@@ -114,11 +105,8 @@
       "subtitle": "Chỉ cần hai phím tắt. Nhấn, nói, xong.",
       "dictateLabel": "Đọc chính tả ở mọi nơi",
       "dictateCaption": "Giữ, nói, thả. Câu chữ tự hiện ra.",
-      "assistantKeysLabel": "Hỏi trợ lý",
-      "assistantKeysCaption": "Giữ và hỏi. Nó còn xem được màn hình của bạn.",
       "changeAnytime": "Bạn có thể thay đổi những mục này bất cứ lúc nào trong Cài đặt.",
       "hotkeyLabel": "Phím đọc chính tả của bạn",
-      "downloadingAssistant": "Trợ lý của bạn đang dọn vào. Đã được {{percentage}}%.",
       "downloadingVoice": "Mô hình giọng nói đang cập bến. Đã được {{percentage}}%.",
       "downloadingGeneric": "Vẫn đang tải xuống. Đã được {{percentage}}%.",
       "signOff": "Vậy là xong. Nói gì đi nào.",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "Ghi nhớ về tôi",
-        "description": "Cho phép trợ lý lưu và dùng bộ nhớ cá nhân. Mặc định tắt."
-      },
-      "incognito": {
-        "label": "Trò chuyện ẩn danh",
-        "description": "Trong cuộc trò chuyện này, không dùng bộ nhớ và không học điều gì mới."
-      },
       "detail": {
         "label": "Mức chi tiết của bộ nhớ",
-        "description": "Lượng bộ nhớ thêm vào mỗi câu trả lời. Chi tiết hơn thì phong phú hơn nhưng chậm hơn một chút.",
         "options": {
           "light": "Nhẹ",
           "balanced": "Cân bằng",
@@ -350,7 +329,6 @@
         "add": "Thêm",
         "addPlaceholder": "Thêm điều cần ghi nhớ…",
         "delete": "Xóa ghi chú",
-        "learned": "đã học",
         "added": "bạn đã thêm"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "Quản lý"
-      },
-      "distill": {
-        "label": "Học từ cuộc trò chuyện này ngay",
-        "description": "Rút những thông tin bền vững từ cuộc trò chuyện hiện tại vào bộ nhớ, ngay lúc này.",
-        "button": "Cập nhật bộ nhớ"
       },
       "export": "Xuất",
       "import": "Nhập",
@@ -937,16 +910,6 @@
         "title": "Emoji bằng giọng nói",
         "description": "Nói “happy emoji” hoặc “thumbs up emoji” để chèn 😊 hoặc 👍. Các tên gọi phổ biến và lỗi nhận dạng nhỏ được xử lý trên thiết bị; tên không xác định vẫn giữ nguyên dạng văn bản."
       },
-      "flow": {
-        "groupTitle": "Tạo nội dung với Flow",
-        "enableLabel": "Tạo nội dung với Flow",
-        "enableDescription": "Bắt đầu một lần đọc chính tả bằng cụm từ kích hoạt để AI viết kết quả cho bạn — “Hey Flow, viết một email lịch sự xin đổi lịch hẹn” sẽ dán ra email đã hoàn chỉnh.",
-        "phraseLabel": "Cụm từ kích hoạt",
-        "phraseDescription": "Flow chỉ kích hoạt khi một lần đọc chính tả bắt đầu bằng cụm từ này. Ở mọi chỗ khác, cùng những từ đó vẫn được dán như đọc chính tả bình thường. Dùng mô hình của trợ lý; để trống để đặt lại thành “Hey Flow”.",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "Cho phép truy cập màn hình",
-        "screenDescription": "Cho Flow chụp một ảnh màn hình khi câu lệnh rõ ràng nói về màn hình của bạn, kiểu “xem email này và viết nháp một câu trả lời”. Mô hình tự quyết định có cần hay không. Tách biệt với quyền truy cập màn hình của trợ lý."
-      },
       "output": {
         "title": "Tùy chọn đầu ra"
       }
@@ -957,29 +920,14 @@
         "title": "Lưu trữ bản ghi âm",
         "description": "Các tùy chọn này ảnh hưởng đến bản ghi đọc chính tả và Flow. Bản ghi đã lưu luôn được giữ lại. Trò chuyện với trợ lý được lưu trữ riêng."
       },
-      "filters": {
-        "label": "Loại lịch sử",
-        "all": "Tất cả",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "Trò chuyện với trợ lý"
-      },
       "openFolder": "Mở thư mục ghi âm",
       "loading": "Đang tải lịch sử…",
       "empty": "Chưa có gì ở đây. Nội dung đọc chính tả, nội dung do Flow tạo và trò chuyện với trợ lý của bạn sẽ xuất hiện ở đây.",
-      "emptyRecordings": "Chưa có nội dung đọc chính tả nào.",
-      "emptyFlow": "Chưa có nội dung nào do Flow tạo.",
-      "emptyAssistant": "Chưa có cuộc trò chuyện nào với trợ lý.",
       "recordingLabel": "Đọc chính tả",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "Bạn đã nói",
       "originalTranscriptionLabel": "Bản chuyển đổi gốc",
-      "flowOutputLabel": "Kết quả từ Flow",
       "finalTextLabel": "Văn bản cuối",
       "cleanupNoChanges": "Đã chạy dọn dẹp bằng AI, không có gì cần sửa",
-      "flowNoOutput": "Flow không tạo ra kết quả nào.",
       "copyToClipboard": "Sao chép bản ghi vào clipboard",
-      "copyFlowOutput": "Sao chép kết quả từ Flow",
       "copyFinalText": "Sao chép văn bản cuối",
       "save": "Lưu bản ghi",
       "unsave": "Xóa khỏi đã lưu",
@@ -988,18 +936,7 @@
       "retranscribe": "Phiên âm lại",
       "retranscribeError": "Không thể phiên âm lại. Vui lòng thử lại.",
       "transcribing": "Đang phiên âm…",
-      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại.",
-      "assistantLabel": "Trò chuyện với trợ lý",
-      "copyConversation": "Sao chép cuộc trò chuyện",
-      "resumeConversation": "Tiếp tục cuộc trò chuyện này trong trợ lý",
-      "showConversation": "Hiện cuộc trò chuyện",
-      "hideConversation": "Ẩn cuộc trò chuyện",
-      "roleUser": "Bạn",
-      "roleAssistant": "Trợ lý",
-      "screenshotAttached": "Màn hình",
-      "messageCount_one": "{{count}} tin nhắn",
-      "messageCount_other": "{{count}} tin nhắn",
-      "deleteAssistantError": "Không thể xóa cuộc trò chuyện. Vui lòng thử lại."
+      "transcriptionFailed": "Phiên âm thất bại. Bạn có thể phiên âm lại bằng biểu tượng thử lại."
     },
     "debug": {
       "title": "Gỡ lỗi",
@@ -1113,324 +1050,60 @@
         "button": "Quyên góp"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "Trợ lý",
-        "label": "Bật trợ lý",
-        "description": "Tắt tùy chọn này để SpeakoFlow chỉ làm việc đọc chính tả. Bảng nổi sẽ đóng và không bao giờ được nạp, các phím tắt của nó được giải phóng, và bộ nhớ nó dùng được trả lại. Tạo nội dung với Flow và dọn dẹp bằng AI vẫn hoạt động."
-      },
-      "shortcuts": {
-        "title": "Phím tắt"
-      },
-      "brain": {
-        "title": "Bộ não trợ lý",
-        "whereLabel": "Nơi chạy",
-        "onDevice": "Trên máy của tôi",
-        "cloud": "Nhà cung cấp đám mây",
-        "downloadModel": "Xem và tải mô hình",
-        "downloadModelDescription": "Chọn một mô hình được đề xuất hoặc tìm trên Hugging Face.",
-        "downloadModelAction": "Xem các mô hình",
-        "catalogTitle": "Chọn một mô hình chạy trên thiết bị",
-        "catalogDescription": "Tải một mô hình cục bộ riêng tư. Nó nằm lại trên máy này và không cần khóa API.",
-        "currentModelTitle": "Mô hình hiện tại",
-        "currentModelDescription": "Đã chọn cho trợ lý tích hợp trên thiết bị này.",
-        "recommendedTitle": "Mô hình được đề xuất",
-        "recommendedDescription": "Ba lựa chọn ưu tiên trò chuyện: nhanh nhất, được đề xuất, và mạnh hơn nhưng chậm hơn.",
-        "acceleratorDetected": "{{name}} · {{memory}} GB bộ nhớ đồ họa được báo cáo",
-        "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB VRAM riêng",
-        "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB bộ nhớ đồ họa dùng chung",
-        "acceleratorDetectedNoMemory": "Đã phát hiện {{name}} · không có báo cáo về bộ nhớ đồ họa",
-        "acceleratorUnknownWithMemory": "Không rõ bộ nhớ đồ họa · {{memory}} GB RAM hệ thống để dự phòng bằng CPU",
-        "acceleratorUnknown": "Không rõ bộ nhớ đồ họa · không thể dự đoán tốc độ trả lời",
-        "details": "Chi tiết",
-        "detailFile": "Tệp",
-        "detailLocation": "Vị trí",
-        "detailFormat": "Định dạng",
-        "detailId": "ID mô hình",
-        "switchBeforeDelete": "Hãy chuyển trợ lý tích hợp sang mô hình khác trước khi xóa mô hình này.",
-        "deleteModelConfirm": "Xóa {{modelName}}? Các tệp đã tải và mục đã lưu của nó sẽ bị loại bỏ.",
-        "deleteModelFailed": "Không thể xóa mô hình.",
-        "finderSectionTitle": "Thêm mô hình chạy trên thiết bị",
-        "finderTitle": "Xem trên Hugging Face",
-        "finderDescription": "Tìm trong hàng nghìn mô hình GGUF và tải một mô hình trực tiếp vào SpeakoFlow.",
-        "finderAction": "Tìm một mô hình",
-        "huggingFaceTitle": "Mô hình của bạn",
-        "catalogEmpty": "Hiện không có mô hình cục bộ được đề xuất nào."
-      },
-      "subpages": {
-        "profilesCaption": "Đổi tên, vai trò và tính cách của trợ lý.",
-        "memoryCaption": "Những gì trợ lý ghi nhớ về bạn giữa các cuộc trò chuyện."
-      },
-      "tapToLock": {
-        "label": "Nhấn để khóa",
-        "info": "Trong khi giữ phím tắt trợ lý, hãy nhấn phím này để khóa chế độ rảnh tay, nhờ đó bạn có thể thả tay ra mà vẫn nói tiếp. Chọn phím nào không thuộc phím tắt trợ lý của bạn (phím bị trùng sẽ bị bỏ qua), hoặc xóa trống để tắt tính năng này.",
-        "off": "Tắt",
-        "clear": "Xóa"
-      },
-      "provider": {
-        "title": "Nhà cung cấp cho trợ lý",
-        "saveFailed": "Không thể chuyển nhà cung cấp cho Trợ lý.",
-        "providerLabel": "Nhà cung cấp",
-        "providerDescription": "Nhà cung cấp trả lời các câu hỏi cho trợ lý.",
-        "baseUrlLabel": "URL cơ sở",
-        "baseUrlDescription": "URL cơ sở tương thích OpenAI. URL của Azure được chuẩn hóa tự động.",
-        "apiKeyLabel": "Khóa API",
-        "apiKeyDescription": "Dùng chung với dọn dẹp bằng AI.",
-        "apiKeyPlaceholder": "Nhập khóa API…",
-        "modelLabel": "Mô hình",
-        "modelDescription": "Tên mô hình hoặc tên bản triển khai dùng cho câu trả lời của trợ lý.",
-        "modelPlaceholder": "ví dụ: gpt-4o-mini",
-        "modelSearchPlaceholder": "Tìm hoặc nhập tên mô hình…",
-        "modelUse": "Dùng “{{model}}”",
-        "loadModels": "Tải danh sách mô hình",
-        "loadingModels": "Đang tải…",
-        "noModelsFound": "Không có mô hình nào được trả về. Hãy tự nhập tên mô hình.",
-        "builtinModelDescription": "Chọn một mô hình cục bộ đã tải. Nó chạy trên máy của bạn, không cần khóa API.",
-        "builtinModelPlaceholder": "Chọn một mô hình đã tải",
-        "builtinNoModels": "Chưa có mô hình nào trên máy của bạn — hãy tải một mô hình bên dưới.",
-        "builtinReady": "Chạy hoàn toàn trên máy của bạn. Không cần khóa API, không cần thiết lập.",
-        "builtinEngineMissing": "Lần dùng đầu tiên sẽ tự động tải một công cụ cục bộ nhỏ (chỉ một lần), sau đó chạy hoàn toàn ngoại tuyến. Không cần thiết lập gì.",
-        "builtinEngineDownloading": "Đang tải công cụ cục bộ… {{percent}}%",
-        "builtinEnginePreparing": "Đang tải công cụ cục bộ…",
-        "builtinEngineExtracting": "Đang cài đặt công cụ cục bộ…",
-        "builtinEngineReady": "Công cụ cục bộ đã sẵn sàng.",
-        "contextSizeLabel": "Cửa sổ ngữ cảnh",
-        "contextSizeDescription": "Lượng thông tin mô hình cục bộ có thể ghi nhớ cùng lúc — hướng dẫn hệ thống, lịch sử trò chuyện của bạn, ảnh màn hình nếu có (một ảnh có thể chiếm phần khá lớn) và câu trả lời của nó. Cửa sổ lớn hơn chứa được nhiều hơn và giúp khả năng xem màn hình cùng tìm kiếm web đáng tin cậy, nhưng dùng nhiều bộ nhớ hơn. Mặc định là 8192; 16384 là bước nâng tốt nếu máy của bạn còn dư RAM. Bạn có thể giảm lại sau để tiết kiệm bộ nhớ.",
-        "unloadTimeoutLabel": "Giải phóng khỏi bộ nhớ sau",
-        "unloadTimeoutDescription": "Giải phóng bộ nhớ bằng cách dỡ mô hình cục bộ sau khi nó rảnh đủ lâu. Nó tự nạp lại ở lần dùng tiếp theo."
-      },
-      "systemPrompt": {
-        "title": "Prompt hệ thống",
-        "label": "Prompt hệ thống của trợ lý",
-        "description": "Quy định cách trợ lý hành xử."
-      },
-      "characters": {
-        "title": "Hồ sơ",
-        "description": "Những hồ sơ tập trung theo tác vụ mà bạn có thể chuyển qua lại. Hồ sơ đang dùng quy định tên, vai trò và hướng dẫn của trợ lý — cùng độ dài câu trả lời. Chuyển bất cứ lúc nào từ phần đầu của bảng.",
-        "galleryLabel": "Hồ sơ của bạn",
-        "editSection": "Sửa hồ sơ",
-        "avatarLabel": "Ảnh đại diện",
-        "active": "Đang dùng",
-        "meowsOnly": "Chỉ biết meo meo",
-        "builtin": "Có sẵn",
-        "custom": "Tùy chỉnh",
-        "new": "Mới",
-        "newName": "Hồ sơ mới",
-        "copyName": "Bản sao của {{name}}",
-        "createAi": "Tạo bằng AI",
-        "import": "Nhập",
-        "aiTitle": "Mô tả hồ sơ của bạn",
-        "aiClose": "Đóng",
-        "aiPlaceholder": "ví dụ: một người viết ghi chú phát hành ngắn gọn, hoặc một gia sư kiên nhẫn giải thích từng bước",
-        "aiDictate": "Đọc chính tả phần mô tả",
-        "aiDictateStop": "Dừng đọc chính tả",
-        "generate": "Tạo",
-        "avatarUpload": "Tải ảnh lên",
-        "avatarRemove": "Xóa",
-        "nameLabel": "Tên",
-        "roleLabel": "Vai trò",
-        "rolePlaceholder": "Mô tả ngắn hiện trên thẻ (tùy chọn)",
-        "promptLabel": "Hướng dẫn (prompt hệ thống)",
-        "responseLength": {
-          "label": "Độ dài câu trả lời",
-          "hint": "Câu trả lời của hồ sơ này dài đến đâu. “Kế thừa” sẽ theo cài đặt Trợ lý chung của bạn.",
-          "options": {
-            "inherit": "Kế thừa cài đặt chung",
-            "short": "Ngắn",
-            "medium": "Trung bình",
-            "long": "Dài"
-          }
-        },
-        "greetingLabel": "Lời chào (tùy chọn)",
-        "greetingPlaceholder": "Câu mở đầu tùy chọn hiện trong cuộc trò chuyện trống",
-        "catNote": "Con Mèo bỏ qua AI hoàn toàn — nó chỉ meo meo. Không có gì để cấu hình ở đây.",
-        "duplicate": "Tạo bản sao",
-        "export": "Xuất",
-        "restoreDefault": "Khôi phục mặc định",
-        "restoreBuiltins": "Khôi phục hồ sơ có sẵn",
-        "moreActions": "Thêm hành động",
-        "expand": "Mở rộng",
-        "collapse": "Thu gọn",
-        "delete": "Xóa",
-        "deleteConfirm": "Xóa hồ sơ này? Hành động này không thể hoàn tác.",
-        "emptyState": "Chưa có hồ sơ nào. Hãy tạo hồ sơ đầu tiên để trợ lý có một tính cách."
-      },
-      "behavior": {
-        "title": "Hành vi"
-      },
-      "memory": {
-        "label": "Bộ nhớ cuộc trò chuyện",
-        "description": "Số tin nhắn gần đây được gửi kèm làm ngữ cảnh mỗi lượt. 0 sẽ tắt bộ nhớ."
-      },
-      "autoSummarize": {
-        "label": "Tóm tắt cuộc trò chuyện dài",
-        "description": "Khi một cuộc trò chuyện vượt quá cửa sổ ngữ cảnh của mô hình, tự động cô đọng các tin nhắn cũ thành một bản tóm tắt liên tục để cuộc trò chuyện giữ được ngữ cảnh thay vì quên phần đầu. Một chỉ báo mờ nhạt hiện ra trong lúc chạy."
-      },
-      "responseLength": {
-        "label": "Độ dài câu trả lời",
-        "description": "Độ dài câu trả lời bạn muốn. “Không tác động” sẽ giữ nguyên prompt của bạn.",
-        "options": {
-          "default": "Không tác động",
-          "short": "Ngắn",
-          "medium": "Trung bình",
-          "long": "Dài"
-        }
-      },
-      "vision": {
-        "title": "Xem màn hình",
-        "modeLabel": "Truy cập màn hình",
-        "modes": {
-          "off": "Tắt",
-          "manual": "Thủ công",
-          "agentDecides": "AI tự quyết",
-          "descriptions": {
-            "off": "Chụp màn hình đã tắt. Các điều khiển máy ảnh và chọn vùng bị ẩn.",
-            "manual": "Bạn chọn khi nào gửi kèm toàn màn hình hoặc một vùng. Thời điểm chụp cho câu hỏi bằng giọng nói vẫn được áp dụng.",
-            "agent_decides": "Mô hình có thể yêu cầu chụp màn hình khi nó cần ngữ cảnh hình ảnh hiện tại. Mọi ảnh màn hình được gửi đều hiện trong cuộc trò chuyện."
-          }
-        },
-        "timing": {
-          "label": "Chụp khi nào",
-          "description": "Với câu hỏi bằng giọng nói: chụp ngay lúc bạn bắt đầu hỏi, hoặc chờ đến khi tin nhắn được gửi. Tin nhắn gõ tay luôn chụp lúc gửi.",
-          "descriptionAgent": "Cả hai tùy chọn đều chuẩn bị ảnh màn hình trước, nên trợ lý không bao giờ để bạn phải chờ. Khác biệt nằm ở nội dung ảnh: “Khi tôi bắt đầu hỏi” lấy màn hình như lúc bạn bắt đầu nói, “Khi tin nhắn được gửi” lấy màn hình như hiện tại. Dù chọn cách nào, ảnh vẫn ở trên máy của bạn và chỉ được gửi đi nếu trợ lý thực sự cần xem.",
-          "options": {
-            "immediate": "Khi tôi bắt đầu hỏi",
-            "on_send": "Khi tin nhắn được gửi"
-          }
-        },
-        "screenRecording": {
-          "description": "Khả năng xem màn hình cần quyền Ghi màn hình của macOS. Hãy cấp quyền trong Cài đặt Hệ thống, rồi khởi động lại SpeakoFlow để có hiệu lực.",
-          "grant": "Mở Cài đặt Hệ thống"
-        }
-      },
-      "webSearch": {
-        "title": "Tìm kiếm web",
-        "enableLabel": "Cho phép tìm kiếm web",
-        "enableDescription": "Cho trợ lý tìm trên web khi một câu hỏi cần thông tin mới nhất.",
-        "openRouterNativeLabel": "Dùng tìm kiếm tích hợp của OpenRouter",
-        "openRouterNativeDescription": "Khi bật, OpenRouter tự thực hiện việc tìm kiếm (chế độ :online của họ) và dùng tín dụng OpenRouter của bạn. Khi tắt, ứng dụng tìm kiếm bằng nhà cung cấp bạn chọn bên dưới.",
-        "providerLabel": "Nhà cung cấp tìm kiếm",
-        "providerDescription": "Serper là lựa chọn mặc định tốt. Mọi nhà cung cấp đều có bậc miễn phí, và TinyFish miễn phí mà không cần thẻ.",
-        "providers": {
-          "serper": "Serper (Google, nhanh)",
-          "brave": "Brave Search",
-          "tavily": "Tavily (tìm kiếm AI)",
-          "exa": "Exa (nơ-ron)",
-          "serpapi": "SerpAPI (Google)",
-          "tinyfish": "TinyFish (miễn phí, không cần thẻ)"
-        },
-        "apiKeyLabel": "Khóa API",
-        "apiKeyDescription": "Khóa cho nhà cung cấp tìm kiếm đã chọn.",
-        "apiKeyPlaceholder": "Nhập khóa API…",
-        "fetchContentLabel": "Đọc toàn bộ trang (chất lượng tốt nhất)",
-        "fetchContentDescription": "Đọc toàn văn từng kết quả thay vì chỉ đoạn trích. Câu trả lời tốt hơn, nhưng chậm hơn.",
-        "maxResultsLabel": "Số nguồn sử dụng",
-        "maxResultsDescription": "Số kết quả cần đọc (1–10).",
-        "depthLabel": "Độ sâu tìm kiếm",
-        "depthDescription": "Nhanh cho thông tin đơn giản, Chuẩn cho phần lớn câu hỏi, Sâu cho câu hỏi khó.",
-        "depthOptions": {
-          "low": "Nhanh",
-          "medium": "Chuẩn",
-          "high": "Sâu"
-        },
-        "localSmartLabel": "Tự quyết định tìm kiếm thông minh (mô hình cục bộ)",
-        "localSmartDescription": "Cho mô hình cục bộ tự quyết khi nào cần tìm kiếm. Khi tắt, ứng dụng dùng phép kiểm tra từ khóa nhanh.",
-        "creditBudgetLabel": "Giới hạn tín dụng Firecrawl mỗi ngày",
-        "creditBudgetDescription": "Mức trần tín dụng Firecrawl mỗi ngày trước khi tìm kiếm tạm dừng. 0 = không giới hạn.",
-        "testLabel": "Thử tìm kiếm",
-        "testDescription": "Chạy một lần tìm kiếm mẫu với nhà cung cấp và khóa hiện tại.",
-        "testButton": "Thử tìm kiếm",
-        "testing": "Đang tìm…",
-        "testResult": "Đã nhận {{count}} kết quả."
-      },
-      "tts": {
-        "title": "Đầu ra giọng nói",
-        "enableLabel": "Đọc to câu trả lời",
-        "enableDescription": "Đọc to các câu trả lời của trợ lý.",
-        "stopOnDictationLabel": "Dừng đọc khi bắt đầu đọc chính tả",
-        "stopOnDictationDescription": "Dừng câu trả lời còn đang phát khi bạn bắt đầu đọc chính tả.",
-        "engineLabel": "Công cụ",
-        "engineDescription": "Kokoro chạy cục bộ và miễn phí. Các công cụ khác dùng khóa API của bạn.",
-        "kokoroSetupLabel": "Mô hình giọng nói Kokoro",
-        "kokoroSetupDescription": "Tải một lần, sau đó câu trả lời nói ra sẽ chạy riêng tư trên thiết bị này.",
-        "kokoroDownload": "Tải Kokoro",
-        "kokoroDownloading": "Đang tải Kokoro",
-        "kokoroReady": "Đã sẵn sàng trên thiết bị này",
-        "kokoroRetry": "Thử tải lại",
-        "engines": {
-          "kokoro": "Kokoro (cục bộ, miễn phí)",
-          "openai": "Tương thích OpenAI",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "Giọng",
-        "voiceDescription": "Giọng Kokoro cho câu trả lời nói ra.",
-        "dtypeLabel": "Độ chính xác Kokoro",
-        "dtypeDescription": "fp32 cho chất lượng cao nhất; q8 nhanh hơn trên CPU. Đổi tùy chọn này sẽ nạp lại mô hình.",
-        "speedLabel": "Tốc độ phát",
-        "speedDescription": "1× là bình thường. ElevenLabs chỉ hỗ trợ 0.7×–1.2×.",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "Tốc độ phát tùy chỉnh",
-        "testLabel": "Thử giọng",
-        "testDescription": "Phát một mẫu ngắn với cài đặt hiện tại.",
-        "testButton": "Thử giọng",
-        "testing": "Đang thử…",
-        "testOk": "Đã phát ✓",
-        "testPhrase": "Xin chào! Đây là bản thử đầu ra giọng nói của SpeakoFlow.",
-        "downloadStart": "Đang tải giọng Kokoro…",
-        "downloadProgress": "Đang tải giọng Kokoro… {{progress}}%",
-        "downloadReady": "Giọng Kokoro đã sẵn sàng ✓",
-        "downloadError": "Không thể tải mô hình giọng nói Kokoro",
-        "baseUrlLabel": "URL cơ sở",
-        "baseUrlDescription": "URL TTS tương thích OpenAI. Dùng URL cơ sở hoặc URL /audio/speech đầy đủ đều được.",
-        "azureBaseUrlLabel": "URL Speech",
-        "azureBaseUrlDescription": "URL Azure Speech của bạn lấy từ cổng quản trị, ví dụ https://eastus2.tts.speech.microsoft.com.",
-        "apiKeyLabel": "Khóa API",
-        "apiKeyDescription": "Tách biệt với khóa của trợ lý.",
-        "modelLabel": "Mô hình",
-        "modelDescription": "Tên mô hình hoặc bản triển khai, ví dụ gpt-4o-mini-tts (OpenAI/Azure) hoặc eleven_flash_v2_5 (ElevenLabs).",
-        "remoteVoiceLabel": "Tên giọng",
-        "remoteVoiceDescription": "Giọng cho TTS tương thích OpenAI, ví dụ alloy, echo, nova, shimmer.",
-        "azureVoiceLabel": "Tên giọng",
-        "azureVoiceDescription": "Tên giọng Azure, ví dụ en-US-JennyNeural. Nhấn Tải danh sách giọng để xem.",
-        "loadVoices": "Tải danh sách giọng",
-        "voicesLoading": "Đang tải…",
-        "voicesPick": "Chọn trong {{count}} giọng…",
-        "loadModels": "Tải danh sách mô hình",
-        "modelsLoading": "Đang tải…",
-        "modelsPick": "Chọn trong {{count}} mô hình…",
-        "modelsUse": "Dùng “{{model}}”",
-        "voicesUse": "Dùng “{{voice}}”",
-        "elevenVoiceLabel": "ID giọng",
-        "elevenVoiceDescription": "ID giọng của ElevenLabs (lấy ở tab Voices trong bảng điều khiển của họ).",
-        "promptLabel": "Prompt tóm tắt",
-        "promptDescription": "Hướng dẫn để tạo bản tóm tắt ngắn được đọc lên cho mỗi câu trả lời."
-      },
-      "appearance": {
-        "title": "Giao diện bảng",
-        "previewLabel": "Xem trước",
-        "previewDescription": "Xem trước trực tiếp bảng với cỡ chữ và độ mờ bạn chọn.",
-        "previewUser": "Này, bạn làm được những gì?",
-        "previewAssistant": "Nhiều lắm! Hỏi tôi bất cứ điều gì — tôi còn xem được màn hình của bạn.",
-        "fontSizeLabel": "Cỡ chữ",
-        "fontSizeDescription": "Cỡ chữ của phần trò chuyện trong bảng trợ lý.",
-        "fontSizes": {
-          "small": "Nhỏ",
-          "medium": "Trung bình",
-          "large": "Lớn"
-        },
-        "panelSizeLabel": "Kích thước bảng",
-        "panelSizeDescription": "Kích thước tổng thể của bảng trợ lý nổi. Bạn cũng có thể kéo các cạnh của nó để thay đổi kích thước.",
-        "panelSizes": {
-          "mini": "Nhỏ",
-          "compact": "Gọn",
-          "standard": "Chuẩn",
-          "large": "Lớn"
-        },
-        "opacityLabel": "Độ mờ của bảng",
-        "opacityDescription": "Bảng nổi đục đến mức nào. 100% là hoàn toàn đặc; giá trị thấp hơn cho phép thấy mờ màn hình nền phía sau."
+    "profiles": {
+      "active": "Đang dùng",
+      "add": "Mới",
+      "newName": "Hồ sơ mới",
+      "copyName": "Bản sao của {{name}}",
+      "import": "Nhập",
+      "export": "Xuất",
+      "duplicate": "Tạo bản sao",
+      "delete": "Xóa",
+      "restore": "Khôi phục mặc định",
+      "restoreMissing": "Khôi phục hồ sơ có sẵn",
+      "more": "Thêm hành động",
+      "edit": "Mở rộng",
+      "close": "Thu gọn",
+      "fields": {
+        "avatar": "Tải ảnh lên",
+        "avatarClear": "Xóa"
       }
+    },
+    "cleanupModels": {
+      "title": "Bộ não trợ lý",
+      "whereLabel": "Nơi chạy",
+      "onDevice": "Trên máy của tôi",
+      "cloud": "Nhà cung cấp đám mây",
+      "downloadModel": "Xem và tải mô hình",
+      "downloadModelDescription": "Chọn một mô hình được đề xuất hoặc tìm trên Hugging Face.",
+      "downloadModelAction": "Xem các mô hình",
+      "catalogTitle": "Chọn một mô hình chạy trên thiết bị",
+      "catalogDescription": "Tải một mô hình cục bộ riêng tư. Nó nằm lại trên máy này và không cần khóa API.",
+      "currentModelTitle": "Mô hình hiện tại",
+      "currentModelDescription": "Đã chọn cho trợ lý tích hợp trên thiết bị này.",
+      "recommendedTitle": "Mô hình được đề xuất",
+      "recommendedDescription": "Ba lựa chọn ưu tiên trò chuyện: nhanh nhất, được đề xuất, và mạnh hơn nhưng chậm hơn.",
+      "acceleratorDetected": "{{name}} · {{memory}} GB bộ nhớ đồ họa được báo cáo",
+      "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB VRAM riêng",
+      "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB bộ nhớ đồ họa dùng chung",
+      "acceleratorDetectedNoMemory": "Đã phát hiện {{name}} · không có báo cáo về bộ nhớ đồ họa",
+      "acceleratorUnknownWithMemory": "Không rõ bộ nhớ đồ họa · {{memory}} GB RAM hệ thống để dự phòng bằng CPU",
+      "acceleratorUnknown": "Không rõ bộ nhớ đồ họa · không thể dự đoán tốc độ trả lời",
+      "details": "Chi tiết",
+      "detailFile": "Tệp",
+      "detailLocation": "Vị trí",
+      "detailFormat": "Định dạng",
+      "detailId": "ID mô hình",
+      "switchBeforeDelete": "Hãy chuyển trợ lý tích hợp sang mô hình khác trước khi xóa mô hình này.",
+      "deleteModelConfirm": "Xóa {{modelName}}? Các tệp đã tải và mục đã lưu của nó sẽ bị loại bỏ.",
+      "deleteModelFailed": "Không thể xóa mô hình.",
+      "finderSectionTitle": "Thêm mô hình chạy trên thiết bị",
+      "finderTitle": "Xem trên Hugging Face",
+      "finderDescription": "Tìm trong hàng nghìn mô hình GGUF và tải một mô hình trực tiếp vào SpeakoFlow.",
+      "finderAction": "Tìm một mô hình",
+      "huggingFaceTitle": "Mô hình của bạn",
+      "catalogEmpty": "Hiện không có mô hình cục bộ được đề xuất nào.",
+      "custom": "Tùy chỉnh"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "Đang ghi âm",
     "transcribing": "Đang chuyển đổi…",
     "processing": "Đang xử lý…",
-    "generating": "Đang viết bằng Flow…",
-    "vision": "Đang xem màn hình của bạn…",
     "notices": {
-      "flowNotConfigured": "Flow cần một mô hình trợ lý — đã dán như đọc chính tả",
-      "flowFailed": "Flow không tạo được nội dung — không có gì được dán",
-      "flowEmpty": "Hãy nói một câu lệnh sau cụm từ kích hoạt",
       "cleanupFallback": "Dọn dẹp bằng AI không chạy — đã dán văn bản gốc"
     },
     "listening": "Đang lắng nghe…",
     "locked": "Đang ghi âm rảnh tay — nhấn lại phím tắt để dừng",
     "cancel": "Hủy",
-    "done": "Xong",
-    "askAssistant": "Hỏi trợ lý thay vì gõ nội dung này"
-  },
-  "assistant": {
-    "title": "Trợ lý",
-    "character": {
-      "switch": "Đổi hồ sơ"
-    },
-    "empty": "Hỏi bằng giọng nói với phím tắt trợ lý,\nhoặc gõ bên dưới.",
-    "inputPlaceholder": "Tin nhắn…",
-    "inputPlaceholderScreen": "Hỏi về màn hình của bạn…",
-    "queuedUntilReady": "Đã xếp hàng — sẽ gửi ngay khi câu trả lời này xong.",
-    "send": "Gửi",
-    "stop": "Dừng",
-    "cancel": "Hủy",
-    "finish": "Xong và gửi",
-    "clear": "Xóa cuộc trò chuyện",
-    "hide": "Ẩn bảng",
-    "copy": "Sao chép",
-    "copyCode": "Sao chép mã",
-    "regenerate": "Tạo lại câu trả lời (câu cũ vẫn còn trong Lịch sử)",
-    "summarizing": "Đang tóm tắt các tin nhắn trước đó…",
-    "screenAttached": "Màn hình",
-    "attachScreen": "Xem màn hình — gửi kèm màn hình của bạn vào mỗi tin nhắn cho đến khi tắt",
-    "detachScreen": "Tắt khả năng xem màn hình",
-    "attach": {
-      "file": "Gửi kèm hình ảnh hoặc tệp",
-      "snip": "Cắt một vùng của màn hình",
-      "image": "Hình ảnh",
-      "imageCount": "{{count}} hình ảnh",
-      "imageCount_other": "{{count}} hình ảnh",
-      "remove": "Bỏ tệp gửi kèm",
-      "dropHint": "Thả để gửi kèm"
-    },
-    "snip": {
-      "hint": "Kéo để cắt một vùng — Esc để hủy"
-    },
-    "webSearch": {
-      "enable": "Bật tìm kiếm web",
-      "disable": "Tắt tìm kiếm web"
-    },
-    "tts": {
-      "enable": "Bật tóm tắt bằng giọng nói",
-      "disable": "Tắt tóm tắt bằng giọng nói",
-      "loading": "Đang nạp mô hình giọng nói Kokoro...",
-      "loadingShort": "Mô hình giọng nói {{progress}}%"
-    },
-    "pill": {
-      "talk": "Nhấn để nói",
-      "stop": "Dừng và gửi",
-      "idle": "Trợ lý",
-      "expand": "Mở rộng bảng",
-      "collapse": "Thu về dạng viên",
-      "close": "Đóng trợ lý",
-      "cancel": "Hủy mà không gửi",
-      "cancelTurn": "Hủy",
-      "dismiss": "Bỏ qua",
-      "disarmScreen": "Xem màn hình đang bật — nhấn để tắt",
-      "armScreen": "Xem màn hình đang tắt — nhấn để bật"
-    },
-    "status": {
-      "listening": "Đang lắng nghe…",
-      "locked": "Đang lắng nghe",
-      "transcribing": "Đang chuyển đổi…",
-      "searching": "Đang tìm trên web...",
-      "thinking": "Đang suy nghĩ...",
-      "speaking": "Đang nói..."
-    },
-    "tool": {
-      "search": "Đang tìm trên web",
-      "screen": "Đang xem màn hình của bạn",
-      "working": "Đang xử lý",
-      "elapsed": "{{seconds}}s"
-    },
-    "errors": {
-      "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
-      "genericShort": "Đã xảy ra lỗi",
-      "no_provider": "Chưa thiết lập mô hình trợ lý nào. Hãy chọn một nhà cung cấp trong Cài đặt → Trợ lý.",
-      "no_providerShort": "Chưa thiết lập mô hình",
-      "no_model": "Nhà cung cấp của bạn chưa chọn mô hình nào. Hãy chọn một mô hình trong Cài đặt → Trợ lý.",
-      "no_modelShort": "Chưa chọn mô hình",
-      "engine_start": "Mô hình tích hợp không khởi động được. Hãy thử lại, hoặc chọn mô hình khác trong Cài đặt → Trợ lý.",
-      "engine_startShort": "Mô hình không khởi động được",
-      "provider": "Mô hình không trả lời được. Hãy kiểm tra khóa API và kết nối của bạn, rồi thử lại.",
-      "providerShort": "Không nhận được câu trả lời",
-      "empty_reply": "Mô hình đã kết thúc mà không viết câu trả lời. Hãy thử hỏi lại, hoặc chọn mô hình khác trong Cài đặt → Trợ lý.",
-      "empty_replyShort": "Câu trả lời trống",
-      "vision_unsupported": "Mô hình này không đọc được màn hình của bạn. Hãy chọn một mô hình xem được hình ảnh trong Cài đặt → Trợ lý, hoặc hỏi lại mà không dùng khả năng xem màn hình.",
-      "vision_unsupportedShort": "Mô hình không xem được hình ảnh",
-      "screenshot_too_large": "Ảnh màn hình quá lớn với nhà cung cấp này. Vui lòng thử lại — ảnh sẽ được nén mạnh hơn.",
-      "screenshot_too_largeShort": "Ảnh màn hình quá lớn",
-      "screen_capture": "Không thể chụp màn hình. Hãy thử lại, hoặc hỏi mà không dùng khả năng xem màn hình.",
-      "screen_captureShort": "Chụp màn hình thất bại",
-      "transcription": "Không thể chuyển giọng nói của bạn thành văn bản. Vui lòng thử nói lại.",
-      "transcriptionShort": "Chuyển đổi thất bại",
-      "tts": "Câu trả lời bằng giọng nói thất bại. Hãy kiểm tra cài đặt TTS, hoặc đọc câu trả lời trong bảng.",
-      "ttsShort": "Trả lời bằng giọng nói thất bại",
-      "tts_local": "Giọng nói cục bộ không nạp được. Hãy kiểm tra kết nối hoặc đổi công cụ TTS trong Cài đặt.",
-      "tts_localShort": "Không nạp được giọng nói",
-      "tts_blocked": "Hệ thống của bạn đã chặn giọng nói tự phát. Hãy nhấn vào bất kỳ đâu trong bảng để nghe câu trả lời.",
-      "tts_blockedShort": "Nhấn vào bảng để nghe",
-      "tts_playback": "Không thể phát giọng nói trên thiết bị đầu ra của bạn. Hãy kiểm tra cài đặt loa/đầu ra, rồi thử lại.",
-      "tts_playbackShort": "Phát giọng nói thất bại",
-      "mic_denied": "Quyền truy cập micrô đang bị chặn. Hãy cho phép trong cài đặt quyền riêng tư của hệ thống.",
-      "mic_deniedShort": "Quyền micrô bị chặn",
-      "mic_unavailable": "Không tìm thấy micrô nào. Hãy kết nối một micrô rồi thử lại.",
-      "mic_unavailableShort": "Không tìm thấy micrô",
-      "mic_error": "Micrô không khởi động được. Có thể nó đang được ứng dụng khác sử dụng.",
-      "mic_errorShort": "Micrô không khởi động được",
-      "file_read": "Không thể gửi kèm tệp đó.",
-      "file_readShort": "Không thể gửi kèm tệp"
-    },
-    "notices": {
-      "web_search_failed": "Tìm kiếm web không trả về kết quả — đang trả lời mà không có chúng.",
-      "web_search_failedShort": "Không có kết quả từ web"
-    },
-    "engineSetup": {
-      "downloading": "Đang thiết lập công cụ cục bộ (lần chạy đầu)… {{percent}}%",
-      "preparing": "Đang thiết lập công cụ cục bộ (lần chạy đầu)…",
-      "extracting": "Đang cài đặt công cụ cục bộ…",
-      "short": "Đang thiết lập công cụ…"
-    }
+    "done": "Xong"
   }
 }

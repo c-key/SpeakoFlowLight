@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "Allmänt",
     "dictation": "Diktering",
-    "assistant": "Assistent",
     "history": "Historik",
     "about": "Om",
     "debug": "Felsökning",
-    "characters": "Profiler",
     "memory": "Minne",
     "collapse": "Fäll in sidofältet",
-    "expand": "Fäll ut sidofältet"
+    "expand": "Fäll ut sidofältet",
+    "profiles": "Profiler"
   },
   "window": {
     "minimize": "Minimera",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "Kortkommandon, din mikrofon och appens utseende.",
-    "dictation": "Modellen som omvandlar din röst till text, och hur texten rensas upp.",
-    "assistant": "Ställ in assistenten och finjustera sedan dess röst, skärmvisning och webbsökning.",
-    "history": "Dina senaste dikteringar, Flow-genereringar och assistentchattar, lagrade på den här enheten.",
     "about": "Version, appspråk, dataplatser och tack till.",
     "debug": "Diagnostik och utvecklarverktyg."
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "Laddar ner din modell i bakgrunden."
     },
     "aiModel": {
-      "title": "Lägg till en lokal AI-modell",
-      "subtitle": "Välj utifrån svarshastighet och kapacitet. E4B är det balanserade standardvalet; 12B är skarpare men långsammare.",
       "tiers": {
         "small": {
           "description": "Körs på alla datorer. Bra för att snygga till din text."
@@ -90,9 +84,6 @@
           "description": "De skarpaste svaren, och den kan se din skärm."
         }
       },
-      "seesScreen": "Ser din skärm",
-      "textOnly": "Endast text",
-      "recommendedForAssistant": "Rekommenderas för assistenten",
       "download": "Ladda ner modell",
       "useDownloaded": "Använd nedladdad modell",
       "skip": "Hoppa över tills vidare",
@@ -114,11 +105,8 @@
       "subtitle": "Två kortkommandon är allt du behöver. Tryck, tala, klart.",
       "dictateLabel": "Diktera var som helst",
       "dictateCaption": "Håll ned, tala, släpp. Dina ord skriver sig själva.",
-      "assistantKeysLabel": "Fråga assistenten",
-      "assistantKeysCaption": "Håll ned och fråga. Den kan till och med se din skärm.",
       "changeAnytime": "Du kan ändra detta när som helst i Inställningar.",
       "hotkeyLabel": "Dina dikteringstangenter",
-      "downloadingAssistant": "Din assistent flyttar in. {{percentage}}% klart.",
       "downloadingVoice": "Din röstmodell landar. {{percentage}}% klart.",
       "downloadingGeneric": "Laddar fortfarande ner. {{percentage}}% klart.",
       "signOff": "Det var allt. Säg något nu.",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "Kom ihåg mig",
-        "description": "Låt assistenten spara och använda ett personligt minne. Av som standard."
-      },
-      "incognito": {
-        "label": "Inkognitochatt",
-        "description": "Använd inte minnet och lär inget nytt under den här konversationen."
-      },
       "detail": {
         "label": "Minnesdetaljnivå",
-        "description": "Hur mycket minne som läggs till varje svar. Mer detaljer ger rikare svar men går något långsammare.",
         "options": {
           "light": "Lätt",
           "balanced": "Balanserad",
@@ -350,7 +329,6 @@
         "add": "Lägg till",
         "addPlaceholder": "Lägg till något att minnas…",
         "delete": "Ta bort anteckning",
-        "learned": "inlärd",
         "added": "tillagd av dig"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "Hantera"
-      },
-      "distill": {
-        "label": "Lär från den här chatten nu",
-        "description": "Hämta bestående fakta från din nuvarande konversation till minnet, direkt.",
-        "button": "Uppdatera minnet"
       },
       "export": "Exportera",
       "import": "Importera",
@@ -937,16 +910,6 @@
         "title": "Talade emojier",
         "description": "Säg “happy emoji” eller “thumbs up emoji” för att infoga 😊 eller 👍. Vanliga varianter och mindre taligenkänningsfel hanteras på enheten; okända namn lämnas som text."
       },
-      "flow": {
-        "groupTitle": "Generera med Flow",
-        "enableLabel": "Generera med Flow",
-        "enableDescription": "Börja en diktering med aktiveringsfrasen för att låta AI:n skriva resultatet åt dig — ”Hey Flow, skriv ett artigt mejl och be om att boka om” klistrar in det färdiga mejlet.",
-        "phraseLabel": "Aktiveringsfras",
-        "phraseDescription": "Flow aktiveras bara när en diktering börjar med den här frasen. I övrigt klistras samma ord in som vanlig diktering. Använder assistentens modell; lämna tomt för att återställa till ”Hey Flow”.",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "Tillåt skärmåtkomst",
-        "screenDescription": "Låt Flow ta en skärmbild när ett kommando tydligt syftar på din skärm, som ”titta på det här mejlet och skriv ett svar”. Modellen avgör om det behövs. Skilt från assistentens skärmåtkomst."
-      },
       "output": {
         "title": "Utmatningsalternativ"
       }
@@ -957,29 +920,14 @@
         "title": "Lagring av inspelningar",
         "description": "Dessa inställningar påverkar dikterings- och Flow-inspelningar. Sparade inspelningar behålls alltid. Assistentchattar lagras separat."
       },
-      "filters": {
-        "label": "Historiktyp",
-        "all": "Alla",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "Assistentchattar"
-      },
       "openFolder": "Öppna mapp för inspelningar",
       "loading": "Laddar historik…",
       "empty": "Inget här ännu. Dina dikteringar, Flow-genereringar och assistentchattar visas här.",
-      "emptyRecordings": "Inga dikteringar ännu.",
-      "emptyFlow": "Inga Flow-genereringar ännu.",
-      "emptyAssistant": "Inga assistentchattar ännu.",
       "recordingLabel": "Diktering",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "Du sa",
       "originalTranscriptionLabel": "Ursprunglig transkription",
-      "flowOutputLabel": "Flow-resultat",
       "finalTextLabel": "Slutlig text",
       "cleanupNoChanges": "AI-rensningen kördes, inget att rätta",
-      "flowNoOutput": "Inget Flow-resultat genererades.",
       "copyToClipboard": "Kopiera transkription till urklipp",
-      "copyFlowOutput": "Kopiera Flow-resultatet",
       "copyFinalText": "Kopiera den slutliga texten",
       "save": "Spara transkription",
       "unsave": "Ta bort från sparade",
@@ -988,18 +936,7 @@
       "retranscribe": "Transkribera igen",
       "retranscribeError": "Misslyckades med att transkribera igen. Försök igen.",
       "transcribing": "Transkriberar…",
-      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök.",
-      "assistantLabel": "Assistentchatt",
-      "copyConversation": "Kopiera konversationen",
-      "resumeConversation": "Fortsätt den här konversationen i assistenten",
-      "showConversation": "Visa konversationen",
-      "hideConversation": "Dölj konversationen",
-      "roleUser": "Du",
-      "roleAssistant": "Assistent",
-      "screenshotAttached": "Skärmvisning",
-      "messageCount_one": "{{count}} meddelande",
-      "messageCount_other": "{{count}} meddelanden",
-      "deleteAssistantError": "Kunde inte ta bort konversationen. Försök igen."
+      "transcriptionFailed": "Transkribering misslyckades. Du kan transkribera igen med hjälp av ikonen för nytt försök."
     },
     "debug": {
       "title": "Felsökning",
@@ -1113,324 +1050,60 @@
         "button": "Donera"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "Assistent",
-        "label": "Aktivera assistenten",
-        "description": "Stäng av det här för att göra SpeakoFlow till enbart diktering. Den flytande panelen stängs och laddas aldrig, dess kortkommandon frigörs och minnet den använder lämnas tillbaka. Generera med Flow och AI-rensning fortsätter att fungera."
-      },
-      "shortcuts": {
-        "title": "Kortkommandon"
-      },
-      "brain": {
-        "title": "Assistentens hjärna",
-        "whereLabel": "Var den körs",
-        "onDevice": "På min enhet",
-        "cloud": "Molnleverantör",
-        "downloadModel": "Utforska och ladda ner modeller",
-        "downloadModelDescription": "Välj en rekommenderad modell eller sök på Hugging Face.",
-        "downloadModelAction": "Utforska modeller",
-        "catalogTitle": "Välj en modell på enheten",
-        "catalogDescription": "Ladda ner en privat lokal modell. Den stannar på den här datorn och kräver ingen API-nyckel.",
-        "currentModelTitle": "Nuvarande modell",
-        "currentModelDescription": "Vald för den inbyggda assistenten på den här enheten.",
-        "recommendedTitle": "Rekommenderade modeller",
-        "recommendedDescription": "Tre samtalsinriktade val: snabbast, rekommenderad och mer kapabel men långsammare.",
-        "acceleratorDetected": "{{name}} · {{memory}} GB rapporterat grafikminne",
-        "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB dedikerat VRAM",
-        "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB delat grafikminne",
-        "acceleratorDetectedNoMemory": "{{name}} hittades · grafikminnet rapporteras inte",
-        "acceleratorUnknownWithMemory": "Grafikminnet är okänt · {{memory}} GB systemminne för CPU-läge",
-        "acceleratorUnknown": "Grafikminnet är okänt · svarshastigheten kan inte förutsägas",
-        "details": "Detaljer",
-        "detailFile": "Fil",
-        "detailLocation": "Plats",
-        "detailFormat": "Format",
-        "detailId": "Modell-ID",
-        "switchBeforeDelete": "Byt den inbyggda assistenten till en annan modell innan du tar bort den här.",
-        "deleteModelConfirm": "Ta bort {{modelName}}? Dess nedladdade filer och sparade post tas bort.",
-        "deleteModelFailed": "Kunde inte ta bort modellen.",
-        "finderSectionTitle": "Fler modeller på enheten",
-        "finderTitle": "Utforska Hugging Face",
-        "finderDescription": "Sök bland tusentals GGUF-modeller och ladda ner en direkt till SpeakoFlow.",
-        "finderAction": "Hitta en modell",
-        "huggingFaceTitle": "Dina modeller",
-        "catalogEmpty": "Inga rekommenderade lokala modeller är tillgängliga just nu."
-      },
-      "subpages": {
-        "profilesCaption": "Byt assistentens namn, roll och personlighet.",
-        "memoryCaption": "Vad assistenten minns om dig mellan chattarna."
-      },
-      "tapToLock": {
-        "label": "Tryck för att låsa",
-        "info": "Medan du håller ned assistentkortkommandot trycker du på den här tangenten för att låsa handsfree, så att du kan släppa och fortsätta tala. Välj en tangent som inte ingår i ditt assistentkortkommando (en som överlappar ignoreras), eller rensa den för att stänga av funktionen.",
-        "off": "Av",
-        "clear": "Rensa"
-      },
-      "provider": {
-        "title": "Assistentleverantör",
-        "saveFailed": "Kunde inte byta assistentleverantör.",
-        "providerLabel": "Leverantör",
-        "providerDescription": "Leverantören som svarar på frågor till assistenten.",
-        "baseUrlLabel": "Bas-URL",
-        "baseUrlDescription": "OpenAI-kompatibel bas-URL. Azure-URL:er normaliseras automatiskt.",
-        "apiKeyLabel": "API-nyckel",
-        "apiKeyDescription": "Delas med AI-rensning.",
-        "apiKeyPlaceholder": "Ange API-nyckel…",
-        "modelLabel": "Modell",
-        "modelDescription": "Modell- eller distributionsnamn som ska användas för assistentens svar.",
-        "modelPlaceholder": "t.ex. gpt-4o-mini",
-        "modelSearchPlaceholder": "Sök eller skriv en modell…",
-        "modelUse": "Använd \"{{model}}\"",
-        "loadModels": "Ladda modeller",
-        "loadingModels": "Laddar…",
-        "noModelsFound": "Inga modeller returnerades. Skriv modellnamnet i stället.",
-        "builtinModelDescription": "Välj en nedladdad lokal modell. Den körs på din dator utan API-nyckel.",
-        "builtinModelPlaceholder": "Välj en nedladdad modell",
-        "builtinNoModels": "Inga modeller på din dator ännu — ladda ner en nedan.",
-        "builtinReady": "Körs helt på din dator. Ingen API-nyckel, ingen konfiguration.",
-        "builtinEngineMissing": "Första gången laddas en liten lokal motor ner automatiskt (en gång), sedan körs allt helt offline. Ingen konfiguration behövs.",
-        "builtinEngineDownloading": "Laddar ner den lokala motorn… {{percent}}%",
-        "builtinEnginePreparing": "Laddar ner den lokala motorn…",
-        "builtinEngineExtracting": "Installerar den lokala motorn…",
-        "builtinEngineReady": "Den lokala motorn är klar.",
-        "contextSizeLabel": "Kontextfönster",
-        "contextSizeDescription": "Hur mycket den lokala modellen kan hålla i huvudet samtidigt — systeminstruktionerna, din chatthistorik, eventuella skärmbilder (en enda bild kan ta en stor del) och dess svar. Ett större fönster rymmer mer och håller skärmvisning och webbsökning tillförlitliga, men använder mer minne. Standard är 8192; 16384 är ett bra steg upp om din dator har RAM att avvara. Du kan sänka det senare för att spara minne.",
-        "unloadTimeoutLabel": "Avlasta från minnet efter",
-        "unloadTimeoutDescription": "Frigör minne genom att avlasta den lokala modellen när den varit inaktiv så länge. Den laddas om automatiskt vid nästa användning."
-      },
-      "systemPrompt": {
-        "title": "Systemprompt",
-        "label": "Assistentens systemprompt",
-        "description": "Styr assistentens beteende."
-      },
-      "characters": {
-        "title": "Profiler",
-        "description": "Uppgiftsinriktade profiler som du kan växla mellan. Den aktiva profilen bestämmer assistentens namn, roll och instruktioner — och hur långa svaren blir. Byt när som helst i panelens rubrik.",
-        "galleryLabel": "Dina profiler",
-        "editSection": "Redigera profil",
-        "avatarLabel": "Avatar",
-        "active": "Aktiv",
-        "meowsOnly": "Jamar bara",
-        "builtin": "Inbyggd",
-        "custom": "Anpassad",
-        "new": "Ny",
-        "newName": "Ny profil",
-        "copyName": "Kopia av {{name}}",
-        "createAi": "Skapa med AI",
-        "import": "Importera",
-        "aiTitle": "Beskriv din profil",
-        "aiClose": "Stäng",
-        "aiPlaceholder": "t.ex. en koncis skribent av släppnoteringar, eller en tålmodig lärare som förklarar varje steg",
-        "aiDictate": "Diktera beskrivningen",
-        "aiDictateStop": "Stoppa dikteringen",
-        "generate": "Generera",
-        "avatarUpload": "Ladda upp bild",
-        "avatarRemove": "Ta bort",
-        "nameLabel": "Namn",
-        "roleLabel": "Roll",
-        "rolePlaceholder": "Kort beskrivning som visas på kortet (valfritt)",
-        "promptLabel": "Instruktioner (systemprompt)",
-        "responseLength": {
-          "label": "Svarslängd",
-          "hint": "Hur långa den här profilens svar blir. \"Ärv\" följer din globala assistentinställning.",
-          "options": {
-            "inherit": "Ärv global",
-            "short": "Kort",
-            "medium": "Medel",
-            "long": "Lång"
-          }
-        },
-        "greetingLabel": "Hälsning (valfritt)",
-        "greetingPlaceholder": "Valfri inledande rad som visas i en tom chatt",
-        "catNote": "Katten ignorerar AI:n helt — den bara jamar. Inget att ställa in här.",
-        "duplicate": "Duplicera",
-        "export": "Exportera",
-        "restoreDefault": "Återställ standard",
-        "restoreBuiltins": "Återställ inbyggda",
-        "moreActions": "Fler åtgärder",
-        "expand": "Fäll ut",
-        "collapse": "Fäll in",
-        "delete": "Ta bort",
-        "deleteConfirm": "Ta bort den här profilen? Det kan inte ångras.",
-        "emptyState": "Inga profiler ännu. Skapa din första för att ge assistenten en personlighet."
-      },
-      "behavior": {
-        "title": "Beteende"
-      },
-      "memory": {
-        "label": "Konversationsminne",
-        "description": "Hur många av de senaste meddelandena som skickas som kontext varje gång. 0 stänger av minnet."
-      },
-      "autoSummarize": {
-        "label": "Sammanfatta långa chattar",
-        "description": "När en konversation växer bortom modellens kontextfönster komprimeras äldre meddelanden automatiskt till en löpande sammanfattning, så att chatten behåller sin kontext i stället för att glömma början. En diskret indikator visas medan det pågår."
-      },
-      "responseLength": {
-        "label": "Svarslängd",
-        "description": "Önskad svarslängd. \"Ingen effekt\" lämnar din prompt orörd.",
-        "options": {
-          "default": "Ingen effekt",
-          "short": "Kort",
-          "medium": "Medel",
-          "long": "Lång"
-        }
-      },
-      "vision": {
-        "title": "Skärmvisning",
-        "modeLabel": "Skärmåtkomst",
-        "modes": {
-          "off": "Av",
-          "manual": "Manuell",
-          "agentDecides": "Agenten avgör",
-          "descriptions": {
-            "off": "Skärmbilder är avstängda. Kamera- och områdeskontrollerna är dolda.",
-            "manual": "Du väljer när hela skärmen eller ett område ska bifogas. Inställningen för när skärmen fångas gäller vid röstfrågor.",
-            "agent_decides": "Modellen kan begära en skärmbild när den behöver aktuell visuell kontext. Varje skärmbild som skickas visas i konversationen."
-          }
-        },
-        "timing": {
-          "label": "När skärmen fångas",
-          "description": "För röstfrågor: fånga skärmen i samma stund som du börjar fråga, eller vänta till meddelandet skickas. Skrivna meddelanden fångar alltid skärmen när de skickas.",
-          "descriptionAgent": "Båda alternativen förbereder skärmbilden i förväg, så assistenten låter dig aldrig vänta på en. Skillnaden är vad bilden visar: ”När jag frågar” tar skärmen som den såg ut när du började tala, ”När meddelandet skickas” tar den som den ser ut nu. Oavsett vilket stannar bilden på din enhet och skickas bara om assistenten faktiskt ber om att få se den.",
-          "options": {
-            "immediate": "När jag frågar",
-            "on_send": "När meddelandet skickas"
-          }
-        },
-        "screenRecording": {
-          "description": "Skärmvisning kräver behörigheten Skärminspelning i macOS. Bevilja den i Systeminställningar och starta sedan om SpeakoFlow för att den ska börja gälla.",
-          "grant": "Öppna systeminställningar"
-        }
-      },
-      "webSearch": {
-        "title": "Webbsökning",
-        "enableLabel": "Tillåt webbsökning",
-        "enableDescription": "Låt assistenten söka på webben när en fråga kräver aktuell information.",
-        "openRouterNativeLabel": "Använd OpenRouters inbyggda sökning",
-        "openRouterNativeDescription": "När det är på kör OpenRouter sökningen själv (läget :online) och använder dina OpenRouter-krediter. När det är av söker appen med din sökleverantör nedan.",
-        "providerLabel": "Sökleverantör",
-        "providerDescription": "Serper är ett bra standardval. Alla leverantörer har en gratisnivå, och TinyFish är gratis utan kort.",
-        "providers": {
-          "serper": "Serper (Google, snabb)",
-          "brave": "Brave Search",
-          "tavily": "Tavily (AI-sökning)",
-          "exa": "Exa (neural)",
-          "serpapi": "SerpAPI (Google)",
-          "tinyfish": "TinyFish (gratis, inget kort)"
-        },
-        "apiKeyLabel": "API-nyckel",
-        "apiKeyDescription": "Nyckel för den valda sökleverantören.",
-        "apiKeyPlaceholder": "Ange API-nyckel…",
-        "fetchContentLabel": "Läs hela sidor (bästa kvalitet)",
-        "fetchContentDescription": "Läs hela texten i varje resultat i stället för utdrag. Bättre svar, men långsammare.",
-        "maxResultsLabel": "Källor att använda",
-        "maxResultsDescription": "Hur många resultat som ska läsas (1–10).",
-        "depthLabel": "Sökdjup",
-        "depthDescription": "Snabb för enkla fakta, Standard för de flesta frågor, Djup för svåra.",
-        "depthOptions": {
-          "low": "Snabb",
-          "medium": "Standard",
-          "high": "Djup"
-        },
-        "localSmartLabel": "Smarta sökbeslut (lokal modell)",
-        "localSmartDescription": "Låt den lokala modellen avgöra när en sökning ska göras. Av använder en snabb nyckelordskontroll i stället.",
-        "creditBudgetLabel": "Daglig kreditgräns för Firecrawl",
-        "creditBudgetDescription": "Dagligt tak för Firecrawl-krediter innan sökningen pausas. 0 = ingen gräns.",
-        "testLabel": "Testa sökning",
-        "testDescription": "Kör en provsökning med den nuvarande leverantören och nyckeln.",
-        "testButton": "Testa sökning",
-        "testing": "Söker…",
-        "testResult": "Fick {{count}} resultat."
-      },
-      "tts": {
-        "title": "Röstuppläsning",
-        "enableLabel": "Läs upp svaren högt",
-        "enableDescription": "Läs upp assistentens svar högt.",
-        "stopOnDictationLabel": "Stoppa uppläsningen när diktering startar",
-        "stopOnDictationDescription": "Stoppa svar som fortfarande spelas upp när du börjar diktera.",
-        "engineLabel": "Motor",
-        "engineDescription": "Kokoro körs lokalt och gratis. De andra motorerna använder din API-nyckel.",
-        "kokoroSetupLabel": "Kokoro-röstmodell",
-        "kokoroSetupDescription": "Ladda ner den en gång, sedan körs talade svar privat på den här enheten.",
-        "kokoroDownload": "Ladda ner Kokoro",
-        "kokoroDownloading": "Laddar ner Kokoro",
-        "kokoroReady": "Klar på den här enheten",
-        "kokoroRetry": "Försök ladda ner igen",
-        "engines": {
-          "kokoro": "Kokoro (lokal, gratis)",
-          "openai": "OpenAI-kompatibel",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "Röst",
-        "voiceDescription": "Kokoro-röst för talade svar.",
-        "dtypeLabel": "Kokoro-precision",
-        "dtypeDescription": "fp32 ger högsta kvalitet; q8 är snabbare på CPU. Om du ändrar detta laddas modellen om.",
-        "speedLabel": "Uppspelningshastighet",
-        "speedDescription": "1× är normalt. ElevenLabs stöder bara 0,7×–1,2×.",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "Anpassad uppspelningshastighet",
-        "testLabel": "Testa rösten",
-        "testDescription": "Spela upp ett kort prov med de nuvarande inställningarna.",
-        "testButton": "Testa rösten",
-        "testing": "Testar…",
-        "testOk": "Uppspelad ✓",
-        "testPhrase": "Hej! Det här är ett test av SpeakoFlows röstuppläsning.",
-        "downloadStart": "Laddar ner Kokoro-rösten…",
-        "downloadProgress": "Laddar ner Kokoro-rösten… {{progress}}%",
-        "downloadReady": "Kokoro-rösten är klar ✓",
-        "downloadError": "Kunde inte ladda ner Kokoro-röstmodellen",
-        "baseUrlLabel": "Bas-URL",
-        "baseUrlDescription": "OpenAI-kompatibel TTS-URL. Både en bas-URL och en fullständig /audio/speech-URL fungerar.",
-        "azureBaseUrlLabel": "Speech-URL",
-        "azureBaseUrlDescription": "Din Azure Speech-URL från portalen, t.ex. https://eastus2.tts.speech.microsoft.com.",
-        "apiKeyLabel": "API-nyckel",
-        "apiKeyDescription": "Skild från assistentens nyckel.",
-        "modelLabel": "Modell",
-        "modelDescription": "Modell- eller distributionsnamn, t.ex. gpt-4o-mini-tts (OpenAI/Azure) eller eleven_flash_v2_5 (ElevenLabs).",
-        "remoteVoiceLabel": "Röstnamn",
-        "remoteVoiceDescription": "Röst för OpenAI-kompatibel TTS, t.ex. alloy, echo, nova, shimmer.",
-        "azureVoiceLabel": "Röstnamn",
-        "azureVoiceDescription": "Azure-röstnamn, t.ex. en-US-JennyNeural. Klicka på Ladda röster för att bläddra.",
-        "loadVoices": "Ladda röster",
-        "voicesLoading": "Laddar…",
-        "voicesPick": "Välj bland {{count}} röster…",
-        "loadModels": "Ladda modeller",
-        "modelsLoading": "Laddar…",
-        "modelsPick": "Välj bland {{count}} modeller…",
-        "modelsUse": "Använd \"{{model}}\"",
-        "voicesUse": "Använd \"{{voice}}\"",
-        "elevenVoiceLabel": "Röst-ID",
-        "elevenVoiceDescription": "ElevenLabs röst-ID (från fliken Voices i deras kontrollpanel).",
-        "promptLabel": "Sammanfattningsprompt",
-        "promptDescription": "Instruktioner för att skapa den korta talade sammanfattningen av varje svar."
-      },
-      "appearance": {
-        "title": "Panelens utseende",
-        "previewLabel": "Förhandsvisning",
-        "previewDescription": "Direkt förhandsvisning av panelen med din textstorlek och opacitet.",
-        "previewUser": "Hej, vad kan du göra?",
-        "previewAssistant": "Massor! Fråga mig vad som helst — jag kan till och med titta på din skärm.",
-        "fontSizeLabel": "Textstorlek",
-        "fontSizeDescription": "Storleken på chattexten i assistentpanelen.",
-        "fontSizes": {
-          "small": "Liten",
-          "medium": "Medel",
-          "large": "Stor"
-        },
-        "panelSizeLabel": "Panelstorlek",
-        "panelSizeDescription": "Den flytande assistentpanelens övergripande storlek. Du kan också dra i kanterna för att ändra storlek.",
-        "panelSizes": {
-          "mini": "Liten",
-          "compact": "Kompakt",
-          "standard": "Standard",
-          "large": "Stor"
-        },
-        "opacityLabel": "Panelens opacitet",
-        "opacityDescription": "Hur ogenomskinlig den flytande panelen är. 100% är helt tät; lägre värden låter skrivbordet skina igenom suddigt."
+    "profiles": {
+      "active": "Aktiv",
+      "add": "Ny",
+      "newName": "Ny profil",
+      "copyName": "Kopia av {{name}}",
+      "import": "Importera",
+      "export": "Exportera",
+      "duplicate": "Duplicera",
+      "delete": "Ta bort",
+      "restore": "Återställ standard",
+      "restoreMissing": "Återställ inbyggda",
+      "more": "Fler åtgärder",
+      "edit": "Fäll ut",
+      "close": "Fäll in",
+      "fields": {
+        "avatar": "Ladda upp bild",
+        "avatarClear": "Ta bort"
       }
+    },
+    "cleanupModels": {
+      "title": "Assistentens hjärna",
+      "whereLabel": "Var den körs",
+      "onDevice": "På min enhet",
+      "cloud": "Molnleverantör",
+      "downloadModel": "Utforska och ladda ner modeller",
+      "downloadModelDescription": "Välj en rekommenderad modell eller sök på Hugging Face.",
+      "downloadModelAction": "Utforska modeller",
+      "catalogTitle": "Välj en modell på enheten",
+      "catalogDescription": "Ladda ner en privat lokal modell. Den stannar på den här datorn och kräver ingen API-nyckel.",
+      "currentModelTitle": "Nuvarande modell",
+      "currentModelDescription": "Vald för den inbyggda assistenten på den här enheten.",
+      "recommendedTitle": "Rekommenderade modeller",
+      "recommendedDescription": "Tre samtalsinriktade val: snabbast, rekommenderad och mer kapabel men långsammare.",
+      "acceleratorDetected": "{{name}} · {{memory}} GB rapporterat grafikminne",
+      "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB dedikerat VRAM",
+      "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB delat grafikminne",
+      "acceleratorDetectedNoMemory": "{{name}} hittades · grafikminnet rapporteras inte",
+      "acceleratorUnknownWithMemory": "Grafikminnet är okänt · {{memory}} GB systemminne för CPU-läge",
+      "acceleratorUnknown": "Grafikminnet är okänt · svarshastigheten kan inte förutsägas",
+      "details": "Detaljer",
+      "detailFile": "Fil",
+      "detailLocation": "Plats",
+      "detailFormat": "Format",
+      "detailId": "Modell-ID",
+      "switchBeforeDelete": "Byt den inbyggda assistenten till en annan modell innan du tar bort den här.",
+      "deleteModelConfirm": "Ta bort {{modelName}}? Dess nedladdade filer och sparade post tas bort.",
+      "deleteModelFailed": "Kunde inte ta bort modellen.",
+      "finderSectionTitle": "Fler modeller på enheten",
+      "finderTitle": "Utforska Hugging Face",
+      "finderDescription": "Sök bland tusentals GGUF-modeller och ladda ner en direkt till SpeakoFlow.",
+      "finderAction": "Hitta en modell",
+      "huggingFaceTitle": "Dina modeller",
+      "catalogEmpty": "Inga rekommenderade lokala modeller är tillgängliga just nu.",
+      "custom": "Anpassad"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "Spelar in",
     "transcribing": "Transkriberar…",
     "processing": "Bearbetar…",
-    "generating": "Skriver med Flow…",
-    "vision": "Tittar på din skärm…",
     "notices": {
-      "flowNotConfigured": "Flow behöver en assistentmodell — inklistrat som diktering",
-      "flowFailed": "Flow kunde inte generera — inget klistrades in",
-      "flowEmpty": "Säg ett kommando efter aktiveringsfrasen",
       "cleanupFallback": "AI-rensningen kördes inte — klistrade in råtexten"
     },
     "listening": "Lyssnar…",
     "locked": "Spelar in handsfree — tryck på kortkommandot igen för att stoppa",
     "cancel": "Avbryt",
-    "done": "Klar",
-    "askAssistant": "Fråga assistenten i stället för att skriva in det här"
-  },
-  "assistant": {
-    "title": "Assistent",
-    "character": {
-      "switch": "Byt profil"
-    },
-    "empty": "Fråga med röst via ditt assistentkortkommando,\neller skriv nedan.",
-    "inputPlaceholder": "Meddelande…",
-    "inputPlaceholderScreen": "Fråga om din skärm…",
-    "queuedUntilReady": "I kö — skickas så snart det här svaret är klart.",
-    "send": "Skicka",
-    "stop": "Stoppa",
-    "cancel": "Avbryt",
-    "finish": "Avsluta och skicka",
-    "clear": "Rensa konversationen",
-    "hide": "Dölj panelen",
-    "copy": "Kopiera",
-    "copyCode": "Kopiera koden",
-    "regenerate": "Skapa svaret på nytt (det gamla finns kvar i Historik)",
-    "summarizing": "Sammanfattar tidigare meddelanden…",
-    "screenAttached": "Skärm",
-    "attachScreen": "Skärmvisning — bifoga din skärm till varje meddelande tills det stängs av",
-    "detachScreen": "Stäng av skärmvisning",
-    "attach": {
-      "file": "Bifoga en bild eller fil",
-      "snip": "Klipp ut ett område av skärmen",
-      "image": "Bild",
-      "imageCount": "{{count}} bild",
-      "imageCount_other": "{{count}} bilder",
-      "remove": "Ta bort bilagan",
-      "dropHint": "Släpp för att bifoga"
-    },
-    "snip": {
-      "hint": "Dra för att klippa ut ett område — Esc för att avbryta"
-    },
-    "webSearch": {
-      "enable": "Aktivera webbsökning",
-      "disable": "Inaktivera webbsökning"
-    },
-    "tts": {
-      "enable": "Aktivera talade sammanfattningar",
-      "disable": "Inaktivera talade sammanfattningar",
-      "loading": "Laddar Kokoro-röstmodellen...",
-      "loadingShort": "Röstmodell {{progress}}%"
-    },
-    "pill": {
-      "talk": "Klicka för att tala",
-      "stop": "Stoppa och skicka",
-      "idle": "Assistent",
-      "expand": "Fäll ut panelen",
-      "collapse": "Fäll in till kompakt läge",
-      "close": "Stäng assistenten",
-      "cancel": "Avbryt utan att skicka",
-      "cancelTurn": "Avbryt",
-      "dismiss": "Avvisa",
-      "disarmScreen": "Skärmvisning är på — klicka för att stänga av",
-      "armScreen": "Skärmvisning är av — klicka för att slå på"
-    },
-    "status": {
-      "listening": "Lyssnar…",
-      "locked": "Lyssnar",
-      "transcribing": "Transkriberar…",
-      "searching": "Söker på webben...",
-      "thinking": "Tänker...",
-      "speaking": "Talar..."
-    },
-    "tool": {
-      "search": "Söker på webben",
-      "screen": "Tittar på din skärm",
-      "working": "Jobbar på det",
-      "elapsed": "{{seconds}} s"
-    },
-    "errors": {
-      "generic": "Något gick fel. Försök igen.",
-      "genericShort": "Något gick fel",
-      "no_provider": "Ingen assistentmodell är inställd ännu. Välj en leverantör i Inställningar → Assistent.",
-      "no_providerShort": "Ingen modell inställd",
-      "no_model": "Din leverantör har ingen modell vald. Välj en i Inställningar → Assistent.",
-      "no_modelShort": "Ingen modell vald",
-      "engine_start": "Den inbyggda modellen kunde inte starta. Försök igen eller välj en annan modell i Inställningar → Assistent.",
-      "engine_startShort": "Modellen kunde inte starta",
-      "provider": "Modellen kunde inte svara. Kontrollera din API-nyckel och anslutning och försök igen.",
-      "providerShort": "Fick inget svar",
-      "empty_reply": "Modellen blev klar utan att skriva något svar. Försök fråga igen eller välj en annan modell i Inställningar → Assistent.",
-      "empty_replyShort": "Tomt svar",
-      "vision_unsupported": "Den här modellen kan inte läsa din skärm. Välj en modell med skärmvisning i Inställningar → Assistent, eller fråga igen utan skärmvisning.",
-      "vision_unsupportedShort": "Modellen kan inte se bilder",
-      "screenshot_too_large": "Skärmbilden var för stor för den här leverantören. Försök igen — den komprimeras hårdare.",
-      "screenshot_too_largeShort": "Skärmbilden är för stor",
-      "screen_capture": "Kunde inte fånga skärmen. Försök igen eller fråga utan skärmvisning.",
-      "screen_captureShort": "Skärmbilden misslyckades",
-      "transcription": "Kunde inte transkribera din röst. Försök tala igen.",
-      "transcriptionShort": "Transkriberingen misslyckades",
-      "tts": "Det talade svaret misslyckades. Kontrollera dina TTS-inställningar eller läs svaret i panelen.",
-      "ttsShort": "Röstsvaret misslyckades",
-      "tts_local": "Den lokala rösten kunde inte laddas. Kontrollera din anslutning eller byt TTS-motor i Inställningar.",
-      "tts_localShort": "Rösten kunde inte laddas",
-      "tts_blocked": "Systemet blockerade rösten från att spelas upp av sig själv. Klicka var som helst i panelen för att höra svaret.",
-      "tts_blockedShort": "Tryck på panelen för att höra",
-      "tts_playback": "Kunde inte spela upp rösten på din utmatningsenhet. Kontrollera dina högtalar-/utmatningsinställningar och försök igen.",
-      "tts_playbackShort": "Uppspelningen av rösten misslyckades",
-      "mic_denied": "Mikrofonåtkomsten är blockerad. Tillåt den i systemets integritetsinställningar.",
-      "mic_deniedShort": "Mikrofonåtkomst blockerad",
-      "mic_unavailable": "Ingen mikrofon hittades. Anslut en och försök igen.",
-      "mic_unavailableShort": "Ingen mikrofon hittades",
-      "mic_error": "Mikrofonen kunde inte starta. Den kanske används av ett annat program.",
-      "mic_errorShort": "Mikrofonen kunde inte starta",
-      "file_read": "Filen kunde inte bifogas.",
-      "file_readShort": "Kunde inte bifoga filen"
-    },
-    "notices": {
-      "web_search_failed": "Webbsökningen gav inga resultat — svarar utan dem.",
-      "web_search_failedShort": "Inga webbresultat"
-    },
-    "engineSetup": {
-      "downloading": "Ställer in den lokala motorn (första körningen)… {{percent}}%",
-      "preparing": "Ställer in den lokala motorn (första körningen)…",
-      "extracting": "Installerar den lokala motorn…",
-      "short": "Ställer in motorn…"
-    }
+    "done": "Klar"
   }
 }

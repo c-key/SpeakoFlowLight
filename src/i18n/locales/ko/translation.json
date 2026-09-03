@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "일반",
     "dictation": "받아쓰기",
-    "assistant": "어시스턴트",
     "history": "히스토리",
     "about": "정보",
     "debug": "디버그",
-    "characters": "프로필",
     "memory": "메모리",
     "collapse": "사이드바 접기",
-    "expand": "사이드바 펼치기"
+    "expand": "사이드바 펼치기",
+    "profiles": "프로필"
   },
   "window": {
     "minimize": "최소화",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "단축키, 마이크, 그리고 앱의 모양입니다.",
-    "dictation": "음성을 텍스트로 바꾸는 모델과 그 결과를 정리하는 방식입니다.",
-    "assistant": "어시스턴트를 설정하고, 음성과 화면 인식, 웹 검색을 조정하세요.",
-    "history": "이 기기에 저장된 최근 받아쓰기, Flow 생성, 어시스턴트 대화입니다.",
     "about": "버전, 앱 언어, 데이터 위치, 크레딧입니다.",
     "debug": "진단 정보와 개발자 도구입니다."
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "모델을 백그라운드에서 다운로드하고 있습니다."
     },
     "aiModel": {
-      "title": "로컬 AI 모델 추가",
-      "subtitle": "응답 속도와 성능을 기준으로 고르세요. E4B는 균형 잡힌 기본값이고, 12B는 더 똑똑하지만 느립니다.",
       "tiers": {
         "small": {
           "description": "어떤 컴퓨터에서도 실행됩니다. 글을 다듬는 데 좋습니다."
@@ -90,9 +84,6 @@
           "description": "가장 정확한 답변을 주고, 화면도 볼 수 있습니다."
         }
       },
-      "seesScreen": "화면 인식 가능",
-      "textOnly": "텍스트 전용",
-      "recommendedForAssistant": "어시스턴트에 추천",
       "download": "모델 다운로드",
       "useDownloaded": "다운로드한 모델 사용",
       "skip": "지금은 건너뛰기",
@@ -114,11 +105,8 @@
       "subtitle": "단축키 두 개만 있으면 됩니다. 누르고, 말하면, 끝입니다.",
       "dictateLabel": "어디서나 받아쓰기",
       "dictateCaption": "누른 채 말하고 손을 떼세요. 말이 그대로 입력됩니다.",
-      "assistantKeysLabel": "어시스턴트에게 묻기",
-      "assistantKeysCaption": "누른 채 물어보세요. 화면까지 볼 수 있습니다.",
       "changeAnytime": "이 설정은 언제든지 설정에서 바꿀 수 있습니다.",
       "hotkeyLabel": "받아쓰기 단축키",
-      "downloadingAssistant": "어시스턴트가 들어오는 중입니다. {{percentage}}% 진행됐습니다.",
       "downloadingVoice": "음성 모델이 도착하는 중입니다. {{percentage}}% 진행됐습니다.",
       "downloadingGeneric": "아직 다운로드 중입니다. {{percentage}}% 진행됐습니다.",
       "signOff": "이제 끝입니다. 무언가 말해 보세요.",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "나를 기억하기",
-        "description": "어시스턴트가 개인 메모리를 저장하고 사용하도록 허용합니다. 기본값은 꺼짐입니다."
-      },
-      "incognito": {
-        "label": "시크릿 대화",
-        "description": "이 대화에서는 메모리를 사용하지 않고, 새로 배우지도 않습니다."
-      },
       "detail": {
         "label": "메모리 상세도",
-        "description": "답변마다 추가할 메모리의 양입니다. 상세할수록 내용이 풍부하지만 조금 느려집니다.",
         "options": {
           "light": "간단",
           "balanced": "균형",
@@ -350,7 +329,6 @@
         "add": "추가",
         "addPlaceholder": "기억할 내용 추가…",
         "delete": "메모 삭제",
-        "learned": "학습됨",
         "added": "직접 추가"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "관리"
-      },
-      "distill": {
-        "label": "이 대화에서 지금 학습",
-        "description": "지금 바로 현재 대화에서 오래 쓸 사실을 뽑아 메모리에 담습니다.",
-        "button": "메모리 업데이트"
       },
       "export": "내보내기",
       "import": "가져오기",
@@ -937,16 +910,6 @@
         "title": "음성 이모지",
         "description": "“happy emoji” 또는 “thumbs up emoji”라고 말하면 😊 또는 👍가 입력됩니다. 일반적인 별칭과 작은 음성 인식 오류는 기기에서 처리되며, 알 수 없는 이름은 텍스트로 유지됩니다."
       },
-      "flow": {
-        "groupTitle": "Flow로 생성하기",
-        "enableLabel": "Flow로 생성하기",
-        "enableDescription": "활성화 문구로 받아쓰기를 시작하면 AI가 결과물을 대신 써 줍니다 — “Hey Flow, 일정 변경을 정중히 요청하는 이메일을 써 줘”라고 말하면 완성된 이메일이 붙여넣어집니다.",
-        "phraseLabel": "활성화 문구",
-        "phraseDescription": "받아쓰기가 이 문구로 시작할 때만 Flow가 작동합니다. 그 밖의 경우에는 같은 말이 일반 받아쓰기로 붙여넣어집니다. 어시스턴트의 모델을 사용하며, 비워 두면 “Hey Flow”로 초기화됩니다.",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "화면 접근 허용",
-        "screenDescription": "“이 이메일을 보고 답장 초안을 써 줘”처럼 명령이 화면을 분명히 가리킬 때 Flow가 스크린샷을 한 장 찍도록 허용합니다. 필요한지는 모델이 판단합니다. 어시스턴트의 화면 접근과는 별개입니다."
-      },
       "output": {
         "title": "출력 옵션"
       }
@@ -957,29 +920,14 @@
         "title": "녹음 저장",
         "description": "이 설정은 받아쓰기와 Flow 녹음에 적용됩니다. 저장한 녹음은 항상 보관됩니다. 어시스턴트 대화는 따로 저장됩니다."
       },
-      "filters": {
-        "label": "히스토리 종류",
-        "all": "전체",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "어시스턴트 대화"
-      },
       "openFolder": "녹음 폴더 열기",
       "loading": "히스토리 로딩 중…",
       "empty": "아직 아무것도 없습니다. 받아쓰기와 Flow 생성, 어시스턴트 대화가 여기에 표시됩니다.",
-      "emptyRecordings": "아직 받아쓰기가 없습니다.",
-      "emptyFlow": "아직 Flow로 생성한 내용이 없습니다.",
-      "emptyAssistant": "아직 어시스턴트 대화가 없습니다.",
       "recordingLabel": "받아쓰기",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "말한 내용",
       "originalTranscriptionLabel": "원본 전사",
-      "flowOutputLabel": "Flow 결과",
       "finalTextLabel": "최종 텍스트",
       "cleanupNoChanges": "AI 정리를 실행했지만 고칠 것이 없었습니다",
-      "flowNoOutput": "Flow 결과가 생성되지 않았습니다.",
       "copyToClipboard": "녹음 내용을 클립보드에 복사",
-      "copyFlowOutput": "Flow 결과 복사",
       "copyFinalText": "최종 텍스트 복사",
       "save": "변환된 텍스트 저장",
       "unsave": "저장에서 제거",
@@ -988,18 +936,7 @@
       "retranscribe": "다시 전사",
       "retranscribeError": "다시 전사에 실패했습니다. 다시 시도해주세요.",
       "transcribing": "전사 중…",
-      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다.",
-      "assistantLabel": "어시스턴트 대화",
-      "copyConversation": "대화 복사",
-      "resumeConversation": "어시스턴트에서 이 대화 계속하기",
-      "showConversation": "대화 보기",
-      "hideConversation": "대화 숨기기",
-      "roleUser": "나",
-      "roleAssistant": "어시스턴트",
-      "screenshotAttached": "화면",
-      "messageCount_one": "메시지 {{count}}개",
-      "messageCount_other": "메시지 {{count}}개",
-      "deleteAssistantError": "대화를 삭제할 수 없습니다. 다시 시도해주세요."
+      "transcriptionFailed": "전사에 실패했습니다. 재시도 아이콘을 사용하여 다시 전사할 수 있습니다."
     },
     "debug": {
       "title": "디버그",
@@ -1113,324 +1050,60 @@
         "button": "후원하기"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "어시스턴트",
-        "label": "어시스턴트 사용",
-        "description": "이 기능을 끄면 SpeakoFlow는 받아쓰기 전용이 됩니다. 떠 있는 패널은 닫히고 아예 불러오지 않으며, 단축키는 풀리고 쓰던 메모리도 돌려줍니다. Flow로 생성하기와 AI 정리는 계속 작동합니다."
-      },
-      "shortcuts": {
-        "title": "단축키"
-      },
-      "brain": {
-        "title": "어시스턴트 두뇌",
-        "whereLabel": "실행 위치",
-        "onDevice": "내 기기에서",
-        "cloud": "클라우드 제공자",
-        "downloadModel": "모델 살펴보고 다운로드",
-        "downloadModelDescription": "추천 모델을 고르거나 Hugging Face에서 검색하세요.",
-        "downloadModelAction": "모델 살펴보기",
-        "catalogTitle": "기기에서 실행할 모델 선택",
-        "catalogDescription": "비공개로 쓰는 로컬 모델을 다운로드하세요. 이 컴퓨터에만 머무르고 API 키가 필요하지 않습니다.",
-        "currentModelTitle": "현재 모델",
-        "currentModelDescription": "이 기기의 내장 어시스턴트에 선택된 모델입니다.",
-        "recommendedTitle": "추천 모델",
-        "recommendedDescription": "대화를 우선한 세 가지 선택입니다. 가장 빠른 모델, 추천 모델, 성능은 더 좋지만 느린 모델.",
-        "acceleratorDetected": "{{name}} · 보고된 그래픽 메모리 {{memory}} GB",
-        "acceleratorDetectedDedicated": "{{name}} · 전용 VRAM {{memory}} GB",
-        "acceleratorDetectedIntegrated": "{{name}} · 공유 그래픽 메모리 {{memory}} GB",
-        "acceleratorDetectedNoMemory": "{{name}} 감지됨 · 그래픽 메모리는 보고되지 않음",
-        "acceleratorUnknownWithMemory": "그래픽 메모리를 확인할 수 없음 · CPU 대체 실행용 시스템 RAM {{memory}} GB",
-        "acceleratorUnknown": "그래픽 메모리를 확인할 수 없음 · 응답 속도를 예측할 수 없습니다",
-        "details": "세부 정보",
-        "detailFile": "파일",
-        "detailLocation": "위치",
-        "detailFormat": "형식",
-        "detailId": "모델 ID",
-        "switchBeforeDelete": "이 모델을 삭제하기 전에 내장 어시스턴트를 다른 모델로 바꾸세요.",
-        "deleteModelConfirm": "{{modelName}}을(를) 삭제하시겠습니까? 다운로드한 파일과 저장된 항목이 제거됩니다.",
-        "deleteModelFailed": "모델을 삭제할 수 없습니다.",
-        "finderSectionTitle": "더 많은 기기 내 모델",
-        "finderTitle": "Hugging Face 살펴보기",
-        "finderDescription": "수천 개의 GGUF 모델을 검색해 SpeakoFlow로 바로 다운로드하세요.",
-        "finderAction": "모델 찾기",
-        "huggingFaceTitle": "내 모델",
-        "catalogEmpty": "지금은 사용할 수 있는 추천 로컬 모델이 없습니다."
-      },
-      "subpages": {
-        "profilesCaption": "어시스턴트의 이름, 역할, 성격을 바꿉니다.",
-        "memoryCaption": "어시스턴트가 대화를 넘어 당신에 대해 기억하는 내용입니다."
-      },
-      "tapToLock": {
-        "label": "탭하여 고정",
-        "info": "어시스턴트 단축키를 누르고 있는 동안 이 키를 탭하면 핸즈프리로 고정되어, 손을 떼고도 계속 말할 수 있습니다. 어시스턴트 단축키에 포함되지 않은 키를 고르세요(겹치는 키는 무시됩니다). 지우면 이 기능이 꺼집니다.",
-        "off": "꺼짐",
-        "clear": "지우기"
-      },
-      "provider": {
-        "title": "어시스턴트 제공자",
-        "saveFailed": "어시스턴트 제공자를 변경할 수 없습니다.",
-        "providerLabel": "제공자",
-        "providerDescription": "어시스턴트의 질문에 답하는 제공자입니다.",
-        "baseUrlLabel": "기본 URL",
-        "baseUrlDescription": "OpenAI 호환 기본 URL입니다. Azure URL은 자동으로 정규화됩니다.",
-        "apiKeyLabel": "API 키",
-        "apiKeyDescription": "AI 정리와 함께 사용됩니다.",
-        "apiKeyPlaceholder": "API 키 입력…",
-        "modelLabel": "모델",
-        "modelDescription": "어시스턴트 답변에 사용할 모델 또는 배포 이름입니다.",
-        "modelPlaceholder": "예: gpt-4o-mini",
-        "modelSearchPlaceholder": "모델 검색 또는 직접 입력…",
-        "modelUse": "\"{{model}}\" 사용",
-        "loadModels": "모델 불러오기",
-        "loadingModels": "불러오는 중…",
-        "noModelsFound": "반환된 모델이 없습니다. 모델 이름을 직접 입력하세요.",
-        "builtinModelDescription": "다운로드한 로컬 모델을 선택하세요. API 키 없이 기기에서 실행됩니다.",
-        "builtinModelPlaceholder": "다운로드한 모델 선택",
-        "builtinNoModels": "아직 기기에 모델이 없습니다 — 아래에서 하나 다운로드하세요.",
-        "builtinReady": "완전히 기기에서 실행됩니다. API 키도, 설정도 필요 없습니다.",
-        "builtinEngineMissing": "처음 사용할 때 작은 로컬 엔진이 한 번 자동으로 다운로드되고, 이후에는 완전히 오프라인으로 실행됩니다. 별도 설정은 필요하지 않습니다.",
-        "builtinEngineDownloading": "로컬 엔진 다운로드 중… {{percent}}%",
-        "builtinEnginePreparing": "로컬 엔진 다운로드 중…",
-        "builtinEngineExtracting": "로컬 엔진 설치 중…",
-        "builtinEngineReady": "로컬 엔진 준비 완료.",
-        "contextSizeLabel": "컨텍스트 창",
-        "contextSizeDescription": "로컬 모델이 한 번에 기억할 수 있는 양입니다 — 시스템 지시사항, 대화 기록, 스크린샷(이미지 한 장이 큰 부분을 차지할 수 있습니다), 그리고 모델의 답변까지 포함됩니다. 크게 하면 더 많이 담을 수 있어 화면 인식과 웹 검색이 안정적으로 작동하지만 메모리를 더 씁니다. 기본값은 8192이며, RAM에 여유가 있다면 16384가 적당한 다음 단계입니다. 나중에 낮춰서 메모리를 아낄 수도 있습니다.",
-        "unloadTimeoutLabel": "메모리에서 언로드하기까지",
-        "unloadTimeoutDescription": "로컬 모델이 이 시간 동안 사용되지 않으면 언로드해 메모리를 확보합니다. 다음에 사용할 때 자동으로 다시 로드됩니다."
-      },
-      "systemPrompt": {
-        "title": "시스템 프롬프트",
-        "label": "어시스턴트 시스템 프롬프트",
-        "description": "어시스턴트의 동작 방식을 정합니다."
-      },
-      "characters": {
-        "title": "프로필",
-        "description": "작업에 맞게 전환할 수 있는 프로필입니다. 활성 프로필이 어시스턴트의 이름, 역할, 지시사항 — 그리고 답변 길이를 정합니다. 패널 헤더에서 언제든 바꿀 수 있습니다.",
-        "galleryLabel": "내 프로필",
-        "editSection": "프로필 편집",
-        "avatarLabel": "아바타",
-        "active": "활성",
-        "meowsOnly": "야옹만 합니다",
-        "builtin": "기본 제공",
-        "custom": "사용자 정의",
-        "new": "새로 만들기",
-        "newName": "새 프로필",
-        "copyName": "{{name}} 복사본",
-        "createAi": "AI로 만들기",
-        "import": "가져오기",
-        "aiTitle": "프로필을 설명하세요",
-        "aiClose": "닫기",
-        "aiPlaceholder": "예: 간결한 릴리스 노트 작성자, 또는 모든 단계를 참을성 있게 설명해 주는 선생님",
-        "aiDictate": "설명을 받아쓰기로 입력",
-        "aiDictateStop": "받아쓰기 정지",
-        "generate": "생성",
-        "avatarUpload": "이미지 업로드",
-        "avatarRemove": "제거",
-        "nameLabel": "이름",
-        "roleLabel": "역할",
-        "rolePlaceholder": "카드에 표시되는 짧은 설명 (선택 사항)",
-        "promptLabel": "지시사항 (시스템 프롬프트)",
-        "responseLength": {
-          "label": "답변 길이",
-          "hint": "이 프로필의 답변이 얼마나 길어질지 정합니다. \"전역 설정 따르기\"는 어시스턴트의 전역 설정을 따릅니다.",
-          "options": {
-            "inherit": "전역 설정 따르기",
-            "short": "짧게",
-            "medium": "보통",
-            "long": "길게"
-          }
-        },
-        "greetingLabel": "인사말 (선택 사항)",
-        "greetingPlaceholder": "빈 대화에 표시할 첫 인사말 (선택 사항)",
-        "catNote": "고양이는 AI를 전혀 쓰지 않고 그냥 야옹거립니다. 설정할 것이 없습니다.",
-        "duplicate": "복제",
-        "export": "내보내기",
-        "restoreDefault": "기본값 복원",
-        "restoreBuiltins": "기본 제공 프로필 복원",
-        "moreActions": "추가 작업",
-        "expand": "펼치기",
-        "collapse": "접기",
-        "delete": "삭제",
-        "deleteConfirm": "이 프로필을 삭제하시겠습니까? 되돌릴 수 없습니다.",
-        "emptyState": "아직 프로필이 없습니다. 첫 프로필을 만들어 어시스턴트에게 성격을 부여하세요."
-      },
-      "behavior": {
-        "title": "동작"
-      },
-      "memory": {
-        "label": "대화 메모리",
-        "description": "매 턴에 컨텍스트로 보낼 최근 메시지 수입니다. 0이면 메모리를 사용하지 않습니다."
-      },
-      "autoSummarize": {
-        "label": "긴 대화 요약",
-        "description": "대화가 모델의 컨텍스트 창을 넘어서면 이전 메시지를 자동으로 요약해 하나로 이어갑니다. 덕분에 대화가 처음 내용을 잊지 않고 맥락을 유지합니다. 실행 중에는 작은 표시가 나타납니다."
-      },
-      "responseLength": {
-        "label": "답변 길이",
-        "description": "선호하는 답변 길이입니다. \"영향 없음\"은 프롬프트를 그대로 둡니다.",
-        "options": {
-          "default": "영향 없음",
-          "short": "짧게",
-          "medium": "보통",
-          "long": "길게"
-        }
-      },
-      "vision": {
-        "title": "화면 인식",
-        "modeLabel": "화면 접근",
-        "modes": {
-          "off": "꺼짐",
-          "manual": "직접 선택",
-          "agentDecides": "에이전트가 판단",
-          "descriptions": {
-            "off": "화면 캡처가 비활성화됩니다. 카메라와 영역 선택 컨트롤이 숨겨집니다.",
-            "manual": "전체 화면이나 특정 영역을 언제 첨부할지 직접 정합니다. 음성 캡처 시점 설정이 적용됩니다.",
-            "agent_decides": "모델이 현재 화면 정보가 필요하다고 판단하면 화면 캡처를 요청할 수 있습니다. 전송된 스크린샷은 모두 대화에 표시됩니다."
-          }
-        },
-        "timing": {
-          "label": "캡처 시점",
-          "description": "음성 질문의 경우: 질문을 시작하는 순간에 캡처하거나, 메시지가 전송될 때까지 기다립니다. 타이핑한 메시지는 항상 전송할 때 캡처합니다.",
-          "descriptionAgent": "두 방식 모두 스크린샷을 미리 준비하므로 어시스턴트 때문에 기다릴 일은 없습니다. 다른 점은 이미지에 담기는 내용입니다. “질문할 때”는 말을 시작한 순간의 화면을, “메시지를 보낼 때”는 지금의 화면을 담습니다. 어느 쪽이든 이미지는 기기에 남고, 어시스턴트가 실제로 보겠다고 요청할 때만 전송됩니다.",
-          "options": {
-            "immediate": "질문할 때",
-            "on_send": "메시지를 보낼 때"
-          }
-        },
-        "screenRecording": {
-          "description": "화면 인식에는 macOS 화면 기록 권한이 필요합니다. 시스템 설정에서 허용한 뒤 SpeakoFlow를 다시 시작하면 적용됩니다.",
-          "grant": "시스템 설정 열기"
-        }
-      },
-      "webSearch": {
-        "title": "웹 검색",
-        "enableLabel": "웹 검색 허용",
-        "enableDescription": "최신 정보가 필요한 질문일 때 어시스턴트가 웹을 검색하도록 허용합니다.",
-        "openRouterNativeLabel": "OpenRouter 내장 검색 사용",
-        "openRouterNativeDescription": "켜면 OpenRouter가 자체 검색(:online 모드)을 수행하며 OpenRouter 크레딧을 사용합니다. 끄면 아래에서 선택한 검색 제공자로 앱이 직접 검색합니다.",
-        "providerLabel": "검색 제공자",
-        "providerDescription": "Serper가 무난한 기본값입니다. 모든 제공자에 무료 등급이 있고, TinyFish는 카드 없이 무료입니다.",
-        "providers": {
-          "serper": "Serper (Google, 빠름)",
-          "brave": "Brave Search",
-          "tavily": "Tavily (AI 검색)",
-          "exa": "Exa (뉴럴)",
-          "serpapi": "SerpAPI (Google)",
-          "tinyfish": "TinyFish (무료, 카드 불필요)"
-        },
-        "apiKeyLabel": "API 키",
-        "apiKeyDescription": "선택한 검색 제공자의 키입니다.",
-        "apiKeyPlaceholder": "API 키 입력…",
-        "fetchContentLabel": "전체 페이지 읽기 (최고 품질)",
-        "fetchContentDescription": "요약 발췌 대신 각 결과의 전체 본문을 읽습니다. 답변이 더 좋아지지만 느립니다.",
-        "maxResultsLabel": "사용할 출처 수",
-        "maxResultsDescription": "읽을 결과 수입니다 (1–10).",
-        "depthLabel": "검색 깊이",
-        "depthDescription": "간단한 사실은 빠르게, 대부분의 질문은 표준, 어려운 질문은 심층으로.",
-        "depthOptions": {
-          "low": "빠르게",
-          "medium": "표준",
-          "high": "심층"
-        },
-        "localSmartLabel": "스마트 검색 판단 (로컬 모델)",
-        "localSmartDescription": "로컬 모델이 언제 검색할지 판단하도록 합니다. 끄면 빠른 키워드 검사를 대신 사용합니다.",
-        "creditBudgetLabel": "Firecrawl 일일 크레딧 한도",
-        "creditBudgetDescription": "검색이 중단되기 전까지 하루에 쓸 수 있는 Firecrawl 크레딧 상한입니다. 0 = 제한 없음.",
-        "testLabel": "검색 테스트",
-        "testDescription": "현재 제공자와 키로 샘플 검색을 실행합니다.",
-        "testButton": "검색 테스트",
-        "testing": "검색 중…",
-        "testResult": "결과 {{count}}개를 받았습니다."
-      },
-      "tts": {
-        "title": "음성 출력",
-        "enableLabel": "답변을 소리로 읽기",
-        "enableDescription": "어시스턴트의 답변을 소리로 읽어 줍니다.",
-        "stopOnDictationLabel": "받아쓰기를 시작하면 음성 정지",
-        "stopOnDictationDescription": "받아쓰기를 시작하면 재생 중인 답변을 정지합니다.",
-        "engineLabel": "엔진",
-        "engineDescription": "Kokoro는 기기에서 무료로 실행됩니다. 다른 엔진은 API 키를 사용합니다.",
-        "kokoroSetupLabel": "Kokoro 음성 모델",
-        "kokoroSetupDescription": "한 번만 다운로드하면 음성 답변이 이 기기에서 비공개로 실행됩니다.",
-        "kokoroDownload": "Kokoro 다운로드",
-        "kokoroDownloading": "Kokoro 다운로드 중",
-        "kokoroReady": "이 기기에서 준비됨",
-        "kokoroRetry": "다시 다운로드 시도",
-        "engines": {
-          "kokoro": "Kokoro (로컬, 무료)",
-          "openai": "OpenAI 호환",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "목소리",
-        "voiceDescription": "음성 답변에 사용할 Kokoro 목소리입니다.",
-        "dtypeLabel": "Kokoro 정밀도",
-        "dtypeDescription": "fp32가 품질이 가장 높고, q8은 CPU에서 더 빠릅니다. 변경하면 모델을 다시 로드합니다.",
-        "speedLabel": "재생 속도",
-        "speedDescription": "1×가 기본입니다. ElevenLabs는 0.7×–1.2×만 지원합니다.",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "사용자 지정 재생 속도",
-        "testLabel": "음성 테스트",
-        "testDescription": "현재 설정으로 짧은 샘플을 재생합니다.",
-        "testButton": "음성 테스트",
-        "testing": "테스트 중…",
-        "testOk": "재생됨 ✓",
-        "testPhrase": "안녕하세요! SpeakoFlow 음성 출력 테스트입니다.",
-        "downloadStart": "Kokoro 음성 다운로드 중…",
-        "downloadProgress": "Kokoro 음성 다운로드 중… {{progress}}%",
-        "downloadReady": "Kokoro 음성 준비 완료 ✓",
-        "downloadError": "Kokoro 음성 모델을 다운로드할 수 없습니다",
-        "baseUrlLabel": "기본 URL",
-        "baseUrlDescription": "OpenAI 호환 TTS URL입니다. 기본 URL이나 전체 /audio/speech URL 모두 사용할 수 있습니다.",
-        "azureBaseUrlLabel": "Speech URL",
-        "azureBaseUrlDescription": "포털에서 확인한 Azure Speech URL입니다. 예: https://eastus2.tts.speech.microsoft.com.",
-        "apiKeyLabel": "API 키",
-        "apiKeyDescription": "어시스턴트의 키와는 별개입니다.",
-        "modelLabel": "모델",
-        "modelDescription": "모델 또는 배포 이름입니다. 예: gpt-4o-mini-tts (OpenAI/Azure) 또는 eleven_flash_v2_5 (ElevenLabs).",
-        "remoteVoiceLabel": "목소리 이름",
-        "remoteVoiceDescription": "OpenAI 호환 TTS에 사용할 목소리입니다. 예: alloy, echo, nova, shimmer.",
-        "azureVoiceLabel": "목소리 이름",
-        "azureVoiceDescription": "Azure 목소리 이름입니다. 예: en-US-JennyNeural. 목록을 보려면 목소리 불러오기를 클릭하세요.",
-        "loadVoices": "목소리 불러오기",
-        "voicesLoading": "불러오는 중…",
-        "voicesPick": "{{count}}개 목소리 중에서 선택…",
-        "loadModels": "모델 불러오기",
-        "modelsLoading": "불러오는 중…",
-        "modelsPick": "{{count}}개 모델 중에서 선택…",
-        "modelsUse": "\"{{model}}\" 사용",
-        "voicesUse": "\"{{voice}}\" 사용",
-        "elevenVoiceLabel": "목소리 ID",
-        "elevenVoiceDescription": "ElevenLabs 목소리 ID입니다 (대시보드의 Voices 탭에서 확인).",
-        "promptLabel": "요약 프롬프트",
-        "promptDescription": "각 답변의 짧은 음성 요약을 생성하기 위한 지시사항입니다."
-      },
-      "appearance": {
-        "title": "패널 모양",
-        "previewLabel": "미리보기",
-        "previewDescription": "설정한 글자 크기와 불투명도가 적용된 패널 미리보기입니다.",
-        "previewUser": "안녕, 뭘 할 수 있어?",
-        "previewAssistant": "많아요! 무엇이든 물어보세요 — 화면까지 볼 수 있어요.",
-        "fontSizeLabel": "글자 크기",
-        "fontSizeDescription": "어시스턴트 패널의 대화 텍스트 크기입니다.",
-        "fontSizes": {
-          "small": "작게",
-          "medium": "보통",
-          "large": "크게"
-        },
-        "panelSizeLabel": "패널 크기",
-        "panelSizeDescription": "플로팅 어시스턴트 패널의 전체 크기입니다. 가장자리를 끌어서 크기를 조절할 수도 있습니다.",
-        "panelSizes": {
-          "mini": "작게",
-          "compact": "컴팩트",
-          "standard": "표준",
-          "large": "크게"
-        },
-        "opacityLabel": "패널 불투명도",
-        "opacityDescription": "플로팅 패널의 불투명도입니다. 100%는 완전히 불투명하고, 값을 낮추면 뒤의 바탕화면이 흐릿하게 비칩니다."
+    "profiles": {
+      "active": "활성",
+      "add": "새로 만들기",
+      "newName": "새 프로필",
+      "copyName": "{{name}} 복사본",
+      "import": "가져오기",
+      "export": "내보내기",
+      "duplicate": "복제",
+      "delete": "삭제",
+      "restore": "기본값 복원",
+      "restoreMissing": "기본 제공 프로필 복원",
+      "more": "추가 작업",
+      "edit": "펼치기",
+      "close": "접기",
+      "fields": {
+        "avatar": "이미지 업로드",
+        "avatarClear": "제거"
       }
+    },
+    "cleanupModels": {
+      "title": "어시스턴트 두뇌",
+      "whereLabel": "실행 위치",
+      "onDevice": "내 기기에서",
+      "cloud": "클라우드 제공자",
+      "downloadModel": "모델 살펴보고 다운로드",
+      "downloadModelDescription": "추천 모델을 고르거나 Hugging Face에서 검색하세요.",
+      "downloadModelAction": "모델 살펴보기",
+      "catalogTitle": "기기에서 실행할 모델 선택",
+      "catalogDescription": "비공개로 쓰는 로컬 모델을 다운로드하세요. 이 컴퓨터에만 머무르고 API 키가 필요하지 않습니다.",
+      "currentModelTitle": "현재 모델",
+      "currentModelDescription": "이 기기의 내장 어시스턴트에 선택된 모델입니다.",
+      "recommendedTitle": "추천 모델",
+      "recommendedDescription": "대화를 우선한 세 가지 선택입니다. 가장 빠른 모델, 추천 모델, 성능은 더 좋지만 느린 모델.",
+      "acceleratorDetected": "{{name}} · 보고된 그래픽 메모리 {{memory}} GB",
+      "acceleratorDetectedDedicated": "{{name}} · 전용 VRAM {{memory}} GB",
+      "acceleratorDetectedIntegrated": "{{name}} · 공유 그래픽 메모리 {{memory}} GB",
+      "acceleratorDetectedNoMemory": "{{name}} 감지됨 · 그래픽 메모리는 보고되지 않음",
+      "acceleratorUnknownWithMemory": "그래픽 메모리를 확인할 수 없음 · CPU 대체 실행용 시스템 RAM {{memory}} GB",
+      "acceleratorUnknown": "그래픽 메모리를 확인할 수 없음 · 응답 속도를 예측할 수 없습니다",
+      "details": "세부 정보",
+      "detailFile": "파일",
+      "detailLocation": "위치",
+      "detailFormat": "형식",
+      "detailId": "모델 ID",
+      "switchBeforeDelete": "이 모델을 삭제하기 전에 내장 어시스턴트를 다른 모델로 바꾸세요.",
+      "deleteModelConfirm": "{{modelName}}을(를) 삭제하시겠습니까? 다운로드한 파일과 저장된 항목이 제거됩니다.",
+      "deleteModelFailed": "모델을 삭제할 수 없습니다.",
+      "finderSectionTitle": "더 많은 기기 내 모델",
+      "finderTitle": "Hugging Face 살펴보기",
+      "finderDescription": "수천 개의 GGUF 모델을 검색해 SpeakoFlow로 바로 다운로드하세요.",
+      "finderAction": "모델 찾기",
+      "huggingFaceTitle": "내 모델",
+      "catalogEmpty": "지금은 사용할 수 있는 추천 로컬 모델이 없습니다.",
+      "custom": "사용자 정의"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "녹음 중",
     "transcribing": "텍스트로 변환 중…",
     "processing": "처리 중…",
-    "generating": "Flow로 작성 중…",
-    "vision": "화면을 보는 중…",
     "notices": {
-      "flowNotConfigured": "Flow에는 어시스턴트 모델이 필요합니다 — 받아쓰기로 붙여넣었습니다",
-      "flowFailed": "Flow가 생성하지 못했습니다 — 아무것도 붙여넣지 않았습니다",
-      "flowEmpty": "활성화 문구 뒤에 명령을 말하세요",
       "cleanupFallback": "AI 정리가 실행되지 않았습니다 — 원본 텍스트를 붙여넣었습니다"
     },
     "listening": "듣고 있습니다…",
     "locked": "핸즈프리로 녹음 중 — 단축키를 다시 누르면 정지합니다",
     "cancel": "취소",
-    "done": "완료",
-    "askAssistant": "이 내용을 입력하는 대신 어시스턴트에게 묻기"
-  },
-  "assistant": {
-    "title": "어시스턴트",
-    "character": {
-      "switch": "페르소나 전환"
-    },
-    "empty": "어시스턴트 단축키로 음성으로 물어보거나,\n아래에 입력하세요.",
-    "inputPlaceholder": "메시지…",
-    "inputPlaceholderScreen": "화면에 대해 물어보세요…",
-    "queuedUntilReady": "대기 중 — 이 답변이 끝나면 바로 보냅니다.",
-    "send": "보내기",
-    "stop": "정지",
-    "cancel": "취소",
-    "finish": "끝내고 보내기",
-    "clear": "대화 지우기",
-    "hide": "패널 숨기기",
-    "copy": "복사",
-    "copyCode": "코드 복사",
-    "regenerate": "답변 다시 생성 (기존 답변은 히스토리에 남습니다)",
-    "summarizing": "이전 메시지를 요약하는 중…",
-    "screenAttached": "화면",
-    "attachScreen": "화면 인식 — 끌 때까지 모든 메시지에 화면을 첨부합니다",
-    "detachScreen": "화면 인식 끄기",
-    "attach": {
-      "file": "이미지 또는 파일 첨부",
-      "snip": "화면 영역 잘라내기",
-      "image": "이미지",
-      "imageCount": "이미지 {{count}}개",
-      "imageCount_other": "이미지 {{count}}개",
-      "remove": "첨부 제거",
-      "dropHint": "여기에 놓아 첨부"
-    },
-    "snip": {
-      "hint": "끌어서 영역을 선택하세요 — 취소는 Esc"
-    },
-    "webSearch": {
-      "enable": "웹 검색 켜기",
-      "disable": "웹 검색 끄기"
-    },
-    "tts": {
-      "enable": "음성 요약 켜기",
-      "disable": "음성 요약 끄기",
-      "loading": "Kokoro 음성 모델 로딩 중...",
-      "loadingShort": "음성 모델 {{progress}}%"
-    },
-    "pill": {
-      "talk": "클릭해서 말하기",
-      "stop": "정지하고 보내기",
-      "idle": "어시스턴트",
-      "expand": "패널 펼치기",
-      "collapse": "알약 모양으로 접기",
-      "close": "어시스턴트 닫기",
-      "cancel": "보내지 않고 취소",
-      "cancelTurn": "취소",
-      "dismiss": "닫기",
-      "disarmScreen": "화면 인식이 켜져 있습니다 — 클릭하면 끕니다",
-      "armScreen": "화면 인식이 꺼져 있습니다 — 클릭하면 켭니다"
-    },
-    "status": {
-      "listening": "듣고 있습니다…",
-      "locked": "듣고 있습니다",
-      "transcribing": "전사 중…",
-      "searching": "웹을 검색하는 중...",
-      "thinking": "생각하는 중...",
-      "speaking": "말하는 중..."
-    },
-    "tool": {
-      "search": "웹 검색 중",
-      "screen": "화면을 보는 중",
-      "working": "처리하는 중",
-      "elapsed": "{{seconds}}초"
-    },
-    "errors": {
-      "generic": "문제가 발생했습니다. 다시 시도해주세요.",
-      "genericShort": "문제가 발생했습니다",
-      "no_provider": "아직 설정된 어시스턴트 모델이 없습니다. 설정 → 어시스턴트에서 제공자를 선택하세요.",
-      "no_providerShort": "설정된 모델 없음",
-      "no_model": "제공자에 선택된 모델이 없습니다. 설정 → 어시스턴트에서 하나 선택하세요.",
-      "no_modelShort": "선택된 모델 없음",
-      "engine_start": "내장 모델을 시작할 수 없습니다. 다시 시도하거나 설정 → 어시스턴트에서 다른 모델을 선택하세요.",
-      "engine_startShort": "모델을 시작할 수 없음",
-      "provider": "모델이 답변하지 못했습니다. API 키와 연결을 확인한 뒤 다시 시도하세요.",
-      "providerShort": "답변을 받지 못했습니다",
-      "empty_reply": "모델이 답변을 쓰지 않고 끝냈습니다. 다시 물어보거나 설정 → 어시스턴트에서 다른 모델을 선택하세요.",
-      "empty_replyShort": "빈 답변",
-      "vision_unsupported": "이 모델은 화면을 읽을 수 없습니다. 설정 → 어시스턴트에서 이미지를 인식하는 모델을 선택하거나, 화면 인식 없이 다시 물어보세요.",
-      "vision_unsupportedShort": "이미지를 볼 수 없는 모델",
-      "screenshot_too_large": "화면 캡처가 이 제공자에게 너무 컸습니다. 다시 시도해주세요 — 더 강하게 압축됩니다.",
-      "screenshot_too_largeShort": "화면 캡처가 너무 큼",
-      "screen_capture": "화면을 캡처할 수 없습니다. 다시 시도하거나 화면 인식 없이 물어보세요.",
-      "screen_captureShort": "화면 캡처 실패",
-      "transcription": "음성을 전사할 수 없습니다. 다시 말해 주세요.",
-      "transcriptionShort": "전사 실패",
-      "tts": "음성 답변이 실패했습니다. TTS 설정을 확인하거나 패널에서 답변을 읽어 보세요.",
-      "ttsShort": "음성 답변 실패",
-      "tts_local": "로컬 음성을 불러올 수 없습니다. 연결을 확인하거나 설정에서 TTS 엔진을 바꿔 보세요.",
-      "tts_localShort": "음성을 불러올 수 없음",
-      "tts_blocked": "시스템이 음성 자동 재생을 차단했습니다. 패널의 아무 곳이나 클릭하면 답변을 들을 수 있습니다.",
-      "tts_blockedShort": "패널을 탭하면 들립니다",
-      "tts_playback": "출력 장치에서 음성을 재생할 수 없습니다. 스피커/출력 설정을 확인한 뒤 다시 시도하세요.",
-      "tts_playbackShort": "음성 재생 실패",
-      "mic_denied": "마이크 접근이 차단되었습니다. 시스템 개인 정보 설정에서 허용하세요.",
-      "mic_deniedShort": "마이크 접근 차단됨",
-      "mic_unavailable": "마이크를 찾을 수 없습니다. 연결한 뒤 다시 시도하세요.",
-      "mic_unavailableShort": "마이크를 찾을 수 없음",
-      "mic_error": "마이크를 시작할 수 없습니다. 다른 앱이 사용 중일 수 있습니다.",
-      "mic_errorShort": "마이크를 시작할 수 없음",
-      "file_read": "그 파일은 첨부할 수 없습니다.",
-      "file_readShort": "파일을 첨부할 수 없음"
-    },
-    "notices": {
-      "web_search_failed": "웹 검색에서 결과를 찾지 못해 — 검색 없이 답변합니다.",
-      "web_search_failedShort": "웹 결과 없음"
-    },
-    "engineSetup": {
-      "downloading": "로컬 엔진 설정 중 (첫 실행)… {{percent}}%",
-      "preparing": "로컬 엔진 설정 중 (첫 실행)…",
-      "extracting": "로컬 엔진 설치 중…",
-      "short": "엔진 설정 중…"
-    }
+    "done": "완료"
   }
 }

@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "عام",
     "dictation": "الإملاء",
-    "assistant": "المساعد",
     "history": "السجل",
     "about": "حول",
     "debug": "تصحيح الأخطاء",
-    "characters": "الملفات التعريفية",
     "memory": "الذاكرة",
     "collapse": "طيّ الشريط الجانبي",
-    "expand": "توسيع الشريط الجانبي"
+    "expand": "توسيع الشريط الجانبي",
+    "profiles": "الملفات التعريفية"
   },
   "window": {
     "minimize": "تصغير",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "الاختصارات والميكروفون ومظهر التطبيق.",
-    "dictation": "النموذج الذي يحوّل صوتك إلى نص، وكيفية تنظيف النتيجة.",
-    "assistant": "أعدّ المساعد، ثم اضبط صوته ورؤية الشاشة والبحث في الويب.",
-    "history": "أحدث عمليات الإملاء ونتائج Flow ومحادثات المساعد، مخزَّنة على هذا الجهاز.",
     "about": "الإصدار ولغة التطبيق ومواقع البيانات وشكر المساهمين.",
     "debug": "أدوات التشخيص وأدوات المطوّرين."
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "جارٍ تنزيل نموذجك في الخلفية."
     },
     "aiModel": {
-      "title": "إضافة نموذج ذكاء اصطناعي محلي",
-      "subtitle": "اختر بحسب سرعة الاستجابة والقدرة. E4B هو الخيار المتوازن الافتراضي، و12B أدق لكنه أبطأ.",
       "tiers": {
         "small": {
           "description": "يعمل على أي جهاز. مثالي لتنظيم كتابتك."
@@ -90,9 +84,6 @@
           "description": "أدق الإجابات، ويمكنه رؤية شاشتك."
         }
       },
-      "seesScreen": "يرى شاشتك",
-      "textOnly": "نص فقط",
-      "recommendedForAssistant": "موصى به للمساعد",
       "download": "تنزيل النموذج",
       "useDownloaded": "استخدام النموذج المنزَّل",
       "skip": "تخطّي الآن",
@@ -114,11 +105,8 @@
       "subtitle": "اختصاران هما كل ما تحتاجه. اضغط، تحدّث، انتهى.",
       "dictateLabel": "الإملاء في أي مكان",
       "dictateCaption": "اضغط مع الاستمرار، تحدّث، ثم اترك. كلماتك تُكتب من تلقاء نفسها.",
-      "assistantKeysLabel": "اسأل المساعد",
-      "assistantKeysCaption": "اضغط مع الاستمرار واسأل. يمكنه حتى رؤية شاشتك.",
       "changeAnytime": "يمكنك تغيير ذلك في أي وقت من الإعدادات.",
       "hotkeyLabel": "مفاتيح الإملاء الخاصة بك",
-      "downloadingAssistant": "مساعدك في الطريق. أُنجز {{percentage}}%.",
       "downloadingVoice": "نموذج الصوت على وشك الوصول. أُنجز {{percentage}}%.",
       "downloadingGeneric": "التنزيل ما زال جاريًا. أُنجز {{percentage}}%.",
       "signOff": "هذا كل شيء. هيّا قل شيئًا.",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "تذكّرني",
-        "description": "اسمح للمساعد بالاحتفاظ بذاكرة شخصية واستخدامها. معطّل افتراضيًا."
-      },
-      "incognito": {
-        "label": "محادثة متخفية",
-        "description": "في هذه المحادثة، لا تستخدم الذاكرة ولا تتعلّم أي شيء جديد."
-      },
       "detail": {
         "label": "تفاصيل الذاكرة",
-        "description": "مقدار الذاكرة المضافة إلى كل رد. التفاصيل الأكثر أغنى لكنها أبطأ قليلًا.",
         "options": {
           "light": "خفيف",
           "balanced": "متوازن",
@@ -350,7 +329,6 @@
         "add": "إضافة",
         "addPlaceholder": "أضف شيئًا لتذكّره…",
         "delete": "حذف الملاحظة",
-        "learned": "مُتعلَّمة",
         "added": "أضفتها بنفسك"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "إدارة"
-      },
-      "distill": {
-        "label": "تعلَّم من هذه المحادثة الآن",
-        "description": "استخلص الحقائق الثابتة من محادثتك الحالية وأضفها إلى الذاكرة، الآن.",
-        "button": "تحديث الذاكرة"
       },
       "export": "تصدير",
       "import": "استيراد",
@@ -937,16 +910,6 @@
         "title": "الرموز التعبيرية المنطوقة",
         "description": "قل “happy emoji” أو “thumbs up emoji” لإدراج 😊 أو 👍. تتم معالجة الأسماء الشائعة وأخطاء تحويل الكلام البسيطة على جهازك، وتبقى الأسماء غير المعروفة كنص."
       },
-      "flow": {
-        "groupTitle": "التوليد باستخدام Flow",
-        "enableLabel": "التوليد باستخدام Flow",
-        "enableDescription": "ابدأ الإملاء بعبارة التنشيط ليكتب الذكاء الاصطناعي النتيجة نيابةً عنك — عبارة «Hey Flow، اكتب بريدًا مهذّبًا أطلب فيه تغيير الموعد» تلصق البريد جاهزًا.",
-        "phraseLabel": "عبارة التنشيط",
-        "phraseDescription": "لا يُنشَّط Flow إلا إذا بدأ الإملاء بهذه العبارة. وفي غير ذلك، تُلصق الكلمات نفسها كإملاء عادي. يستخدم نموذج مساعدك؛ اتركه فارغًا لإعادته إلى «Hey Flow».",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "السماح بالوصول إلى الشاشة",
-        "screenDescription": "اسمح لـ Flow بأخذ لقطة شاشة واحدة عندما يشير الأمر بوضوح إلى شاشتك، مثل «انظر إلى هذا البريد واكتب ردًا». النموذج هو من يقرّر الحاجة إليها. وهذا منفصل عن وصول المساعد إلى الشاشة."
-      },
       "output": {
         "title": "خيارات الإخراج"
       }
@@ -957,29 +920,14 @@
         "title": "تخزين التسجيلات",
         "description": "تؤثّر هذه الإعدادات في تسجيلات الإملاء وFlow. أما التسجيلات المحفوظة فيُحتفظ بها دائمًا. ومحادثات المساعد لها تخزين منفصل."
       },
-      "filters": {
-        "label": "نوع السجل",
-        "all": "الكل",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "محادثات المساعد"
-      },
       "openFolder": "فتح مجلد التسجيلات",
       "loading": "…جاري تحميل السجل",
       "empty": "لا يوجد شيء هنا بعد. ستظهر هنا عمليات الإملاء ونتائج Flow ومحادثات المساعد.",
-      "emptyRecordings": "لا توجد عمليات إملاء بعد.",
-      "emptyFlow": "لا توجد نتائج Flow بعد.",
-      "emptyAssistant": "لا توجد محادثات مع المساعد بعد.",
       "recordingLabel": "الإملاء",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "ما قلته",
       "originalTranscriptionLabel": "التفريغ الأصلي",
-      "flowOutputLabel": "ناتج Flow",
       "finalTextLabel": "النص النهائي",
       "cleanupNoChanges": "عمل التنظيف بالذكاء الاصطناعي، ولم يكن هناك ما يُصلح",
-      "flowNoOutput": "لم يُنتج Flow أي ناتج.",
       "copyToClipboard": "نسخ التفريغ إلى الحافظة",
-      "copyFlowOutput": "نسخ ناتج Flow",
       "copyFinalText": "نسخ النص النهائي",
       "save": "حفظ التفريغ",
       "unsave": "إزالة من المحفوظات",
@@ -988,18 +936,7 @@
       "retranscribe": "إعادة النسخ",
       "retranscribeError": "فشلت إعادة النسخ. يرجى المحاولة مرة أخرى.",
       "transcribing": "جارٍ النسخ…",
-      "transcriptionFailed": "فشل النسخ. يمكنك إعادة النسخ باستخدام أيقونة إعادة المحاولة.",
-      "assistantLabel": "محادثة المساعد",
-      "copyConversation": "نسخ المحادثة",
-      "resumeConversation": "متابعة هذه المحادثة في المساعد",
-      "showConversation": "إظهار المحادثة",
-      "hideConversation": "إخفاء المحادثة",
-      "roleUser": "أنت",
-      "roleAssistant": "المساعد",
-      "screenshotAttached": "رؤية",
-      "messageCount_one": "{{count}} رسالة",
-      "messageCount_other": "{{count}} رسالة",
-      "deleteAssistantError": "تعذّر حذف المحادثة. يرجى المحاولة مرة أخرى."
+      "transcriptionFailed": "فشل النسخ. يمكنك إعادة النسخ باستخدام أيقونة إعادة المحاولة."
     },
     "debug": {
       "title": "تصحيح الأخطاء",
@@ -1113,324 +1050,60 @@
         "button": "تبرع"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "المساعد",
-        "label": "تمكين المساعد",
-        "description": "أوقف هذا لتجعل SpeakoFlow للإملاء فقط. تُغلق اللوحة العائمة ولا تُحمَّل أبدًا، وتتحرر اختصاراتها، وتُعاد الذاكرة التي تستهلكها. وتبقى التوليد باستخدام Flow والتنظيف بالذكاء الاصطناعي تعملان."
-      },
-      "shortcuts": {
-        "title": "الاختصارات"
-      },
-      "brain": {
-        "title": "عقل المساعد",
-        "whereLabel": "مكان التشغيل",
-        "onDevice": "على جهازي",
-        "cloud": "مزوّد سحابي",
-        "downloadModel": "استعراض النماذج وتنزيلها",
-        "downloadModelDescription": "اختر نموذجًا موصى به أو ابحث في Hugging Face.",
-        "downloadModelAction": "استعراض النماذج",
-        "catalogTitle": "اختر نموذجًا يعمل على الجهاز",
-        "catalogDescription": "نزّل نموذجًا محليًا خاصًا. يبقى على هذا الجهاز ولا يحتاج إلى مفتاح API.",
-        "currentModelTitle": "النموذج الحالي",
-        "currentModelDescription": "المختار للمساعد المدمج على هذا الجهاز.",
-        "recommendedTitle": "النماذج الموصى بها",
-        "recommendedDescription": "ثلاثة خيارات تركّز على المحادثة: الأسرع، والموصى به، والأقدر لكن الأبطأ.",
-        "acceleratorDetected": "{{name}} · {{memory}} GB ذاكرة رسوميات مُبلَّغ عنها",
-        "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB ذاكرة رسوميات مخصّصة",
-        "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB ذاكرة رسوميات مشتركة",
-        "acceleratorDetectedNoMemory": "تم التعرّف على {{name}} · لم يُبلَّغ عن ذاكرة الرسوميات",
-        "acceleratorUnknownWithMemory": "ذاكرة الرسوميات غير متاحة · {{memory}} GB من ذاكرة النظام للعمل على المعالج",
-        "acceleratorUnknown": "ذاكرة الرسوميات غير متاحة · لا يمكن التنبؤ بسرعة الاستجابة",
-        "details": "التفاصيل",
-        "detailFile": "الملف",
-        "detailLocation": "الموقع",
-        "detailFormat": "الصيغة",
-        "detailId": "معرّف النموذج",
-        "switchBeforeDelete": "حوّل المساعد المدمج إلى نموذج آخر قبل حذف هذا النموذج.",
-        "deleteModelConfirm": "حذف {{modelName}}؟ ستُزال ملفاته المنزَّلة ومدخله المحفوظ.",
-        "deleteModelFailed": "تعذّر حذف النموذج.",
-        "finderSectionTitle": "نماذج أخرى على الجهاز",
-        "finderTitle": "استعراض Hugging Face",
-        "finderDescription": "ابحث في آلاف نماذج GGUF ونزّل أحدها مباشرةً إلى SpeakoFlow.",
-        "finderAction": "ابحث عن نموذج",
-        "huggingFaceTitle": "نماذجك",
-        "catalogEmpty": "لا توجد نماذج محلية موصى بها في الوقت الحالي."
-      },
-      "subpages": {
-        "profilesCaption": "غيّر اسم المساعد ودوره وشخصيته.",
-        "memoryCaption": "ما يتذكّره المساعد عنك بين المحادثات."
-      },
-      "tapToLock": {
-        "label": "انقر للتثبيت",
-        "info": "أثناء إمساك اختصار المساعد، انقر هذا المفتاح لتثبيت التسجيل المتواصل فتتمكّن من رفع يدك ومتابعة الحديث. اختر مفتاحًا لا يشكّل جزءًا من اختصار المساعد (المفتاح المتداخل يُتجاهل)، أو امسحه لتعطيل هذه الميزة.",
-        "off": "إيقاف",
-        "clear": "مسح"
-      },
-      "provider": {
-        "title": "مزوّد المساعد",
-        "saveFailed": "تعذّر تغيير مزوّد المساعد.",
-        "providerLabel": "المزوّد",
-        "providerDescription": "المزوّد الذي يجيب عن أسئلة المساعد.",
-        "baseUrlLabel": "URL الأساسي",
-        "baseUrlDescription": "URL أساسي متوافق مع OpenAI. تُوحَّد عناوين Azure تلقائيًا.",
-        "apiKeyLabel": "مفتاح API",
-        "apiKeyDescription": "مشترك مع التنظيف بالذكاء الاصطناعي.",
-        "apiKeyPlaceholder": "أدخل مفتاح API…",
-        "modelLabel": "النموذج",
-        "modelDescription": "اسم النموذج أو النشر المستخدم لإجابات المساعد.",
-        "modelPlaceholder": "مثال: gpt-4o-mini",
-        "modelSearchPlaceholder": "ابحث عن نموذج أو اكتبه…",
-        "modelUse": "استخدام «{{model}}»",
-        "loadModels": "تحميل النماذج",
-        "loadingModels": "جارٍ التحميل…",
-        "noModelsFound": "لم تُرجَع أي نماذج. اكتب اسم النموذج بدلًا من ذلك.",
-        "builtinModelDescription": "اختر نموذجًا محليًا منزَّلًا. يعمل على جهازك دون مفتاح API.",
-        "builtinModelPlaceholder": "اختر نموذجًا منزَّلًا",
-        "builtinNoModels": "لا توجد نماذج على جهازك بعد — نزّل واحدًا أدناه.",
-        "builtinReady": "يعمل بالكامل على جهازك. بلا مفتاح API وبلا إعداد.",
-        "builtinEngineMissing": "يُنزّل الاستخدام الأول محرّكًا محليًا صغيرًا تلقائيًا (مرة واحدة)، ثم يعمل دون اتصال بالكامل. لا يحتاج أي إعداد.",
-        "builtinEngineDownloading": "جارٍ تنزيل المحرّك المحلي… {{percent}}%",
-        "builtinEnginePreparing": "جارٍ تنزيل المحرّك المحلي…",
-        "builtinEngineExtracting": "جارٍ تثبيت المحرّك المحلي…",
-        "builtinEngineReady": "المحرّك المحلي جاهز.",
-        "contextSizeLabel": "نافذة السياق",
-        "contextSizeDescription": "مقدار ما يستطيع النموذج المحلي استحضاره في وقت واحد — تعليمات النظام وسجل محادثتك وأي لقطة شاشة (الصورة الواحدة قد تستهلك جزءًا كبيرًا) وردّه. النافذة الأكبر تستوعب أكثر وتجعل رؤية الشاشة والبحث في الويب أكثر موثوقية، لكنها تستهلك ذاكرة أكبر. القيمة الافتراضية 8192؛ و16384 خطوة جيدة للأعلى إذا كانت ذاكرة جهازك تسمح بذلك. ويمكنك تقليلها لاحقًا لتوفير الذاكرة.",
-        "unloadTimeoutLabel": "إلغاء التحميل من الذاكرة بعد",
-        "unloadTimeoutDescription": "وفّر الذاكرة بإلغاء تحميل النموذج المحلي بعد بقائه خاملًا هذه المدة. ويُعاد تحميله تلقائيًا عند الاستخدام التالي."
-      },
-      "systemPrompt": {
-        "title": "مطالبة النظام",
-        "label": "مطالبة نظام المساعد",
-        "description": "تحدّد سلوك المساعد."
-      },
-      "characters": {
-        "title": "الملفات التعريفية",
-        "description": "ملفات تعريفية موجّهة للمهام يمكنك التبديل بينها. الملف النشط يحدّد اسم المساعد ودوره وتعليماته — وطول ردوده. ويمكنك التبديل في أي وقت من رأس اللوحة.",
-        "galleryLabel": "ملفاتك التعريفية",
-        "editSection": "تعديل الملف التعريفي",
-        "avatarLabel": "الصورة الرمزية",
-        "active": "نشط",
-        "meowsOnly": "مواء فقط",
-        "builtin": "مدمج",
-        "custom": "مخصص",
-        "new": "جديد",
-        "newName": "ملف تعريفي جديد",
-        "copyName": "نسخة من {{name}}",
-        "createAi": "إنشاء بالذكاء الاصطناعي",
-        "import": "استيراد",
-        "aiTitle": "صِف ملفك التعريفي",
-        "aiClose": "إغلاق",
-        "aiPlaceholder": "مثال: كاتب موجز لملاحظات الإصدار، أو معلّم صبور يشرح كل خطوة",
-        "aiDictate": "أملِ الوصف",
-        "aiDictateStop": "إيقاف الإملاء",
-        "generate": "توليد",
-        "avatarUpload": "رفع صورة",
-        "avatarRemove": "إزالة",
-        "nameLabel": "الاسم",
-        "roleLabel": "الدور",
-        "rolePlaceholder": "وصف قصير يظهر على البطاقة (اختياري)",
-        "promptLabel": "التعليمات (مطالبة النظام)",
-        "responseLength": {
-          "label": "طول الرد",
-          "hint": "طول ردود هذا الملف التعريفي. خيار «الوراثة» يتبع إعداد المساعد العام.",
-          "options": {
-            "inherit": "وراثة الإعداد العام",
-            "short": "قصير",
-            "medium": "متوسط",
-            "long": "طويل"
-          }
-        },
-        "greetingLabel": "التحية (اختياري)",
-        "greetingPlaceholder": "سطر افتتاحي اختياري يظهر في محادثة فارغة",
-        "catNote": "القط يتجاهل الذكاء الاصطناعي تمامًا — كل ما يفعله هو المواء. لا شيء لإعداده هنا.",
-        "duplicate": "تكرار",
-        "export": "تصدير",
-        "restoreDefault": "استعادة الافتراضي",
-        "restoreBuiltins": "استعادة الملفات المدمجة",
-        "moreActions": "مزيد من الإجراءات",
-        "expand": "توسيع",
-        "collapse": "طيّ",
-        "delete": "حذف",
-        "deleteConfirm": "حذف هذا الملف التعريفي؟ لا يمكن التراجع عن ذلك.",
-        "emptyState": "لا توجد ملفات تعريفية بعد. أنشئ أول ملف لتمنح المساعد شخصية."
-      },
-      "behavior": {
-        "title": "السلوك"
-      },
-      "memory": {
-        "label": "ذاكرة المحادثة",
-        "description": "عدد الرسائل الأخيرة التي تُرسل كسياق في كل دور. القيمة 0 تعطّل الذاكرة."
-      },
-      "autoSummarize": {
-        "label": "تلخيص المحادثات الطويلة",
-        "description": "عندما تتجاوز المحادثة نافذة سياق النموذج، تُختصر الرسائل الأقدم تلقائيًا في ملخّص متجدّد لتحفظ المحادثة سياقها بدلًا من نسيان بدايتها. ويظهر مؤشّر خفيف أثناء تنفيذ ذلك."
-      },
-      "responseLength": {
-        "label": "طول الرد",
-        "description": "طول الرد المفضّل. خيار «بلا تأثير» يترك مطالبتك كما هي.",
-        "options": {
-          "default": "بلا تأثير",
-          "short": "قصير",
-          "medium": "متوسط",
-          "long": "طويل"
-        }
-      },
-      "vision": {
-        "title": "رؤية الشاشة",
-        "modeLabel": "الوصول إلى الشاشة",
-        "modes": {
-          "off": "إيقاف",
-          "manual": "يدوي",
-          "agentDecides": "الوكيل يقرّر",
-          "descriptions": {
-            "off": "تصوير الشاشة معطّل. وعناصر التحكم بالكاميرا والمنطقة مخفية.",
-            "manual": "أنت تحدّد وقت إرفاق الشاشة كاملة أو منطقة منها. ويُطبَّق توقيت التصوير الخاص بالأسئلة الصوتية.",
-            "agent_decides": "قد يطلب النموذج لقطة شاشة عندما يحتاج سياقًا بصريًا حاليًا. وكل لقطة تُرسَل تظهر في المحادثة."
-          }
-        },
-        "timing": {
-          "label": "وقت التصوير",
-          "description": "للأسئلة الصوتية: صوّر الشاشة لحظة بدء سؤالك، أو انتظر حتى إرسال الرسالة. أما الرسائل المكتوبة فتُصوَّر دائمًا عند الإرسال.",
-          "descriptionAgent": "يجهّز الخياران صورة الشاشة مسبقًا، فلا يجعلك المساعد تنتظرها أبدًا. والفرق هو ما تُظهره الصورة: «عند السؤال» يلتقط الشاشة كما كانت عند بدء حديثك، و«عند إرسال الرسالة» يلتقطها كما هي الآن. وفي كلتا الحالتين تبقى الصورة على جهازك ولا تُرسل إلا إذا طلب المساعد رؤيتها فعلًا.",
-          "options": {
-            "immediate": "عند السؤال",
-            "on_send": "عند إرسال الرسالة"
-          }
-        },
-        "screenRecording": {
-          "description": "تحتاج رؤية الشاشة إلى إذن تسجيل الشاشة في macOS. امنحه من إعدادات النظام، ثم أعد تشغيل SpeakoFlow ليصبح ساري المفعول.",
-          "grant": "فتح إعدادات النظام"
-        }
-      },
-      "webSearch": {
-        "title": "البحث في الويب",
-        "enableLabel": "السماح بالبحث في الويب",
-        "enableDescription": "اسمح للمساعد بالبحث في الويب عندما يتطلّب السؤال معلومات حديثة.",
-        "openRouterNativeLabel": "استخدام البحث المدمج في OpenRouter",
-        "openRouterNativeDescription": "عند التشغيل، يتولّى OpenRouter البحث بنفسه (وضع :online) مستخدمًا أرصدة OpenRouter الخاصة بك. وعند الإيقاف، يبحث التطبيق عبر مزوّد البحث المحدّد أدناه.",
-        "providerLabel": "مزوّد البحث",
-        "providerDescription": "يُعدّ Serper خيارًا افتراضيًا جيّدًا. لكل مزوّد خطة مجانية، وTinyFish مجاني بلا بطاقة.",
-        "providers": {
-          "serper": "Serper (Google، سريع)",
-          "brave": "Brave Search",
-          "tavily": "Tavily (بحث بالذكاء الاصطناعي)",
-          "exa": "Exa (عصبي)",
-          "serpapi": "SerpAPI (Google)",
-          "tinyfish": "TinyFish (مجاني، بلا بطاقة)"
-        },
-        "apiKeyLabel": "مفتاح API",
-        "apiKeyDescription": "مفتاح مزوّد البحث المختار.",
-        "apiKeyPlaceholder": "أدخل مفتاح API…",
-        "fetchContentLabel": "قراءة الصفحات كاملة (أفضل جودة)",
-        "fetchContentDescription": "اقرأ النص الكامل لكل نتيجة بدلًا من المقتطفات. إجابات أفضل، لكن أبطأ.",
-        "maxResultsLabel": "عدد المصادر المستخدمة",
-        "maxResultsDescription": "عدد النتائج التي تُقرأ (1–10).",
-        "depthLabel": "عمق البحث",
-        "depthDescription": "«سريع» للمعلومات البسيطة، و«قياسي» لمعظم الأسئلة، و«عميق» للأسئلة الصعبة.",
-        "depthOptions": {
-          "low": "سريع",
-          "medium": "قياسي",
-          "high": "عميق"
-        },
-        "localSmartLabel": "قرارات بحث ذكية (النموذج المحلي)",
-        "localSmartDescription": "اترك النموذج المحلي يقرّر وقت البحث. وعند الإيقاف، يُستخدم فحص سريع للكلمات المفتاحية بدلًا منه.",
-        "creditBudgetLabel": "حد أرصدة Firecrawl اليومي",
-        "creditBudgetDescription": "الحد اليومي لأرصدة Firecrawl قبل إيقاف البحث مؤقتًا. القيمة 0 تعني بلا حد.",
-        "testLabel": "اختبار البحث",
-        "testDescription": "نفّذ بحثًا تجريبيًا بالمزوّد والمفتاح الحاليين.",
-        "testButton": "اختبار البحث",
-        "testing": "جارٍ البحث…",
-        "testResult": "تم الحصول على {{count}} نتيجة."
-      },
-      "tts": {
-        "title": "الإخراج الصوتي",
-        "enableLabel": "قراءة الردود بصوت مسموع",
-        "enableDescription": "اقرأ ردود المساعد بصوت مسموع.",
-        "stopOnDictationLabel": "إيقاف النطق عند بدء الإملاء",
-        "stopOnDictationDescription": "أوقف أي رد لا يزال قيد التشغيل عندما تبدأ الإملاء.",
-        "engineLabel": "المحرّك",
-        "engineDescription": "يعمل Kokoro محليًا بالمجان. أما المحرّكات الأخرى فتستخدم مفتاح API الخاص بك.",
-        "kokoroSetupLabel": "نموذج صوت Kokoro",
-        "kokoroSetupDescription": "نزّله مرة واحدة، ثم تعمل الردود المنطوقة بخصوصية على هذا الجهاز.",
-        "kokoroDownload": "تنزيل Kokoro",
-        "kokoroDownloading": "جارٍ تنزيل Kokoro",
-        "kokoroReady": "جاهز على هذا الجهاز",
-        "kokoroRetry": "إعادة محاولة التنزيل",
-        "engines": {
-          "kokoro": "Kokoro (محلي، مجاني)",
-          "openai": "متوافق مع OpenAI",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "الصوت",
-        "voiceDescription": "صوت Kokoro للردود المنطوقة.",
-        "dtypeLabel": "دقة Kokoro",
-        "dtypeDescription": "الخيار fp32 هو الأعلى جودة؛ وq8 أسرع على المعالج. تغيير هذا يعيد تحميل النموذج.",
-        "speedLabel": "سرعة التشغيل",
-        "speedDescription": "السرعة 1× هي العادية. ويدعم ElevenLabs النطاق 0.7×–1.2× فقط.",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "سرعة تشغيل مخصصة",
-        "testLabel": "اختبار الصوت",
-        "testDescription": "شغّل عيّنة قصيرة بالإعدادات الحالية.",
-        "testButton": "اختبار الصوت",
-        "testing": "جارٍ الاختبار…",
-        "testOk": "تم التشغيل ✓",
-        "testPhrase": "مرحبًا! هذا اختبار للإخراج الصوتي في SpeakoFlow.",
-        "downloadStart": "جارٍ تنزيل صوت Kokoro…",
-        "downloadProgress": "جارٍ تنزيل صوت Kokoro… {{progress}}%",
-        "downloadReady": "صوت Kokoro جاهز ✓",
-        "downloadError": "تعذّر تنزيل نموذج صوت Kokoro",
-        "baseUrlLabel": "URL الأساسي",
-        "baseUrlDescription": "عنوان TTS متوافق مع OpenAI. يعمل URL أساسي أو عنوان /audio/speech كامل.",
-        "azureBaseUrlLabel": "عنوان خدمة النطق",
-        "azureBaseUrlDescription": "عنوان Azure Speech من البوابة، مثل https://eastus2.tts.speech.microsoft.com.",
-        "apiKeyLabel": "مفتاح API",
-        "apiKeyDescription": "منفصل عن مفتاح المساعد.",
-        "modelLabel": "النموذج",
-        "modelDescription": "اسم النموذج أو النشر، مثل gpt-4o-mini-tts (OpenAI/Azure) أو eleven_flash_v2_5 (ElevenLabs).",
-        "remoteVoiceLabel": "اسم الصوت",
-        "remoteVoiceDescription": "الصوت المستخدم لخدمة TTS المتوافقة مع OpenAI، مثل alloy أو echo أو nova أو shimmer.",
-        "azureVoiceLabel": "اسم الصوت",
-        "azureVoiceDescription": "اسم صوت Azure، مثل en-US-JennyNeural. انقر «تحميل الأصوات» للاستعراض.",
-        "loadVoices": "تحميل الأصوات",
-        "voicesLoading": "جارٍ التحميل…",
-        "voicesPick": "اختر من {{count}} صوتًا…",
-        "loadModels": "تحميل النماذج",
-        "modelsLoading": "جارٍ التحميل…",
-        "modelsPick": "اختر من {{count}} نموذجًا…",
-        "modelsUse": "استخدام «{{model}}»",
-        "voicesUse": "استخدام «{{voice}}»",
-        "elevenVoiceLabel": "معرّف الصوت",
-        "elevenVoiceDescription": "معرّف صوت ElevenLabs (من علامة تبويب Voices في لوحة التحكم).",
-        "promptLabel": "مطالبة التلخيص",
-        "promptDescription": "تعليمات توليد الملخّص المنطوق القصير لكل إجابة."
-      },
-      "appearance": {
-        "title": "مظهر اللوحة",
-        "previewLabel": "معاينة",
-        "previewDescription": "معاينة مباشرة للوحة بحجم النص والعتامة المختارين.",
-        "previewUser": "مرحبًا، ما الذي تستطيع فعله؟",
-        "previewAssistant": "الكثير! اسألني عن أي شيء — بل يمكنني النظر إلى شاشتك.",
-        "fontSizeLabel": "حجم النص",
-        "fontSizeDescription": "حجم نص المحادثة في لوحة المساعد.",
-        "fontSizes": {
-          "small": "صغير",
-          "medium": "متوسط",
-          "large": "كبير"
-        },
-        "panelSizeLabel": "حجم اللوحة",
-        "panelSizeDescription": "الحجم الكلي للوحة المساعد العائمة. ويمكنك أيضًا سحب حوافها لتغيير حجمها.",
-        "panelSizes": {
-          "mini": "صغير",
-          "compact": "مدمج",
-          "standard": "قياسي",
-          "large": "كبير"
-        },
-        "opacityLabel": "عتامة اللوحة",
-        "opacityDescription": "مدى عتامة اللوحة العائمة. القيمة 100% تعني لوحة معتمة تمامًا؛ والقيم الأقل تُظهر سطح المكتب ضبابيًا من خلالها."
+    "profiles": {
+      "active": "نشط",
+      "add": "جديد",
+      "newName": "ملف تعريفي جديد",
+      "copyName": "نسخة من {{name}}",
+      "import": "استيراد",
+      "export": "تصدير",
+      "duplicate": "تكرار",
+      "delete": "حذف",
+      "restore": "استعادة الافتراضي",
+      "restoreMissing": "استعادة الملفات المدمجة",
+      "more": "مزيد من الإجراءات",
+      "edit": "توسيع",
+      "close": "طيّ",
+      "fields": {
+        "avatar": "رفع صورة",
+        "avatarClear": "إزالة"
       }
+    },
+    "cleanupModels": {
+      "title": "عقل المساعد",
+      "whereLabel": "مكان التشغيل",
+      "onDevice": "على جهازي",
+      "cloud": "مزوّد سحابي",
+      "downloadModel": "استعراض النماذج وتنزيلها",
+      "downloadModelDescription": "اختر نموذجًا موصى به أو ابحث في Hugging Face.",
+      "downloadModelAction": "استعراض النماذج",
+      "catalogTitle": "اختر نموذجًا يعمل على الجهاز",
+      "catalogDescription": "نزّل نموذجًا محليًا خاصًا. يبقى على هذا الجهاز ولا يحتاج إلى مفتاح API.",
+      "currentModelTitle": "النموذج الحالي",
+      "currentModelDescription": "المختار للمساعد المدمج على هذا الجهاز.",
+      "recommendedTitle": "النماذج الموصى بها",
+      "recommendedDescription": "ثلاثة خيارات تركّز على المحادثة: الأسرع، والموصى به، والأقدر لكن الأبطأ.",
+      "acceleratorDetected": "{{name}} · {{memory}} GB ذاكرة رسوميات مُبلَّغ عنها",
+      "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB ذاكرة رسوميات مخصّصة",
+      "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB ذاكرة رسوميات مشتركة",
+      "acceleratorDetectedNoMemory": "تم التعرّف على {{name}} · لم يُبلَّغ عن ذاكرة الرسوميات",
+      "acceleratorUnknownWithMemory": "ذاكرة الرسوميات غير متاحة · {{memory}} GB من ذاكرة النظام للعمل على المعالج",
+      "acceleratorUnknown": "ذاكرة الرسوميات غير متاحة · لا يمكن التنبؤ بسرعة الاستجابة",
+      "details": "التفاصيل",
+      "detailFile": "الملف",
+      "detailLocation": "الموقع",
+      "detailFormat": "الصيغة",
+      "detailId": "معرّف النموذج",
+      "switchBeforeDelete": "حوّل المساعد المدمج إلى نموذج آخر قبل حذف هذا النموذج.",
+      "deleteModelConfirm": "حذف {{modelName}}؟ ستُزال ملفاته المنزَّلة ومدخله المحفوظ.",
+      "deleteModelFailed": "تعذّر حذف النموذج.",
+      "finderSectionTitle": "نماذج أخرى على الجهاز",
+      "finderTitle": "استعراض Hugging Face",
+      "finderDescription": "ابحث في آلاف نماذج GGUF ونزّل أحدها مباشرةً إلى SpeakoFlow.",
+      "finderAction": "ابحث عن نموذج",
+      "huggingFaceTitle": "نماذجك",
+      "catalogEmpty": "لا توجد نماذج محلية موصى بها في الوقت الحالي.",
+      "custom": "مخصص"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "جارٍ التسجيل",
     "transcribing": "…جاري التفريغ",
     "processing": "…جاري المعالجة",
-    "generating": "جارٍ الكتابة باستخدام Flow…",
-    "vision": "جارٍ النظر إلى شاشتك…",
     "notices": {
-      "flowNotConfigured": "يحتاج Flow إلى نموذج مساعد — تم اللصق كإملاء عادي",
-      "flowFailed": "تعذّر التوليد بواسطة Flow — لم يُلصق أي شيء",
-      "flowEmpty": "قل أمرًا بعد عبارة التنشيط",
       "cleanupFallback": "لم يعمل التنظيف بالذكاء الاصطناعي — تم لصق النص الأصلي"
     },
     "listening": "جارٍ الاستماع…",
     "locked": "تسجيل متواصل — اضغط الاختصار مرة أخرى للإيقاف",
     "cancel": "إلغاء",
-    "done": "تم",
-    "askAssistant": "اسأل المساعد بدلًا من كتابة هذا"
-  },
-  "assistant": {
-    "title": "المساعد",
-    "character": {
-      "switch": "تبديل الشخصية"
-    },
-    "empty": "اسأل بصوتك عبر اختصار المساعد،\nأو اكتب أدناه.",
-    "inputPlaceholder": "رسالة…",
-    "inputPlaceholderScreen": "اسأل عن شاشتك…",
-    "queuedUntilReady": "في الانتظار — سيُرسَل بمجرد انتهاء هذا الرد.",
-    "send": "إرسال",
-    "stop": "إيقاف",
-    "cancel": "إلغاء",
-    "finish": "إنهاء وإرسال",
-    "clear": "مسح المحادثة",
-    "hide": "إخفاء اللوحة",
-    "copy": "نسخ",
-    "copyCode": "نسخ الكود",
-    "regenerate": "إعادة توليد الإجابة (تبقى القديمة في السجل)",
-    "summarizing": "جارٍ تلخيص الرسائل السابقة…",
-    "screenAttached": "الشاشة",
-    "attachScreen": "رؤية الشاشة — أرفق شاشتك بكل رسالة حتى إيقافها",
-    "detachScreen": "إيقاف رؤية الشاشة",
-    "attach": {
-      "file": "إرفاق صورة أو ملف",
-      "snip": "قصّ منطقة من الشاشة",
-      "image": "صورة",
-      "imageCount": "{{count}} صورة",
-      "imageCount_other": "{{count}} صورة",
-      "remove": "إزالة المرفق",
-      "dropHint": "أفلِت الملف للإرفاق"
-    },
-    "snip": {
-      "hint": "اسحب لقصّ منطقة — Esc للإلغاء"
-    },
-    "webSearch": {
-      "enable": "تمكين البحث في الويب",
-      "disable": "تعطيل البحث في الويب"
-    },
-    "tts": {
-      "enable": "تمكين الملخّصات الصوتية",
-      "disable": "تعطيل الملخّصات الصوتية",
-      "loading": "جارٍ تحميل نموذج صوت Kokoro...",
-      "loadingShort": "نموذج الصوت {{progress}}%"
-    },
-    "pill": {
-      "talk": "انقر للتحدّث",
-      "stop": "إيقاف وإرسال",
-      "idle": "المساعد",
-      "expand": "توسيع اللوحة",
-      "collapse": "الطيّ إلى شكل مصغّر",
-      "close": "إغلاق المساعد",
-      "cancel": "الإلغاء دون إرسال",
-      "cancelTurn": "إلغاء",
-      "dismiss": "تجاهل",
-      "disarmScreen": "رؤية الشاشة مشغّلة — انقر لإيقافها",
-      "armScreen": "رؤية الشاشة موقفة — انقر لتشغيلها"
-    },
-    "status": {
-      "listening": "جارٍ الاستماع…",
-      "locked": "جارٍ الاستماع",
-      "transcribing": "جارٍ التفريغ…",
-      "searching": "جارٍ البحث في الويب...",
-      "thinking": "جارٍ التفكير...",
-      "speaking": "جارٍ التحدّث..."
-    },
-    "tool": {
-      "search": "جارٍ البحث في الويب",
-      "screen": "جارٍ النظر إلى شاشتك",
-      "working": "جارٍ العمل على ذلك",
-      "elapsed": "{{seconds}} ث"
-    },
-    "errors": {
-      "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-      "genericShort": "حدث خطأ ما",
-      "no_provider": "لم يُعدّ أي نموذج للمساعد بعد. اختر مزوّدًا من الإعدادات ← المساعد.",
-      "no_providerShort": "لا يوجد نموذج مُعدّ",
-      "no_model": "لم يُحدَّد نموذج لمزوّدك. اختر واحدًا من الإعدادات ← المساعد.",
-      "no_modelShort": "لم يُحدَّد نموذج",
-      "engine_start": "تعذّر تشغيل النموذج المدمج. حاول مرة أخرى، أو اختر نموذجًا مختلفًا من الإعدادات ← المساعد.",
-      "engine_startShort": "تعذّر تشغيل النموذج",
-      "provider": "تعذّر على النموذج الإجابة. تحقّق من مفتاح API واتصالك، ثم حاول مرة أخرى.",
-      "providerShort": "تعذّر الحصول على إجابة",
-      "empty_reply": "أنهى النموذج دون كتابة أي رد. حاول السؤال مرة أخرى، أو اختر نموذجًا مختلفًا من الإعدادات ← المساعد.",
-      "empty_replyShort": "رد فارغ",
-      "vision_unsupported": "لا يستطيع هذا النموذج قراءة شاشتك. اختر نموذجًا يدعم الرؤية من الإعدادات ← المساعد، أو اسأل مرة أخرى دون رؤية الشاشة.",
-      "vision_unsupportedShort": "النموذج لا يرى الصور",
-      "screenshot_too_large": "كانت لقطة الشاشة أكبر مما يقبله هذا المزوّد. يرجى المحاولة مرة أخرى — سيتم ضغطها أكثر.",
-      "screenshot_too_largeShort": "لقطة الشاشة كبيرة جدًا",
-      "screen_capture": "تعذّر تصوير الشاشة. حاول مرة أخرى، أو اسأل دون رؤية الشاشة.",
-      "screen_captureShort": "فشل تصوير الشاشة",
-      "transcription": "تعذّر تفريغ صوتك. يرجى المحاولة بالتحدّث مرة أخرى.",
-      "transcriptionShort": "فشل التفريغ",
-      "tts": "فشل الرد المنطوق. تحقّق من إعدادات تحويل النص إلى كلام، أو اقرأ الإجابة في اللوحة.",
-      "ttsShort": "فشل الرد الصوتي",
-      "tts_local": "تعذّر تحميل الصوت المحلي. تحقّق من اتصالك أو غيّر محرّك تحويل النص إلى كلام من الإعدادات.",
-      "tts_localShort": "تعذّر تحميل الصوت",
-      "tts_blocked": "منع نظامك تشغيل الصوت تلقائيًا. انقر في أي مكان داخل اللوحة لسماع الرد.",
-      "tts_blockedShort": "انقر اللوحة لسماعه",
-      "tts_playback": "تعذّر تشغيل الصوت على جهاز الإخراج. تحقّق من إعدادات السماعة أو الإخراج، ثم حاول مرة أخرى.",
-      "tts_playbackShort": "فشل تشغيل الصوت",
-      "mic_denied": "الوصول إلى الميكروفون محجوب. اسمح به من إعدادات الخصوصية في نظامك.",
-      "mic_deniedShort": "الوصول إلى الميكروفون محجوب",
-      "mic_unavailable": "لم يتم العثور على ميكروفون. وصّل ميكروفونًا وحاول مرة أخرى.",
-      "mic_unavailableShort": "لم يتم العثور على ميكروفون",
-      "mic_error": "تعذّر تشغيل الميكروفون. قد يكون مستخدمًا في تطبيق آخر.",
-      "mic_errorShort": "تعذّر تشغيل الميكروفون",
-      "file_read": "تعذّر إرفاق هذا الملف.",
-      "file_readShort": "تعذّر إرفاق الملف"
-    },
-    "notices": {
-      "web_search_failed": "لم يُرجع البحث في الويب أي نتائج — ستأتي الإجابة بدونها.",
-      "web_search_failedShort": "لا نتائج من الويب"
-    },
-    "engineSetup": {
-      "downloading": "جارٍ إعداد المحرّك المحلي (التشغيل الأول)… {{percent}}%",
-      "preparing": "جارٍ إعداد المحرّك المحلي (التشغيل الأول)…",
-      "extracting": "جارٍ تثبيت المحرّك المحلي…",
-      "short": "جارٍ إعداد المحرّك…"
-    }
+    "done": "تم"
   }
 }

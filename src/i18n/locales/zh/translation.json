@@ -24,14 +24,13 @@
   "sidebar": {
     "general": "通用",
     "dictation": "语音输入",
-    "assistant": "助手",
     "history": "历史记录",
     "about": "关于",
     "debug": "调试",
-    "characters": "角色",
     "memory": "记忆",
     "collapse": "收起侧边栏",
-    "expand": "展开侧边栏"
+    "expand": "展开侧边栏",
+    "profiles": "角色"
   },
   "window": {
     "minimize": "最小化",
@@ -41,9 +40,6 @@
   },
   "sectionSubtitles": {
     "general": "快捷键、麦克风以及应用的外观。",
-    "dictation": "将语音转为文字的模型，以及文字的清理方式。",
-    "assistant": "先设置助手，再调整它的语音、屏幕视觉和网络搜索。",
-    "history": "您最近的语音输入、Flow 生成和助手聊天，都保存在本设备上。",
     "about": "版本、应用语言、数据位置和致谢。",
     "debug": "诊断与开发者工具。"
   },
@@ -77,8 +73,6 @@
       "downloadStarted": "正在后台下载您的模型。"
     },
     "aiModel": {
-      "title": "添加本地 AI 模型",
-      "subtitle": "按响应速度和能力选择。E4B 是均衡的默认选项；12B 更聪明但更慢。",
       "tiers": {
         "small": {
           "description": "任何电脑都能运行。非常适合润色文字。"
@@ -90,9 +84,6 @@
           "description": "回答最精准，还能看到您的屏幕。"
         }
       },
-      "seesScreen": "可查看屏幕",
-      "textOnly": "仅文字",
-      "recommendedForAssistant": "推荐用于助手",
       "download": "下载模型",
       "useDownloaded": "使用已下载的模型",
       "skip": "暂时跳过",
@@ -114,11 +105,8 @@
       "subtitle": "只需两个快捷键。按下、说话、完成。",
       "dictateLabel": "随处语音输入",
       "dictateCaption": "按住、说话、松开。文字自动出现。",
-      "assistantKeysLabel": "询问助手",
-      "assistantKeysCaption": "按住即可提问。它甚至能看到您的屏幕。",
       "changeAnytime": "您可以随时在“设置”中更改这些内容。",
       "hotkeyLabel": "您的语音输入按键",
-      "downloadingAssistant": "您的助手正在入驻。已完成 {{percentage}}%。",
       "downloadingVoice": "您的语音模型即将就位。已完成 {{percentage}}%。",
       "downloadingGeneric": "仍在下载。已完成 {{percentage}}%。",
       "signOff": "就是这样。去说点什么吧。",
@@ -315,17 +303,8 @@
   },
   "settings": {
     "personalMemory": {
-      "enable": {
-        "label": "记住我",
-        "description": "允许助手保存并使用个人记忆。默认关闭。"
-      },
-      "incognito": {
-        "label": "无痕聊天",
-        "description": "本次对话不使用记忆，也不学习任何新内容。"
-      },
       "detail": {
         "label": "记忆详细程度",
-        "description": "每次回复中加入多少记忆。越详细内容越丰富，但速度略慢。",
         "options": {
           "light": "精简",
           "balanced": "均衡",
@@ -350,7 +329,6 @@
         "add": "添加",
         "addPlaceholder": "添加要记住的内容…",
         "delete": "删除笔记",
-        "learned": "已学习",
         "added": "由您添加"
       },
       "confidence": {
@@ -360,11 +338,6 @@
       },
       "actions": {
         "label": "管理"
-      },
-      "distill": {
-        "label": "立即从本次聊天中学习",
-        "description": "立即将本次对话中长期有效的信息提取到记忆中。",
-        "button": "更新记忆"
       },
       "export": "导出",
       "import": "导入",
@@ -937,16 +910,6 @@
         "title": "语音表情符号",
         "description": "说出“happy emoji”或“thumbs up emoji”即可插入 😊 或 👍。常见别名和轻微的语音转文字错误会在设备上处理；无法识别的名称会保留为文本。"
       },
-      "flow": {
-        "groupTitle": "用 Flow 生成",
-        "enableLabel": "用 Flow 生成",
-        "enableDescription": "以激活短语开始一段语音输入，让 AI 替您写出结果——说“Hey Flow，写一封礼貌的邮件请求改期”就会直接粘贴写好的邮件。",
-        "phraseLabel": "激活短语",
-        "phraseDescription": "只有当语音输入以此短语开头时，Flow 才会启动。在其他情况下，同样的话会作为普通语音输入粘贴。使用您助手的模型；留空则重置为“Hey Flow”。",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "允许访问屏幕",
-        "screenDescription": "当指令明显与您的屏幕有关时，允许 Flow 截取一张屏幕截图，例如“看看这封邮件并起草一份回复”。是否需要由模型判断。此设置与助手的屏幕访问相互独立。"
-      },
       "output": {
         "title": "输出选项"
       }
@@ -957,29 +920,14 @@
         "title": "录音存储",
         "description": "这些设置作用于语音输入和 Flow 的录音。已保存的录音会始终保留。助手聊天单独存储。"
       },
-      "filters": {
-        "label": "历史记录类型",
-        "all": "全部",
-        "recordings": "Recordings",
-        "flow": "Flow",
-        "assistant": "助手聊天"
-      },
       "openFolder": "打开录音文件夹",
       "loading": "加载历史记录中…",
       "empty": "这里还没有内容。您的语音输入、Flow 生成和助手聊天会显示在这里。",
-      "emptyRecordings": "还没有语音输入。",
-      "emptyFlow": "还没有 Flow 生成记录。",
-      "emptyAssistant": "还没有助手聊天记录。",
       "recordingLabel": "语音输入",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "您说的话",
       "originalTranscriptionLabel": "原始转录",
-      "flowOutputLabel": "Flow 输出",
       "finalTextLabel": "最终文本",
       "cleanupNoChanges": "已运行 AI 清理，没有需要修改的地方",
-      "flowNoOutput": "未生成任何 Flow 输出。",
       "copyToClipboard": "复制转录到剪贴板",
-      "copyFlowOutput": "复制 Flow 输出",
       "copyFinalText": "复制最终文本",
       "save": "保存转录",
       "unsave": "从已保存中移除",
@@ -988,18 +936,7 @@
       "retranscribe": "重新转录",
       "retranscribeError": "重新转录失败。请重试。",
       "transcribing": "转录中…",
-      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。",
-      "assistantLabel": "助手聊天",
-      "copyConversation": "复制对话",
-      "resumeConversation": "在助手中继续这段对话",
-      "showConversation": "显示对话",
-      "hideConversation": "隐藏对话",
-      "roleUser": "您",
-      "roleAssistant": "助手",
-      "screenshotAttached": "视觉",
-      "messageCount_one": "{{count}} 条消息",
-      "messageCount_other": "{{count}} 条消息",
-      "deleteAssistantError": "无法删除该对话。请重试。"
+      "transcriptionFailed": "转录失败。您可以使用重试图标重新转录。"
     },
     "debug": {
       "title": "调试",
@@ -1113,324 +1050,60 @@
         "button": "捐赠"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "助手",
-        "label": "启用助手",
-        "description": "关闭后，SpeakoFlow 只做语音输入。悬浮面板会关闭且不再加载，它的快捷键被释放，占用的内存也会归还。用 Flow 生成 和 AI 清理仍照常工作。"
-      },
-      "shortcuts": {
-        "title": "快捷键"
-      },
-      "brain": {
-        "title": "助手大脑",
-        "whereLabel": "运行位置",
-        "onDevice": "在我的设备上",
-        "cloud": "云端提供商",
-        "downloadModel": "浏览并下载模型",
-        "downloadModelDescription": "选择推荐的模型，或搜索 Hugging Face。",
-        "downloadModelAction": "浏览模型",
-        "catalogTitle": "选择一个本地模型",
-        "catalogDescription": "下载一个私密的本地模型。它只留在这台电脑上，无需 API 密钥。",
-        "currentModelTitle": "当前模型",
-        "currentModelDescription": "已为本设备上的内置助手选用。",
-        "recommendedTitle": "推荐模型",
-        "recommendedDescription": "三个以对话为先的选择：最快、推荐，以及能力更强但更慢。",
-        "acceleratorDetected": "{{name}} · 报告显存 {{memory}} GB",
-        "acceleratorDetectedDedicated": "{{name}} · 独立显存 {{memory}} GB",
-        "acceleratorDetectedIntegrated": "{{name}} · 共享显存 {{memory}} GB",
-        "acceleratorDetectedNoMemory": "已检测到 {{name}} · 未报告显存",
-        "acceleratorUnknownWithMemory": "无法获取显存信息 · 回退到 CPU 时可用系统内存 {{memory}} GB",
-        "acceleratorUnknown": "无法获取显存信息 · 无法预估响应速度",
-        "details": "详情",
-        "detailFile": "文件",
-        "detailLocation": "位置",
-        "detailFormat": "格式",
-        "detailId": "模型 ID",
-        "switchBeforeDelete": "删除此模型前，请先把内置助手切换到其他模型。",
-        "deleteModelConfirm": "删除 {{modelName}}？其已下载的文件和保存的条目都将被移除。",
-        "deleteModelFailed": "无法删除该模型。",
-        "finderSectionTitle": "更多本地模型",
-        "finderTitle": "浏览 Hugging Face",
-        "finderDescription": "搜索数千个 GGUF 模型，并直接下载到 SpeakoFlow。",
-        "finderAction": "查找模型",
-        "huggingFaceTitle": "我的模型",
-        "catalogEmpty": "当前没有可用的推荐本地模型。"
-      },
-      "subpages": {
-        "profilesCaption": "切换助手的名称、定位和性格。",
-        "memoryCaption": "助手在多次聊天之间记住的关于您的内容。"
-      },
-      "tapToLock": {
-        "label": "轻按锁定",
-        "info": "按住助手快捷键时轻按此键，即可锁定免持模式，松手后仍可继续说话。请选择不属于助手快捷键的按键（重叠的按键会被忽略），或清空以关闭此功能。",
-        "off": "关闭",
-        "clear": "清空"
-      },
-      "provider": {
-        "title": "助手提供商",
-        "saveFailed": "无法切换助手提供商。",
-        "providerLabel": "提供商",
-        "providerDescription": "回答助手提问的提供商。",
-        "baseUrlLabel": "基础 URL",
-        "baseUrlDescription": "兼容 OpenAI 的基础 URL。Azure 的 URL 会自动规范化。",
-        "apiKeyLabel": "API 密钥",
-        "apiKeyDescription": "与 AI 清理共用。",
-        "apiKeyPlaceholder": "输入 API 密钥…",
-        "modelLabel": "模型",
-        "modelDescription": "用于生成助手回答的模型或部署名称。",
-        "modelPlaceholder": "例如 gpt-4o-mini",
-        "modelSearchPlaceholder": "搜索或输入模型…",
-        "modelUse": "使用“{{model}}”",
-        "loadModels": "加载模型",
-        "loadingModels": "加载中…",
-        "noModelsFound": "未返回任何模型。请直接输入模型名称。",
-        "builtinModelDescription": "选择一个已下载的本地模型。它在您的设备上运行，无需 API 密钥。",
-        "builtinModelPlaceholder": "选择已下载的模型",
-        "builtinNoModels": "您的设备上还没有模型——请在下方下载一个。",
-        "builtinReady": "完全在您的设备上运行。无需 API 密钥，无需设置。",
-        "builtinEngineMissing": "首次使用时会自动下载一个小型本地引擎（仅一次），之后即可完全离线运行。无需任何设置。",
-        "builtinEngineDownloading": "正在下载本地引擎… {{percent}}%",
-        "builtinEnginePreparing": "正在下载本地引擎…",
-        "builtinEngineExtracting": "正在安装本地引擎…",
-        "builtinEngineReady": "本地引擎已就绪。",
-        "contextSizeLabel": "上下文窗口",
-        "contextSizeDescription": "本地模型一次能同时记住多少内容——系统指令、您的聊天记录、任何屏幕截图（一张图片就可能占掉一大块），以及它的回复。窗口越大能容纳的内容越多，屏幕视觉和网络搜索也更可靠，但内存占用更高。默认为 8192；如果您的电脑内存充裕，16384 是不错的提升。之后也可以调低以节省内存。",
-        "unloadTimeoutLabel": "多久后从内存卸载",
-        "unloadTimeoutDescription": "本地模型闲置这么久后将其卸载以释放内存。下次使用时会自动重新加载。"
-      },
-      "systemPrompt": {
-        "title": "系统提示词",
-        "label": "助手系统提示词",
-        "description": "设定助手的行为方式。"
-      },
-      "characters": {
-        "title": "角色",
-        "description": "面向任务的角色，可随时切换。当前角色决定助手的名称、定位和指令，以及回复的长度。随时可从面板顶部切换。",
-        "galleryLabel": "您的角色",
-        "editSection": "编辑角色",
-        "avatarLabel": "头像",
-        "active": "使用中",
-        "meowsOnly": "只会喵喵叫",
-        "builtin": "内置",
-        "custom": "自定义",
-        "new": "新建",
-        "newName": "新角色",
-        "copyName": "{{name}} 副本",
-        "createAi": "用 AI 创建",
-        "import": "导入",
-        "aiTitle": "描述您的角色",
-        "aiClose": "关闭",
-        "aiPlaceholder": "例如：一位简洁的发布说明撰写者，或一位耐心讲解每一步的导师",
-        "aiDictate": "用语音输入描述",
-        "aiDictateStop": "停止语音输入",
-        "generate": "生成",
-        "avatarUpload": "上传图片",
-        "avatarRemove": "移除",
-        "nameLabel": "名称",
-        "roleLabel": "定位",
-        "rolePlaceholder": "显示在卡片上的简短说明（可选）",
-        "promptLabel": "指令（系统提示词）",
-        "responseLength": {
-          "label": "回复长度",
-          "hint": "此角色回复的长度。“继承”表示沿用您的全局助手设置。",
-          "options": {
-            "inherit": "继承全局",
-            "short": "简短",
-            "medium": "中等",
-            "long": "较长"
-          }
-        },
-        "greetingLabel": "问候语（可选）",
-        "greetingPlaceholder": "可选的开场白，显示在空白聊天中",
-        "catNote": "「猫咪」完全不使用 AI——它只会喵喵叫。这里没有可配置的内容。",
-        "duplicate": "复制",
-        "export": "导出",
-        "restoreDefault": "恢复默认",
-        "restoreBuiltins": "恢复内置角色",
-        "moreActions": "更多操作",
-        "expand": "展开",
-        "collapse": "收起",
-        "delete": "删除",
-        "deleteConfirm": "删除此角色？此操作无法撤销。",
-        "emptyState": "还没有角色。创建第一个，为助手赋予个性。"
-      },
-      "behavior": {
-        "title": "行为"
-      },
-      "memory": {
-        "label": "对话记忆",
-        "description": "每轮对话作为上下文发送的最近消息数量。设为 0 则关闭记忆。"
-      },
-      "autoSummarize": {
-        "label": "总结长对话",
-        "description": "当对话超出模型的上下文窗口时，自动把较早的消息压缩成一份持续更新的摘要，让聊天保留上下文而不会忘记开头。运行时会显示一个不显眼的提示。"
-      },
-      "responseLength": {
-        "label": "回复长度",
-        "description": "偏好的回复长度。“不影响”表示不改动您的提示词。",
-        "options": {
-          "default": "不影响",
-          "short": "简短",
-          "medium": "中等",
-          "long": "较长"
-        }
-      },
-      "vision": {
-        "title": "屏幕视觉",
-        "modeLabel": "屏幕访问",
-        "modes": {
-          "off": "关闭",
-          "manual": "手动",
-          "agentDecides": "由助手决定",
-          "descriptions": {
-            "off": "屏幕捕获已禁用。相机和区域选择控件将被隐藏。",
-            "manual": "由您决定何时附上整个屏幕或某个区域。语音捕获时机设置同样生效。",
-            "agent_decides": "当模型需要当前的画面信息时，可以主动请求捕获屏幕。每一张发送的截图都会显示在对话中。"
-          }
-        },
-        "timing": {
-          "label": "捕获时机",
-          "description": "对于语音提问：在您开始提问的那一刻捕获，或等到消息发送时再捕获。输入的消息始终在发送时捕获。",
-          "descriptionAgent": "两个选项都会提前准备好屏幕截图，因此助手绝不会让您等待。区别在于图片的内容：“提问时”截取的是您开始说话时的屏幕，“消息发送时”截取的是当前的屏幕。无论选哪个，图片都留在您的设备上，只有助手确实要求查看时才会发送。",
-          "options": {
-            "immediate": "提问时",
-            "on_send": "消息发送时"
-          }
-        },
-        "screenRecording": {
-          "description": "屏幕视觉需要 macOS 的屏幕录制权限。请在“系统设置”中授予，然后重启 SpeakoFlow 使其生效。",
-          "grant": "打开系统设置"
-        }
-      },
-      "webSearch": {
-        "title": "网络搜索",
-        "enableLabel": "允许网络搜索",
-        "enableDescription": "当问题需要最新信息时，允许助手搜索网络。",
-        "openRouterNativeLabel": "使用 OpenRouter 内置搜索",
-        "openRouterNativeDescription": "开启后，由 OpenRouter 自行执行搜索（其 :online 模式），消耗您的 OpenRouter 额度。关闭后，应用会使用下方的搜索提供商。",
-        "providerLabel": "搜索提供商",
-        "providerDescription": "Serper 是不错的默认选择。每个提供商都有免费额度，TinyFish 免费且无需绑卡。",
-        "providers": {
-          "serper": "Serper（Google，速度快）",
-          "brave": "Brave Search",
-          "tavily": "Tavily（AI 搜索）",
-          "exa": "Exa（神经搜索）",
-          "serpapi": "SerpAPI（Google）",
-          "tinyfish": "TinyFish（免费，无需绑卡）"
-        },
-        "apiKeyLabel": "API 密钥",
-        "apiKeyDescription": "所选搜索提供商的密钥。",
-        "apiKeyPlaceholder": "输入 API 密钥…",
-        "fetchContentLabel": "读取完整网页（质量最佳）",
-        "fetchContentDescription": "读取每条结果的全文，而不只是摘要。回答更好，但速度更慢。",
-        "maxResultsLabel": "使用的来源数量",
-        "maxResultsDescription": "读取多少条结果（1–10）。",
-        "depthLabel": "搜索深度",
-        "depthDescription": "简单事实用「快速」，多数问题用「标准」，疑难问题用「深入」。",
-        "depthOptions": {
-          "low": "快速",
-          "medium": "标准",
-          "high": "深入"
-        },
-        "localSmartLabel": "智能判断是否搜索（本地模型）",
-        "localSmartDescription": "让本地模型决定何时搜索。关闭时改用快速的关键词判断。",
-        "creditBudgetLabel": "每日 Firecrawl 额度上限",
-        "creditBudgetDescription": "每日 Firecrawl 额度上限，达到后暂停搜索。0 表示不限。",
-        "testLabel": "测试搜索",
-        "testDescription": "用当前的提供商和密钥执行一次示例搜索。",
-        "testButton": "测试搜索",
-        "testing": "搜索中…",
-        "testResult": "已获得 {{count}} 条结果。"
-      },
-      "tts": {
-        "title": "语音输出",
-        "enableLabel": "朗读回复",
-        "enableDescription": "把助手的回复朗读出来。",
-        "stopOnDictationLabel": "开始语音输入时停止朗读",
-        "stopOnDictationDescription": "当您开始语音输入时，停止仍在播放的回复。",
-        "engineLabel": "引擎",
-        "engineDescription": "Kokoro 在本地免费运行。其他引擎会使用您的 API 密钥。",
-        "kokoroSetupLabel": "Kokoro 语音模型",
-        "kokoroSetupDescription": "只需下载一次，之后朗读回复就会在本设备上私密运行。",
-        "kokoroDownload": "下载 Kokoro",
-        "kokoroDownloading": "正在下载 Kokoro",
-        "kokoroReady": "已在本设备就绪",
-        "kokoroRetry": "重新尝试下载",
-        "engines": {
-          "kokoro": "Kokoro（本地，免费）",
-          "openai": "兼容 OpenAI",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "语音",
-        "voiceDescription": "用于朗读回复的 Kokoro 语音。",
-        "dtypeLabel": "Kokoro 精度",
-        "dtypeDescription": "fp32 质量最高；q8 在 CPU 上更快。更改此项会重新加载模型。",
-        "speedLabel": "播放速度",
-        "speedDescription": "1× 为正常速度。ElevenLabs 仅支持 0.7×–1.2×。",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "自定义播放速度",
-        "testLabel": "测试语音",
-        "testDescription": "用当前设置播放一段简短示例。",
-        "testButton": "测试语音",
-        "testing": "测试中…",
-        "testOk": "已播放 ✓",
-        "testPhrase": "你好！这是 SpeakoFlow 语音输出的测试。",
-        "downloadStart": "正在下载 Kokoro 语音…",
-        "downloadProgress": "正在下载 Kokoro 语音… {{progress}}%",
-        "downloadReady": "Kokoro 语音已就绪 ✓",
-        "downloadError": "无法下载 Kokoro 语音模型",
-        "baseUrlLabel": "基础 URL",
-        "baseUrlDescription": "兼容 OpenAI 的 TTS 地址。填写基础 URL 或完整的 /audio/speech 地址均可。",
-        "azureBaseUrlLabel": "语音服务 URL",
-        "azureBaseUrlDescription": "您在 Azure 门户中获取的语音服务 URL，例如 https://eastus2.tts.speech.microsoft.com。",
-        "apiKeyLabel": "API 密钥",
-        "apiKeyDescription": "与助手的密钥相互独立。",
-        "modelLabel": "模型",
-        "modelDescription": "模型或部署名称，例如 gpt-4o-mini-tts（OpenAI/Azure）或 eleven_flash_v2_5（ElevenLabs）。",
-        "remoteVoiceLabel": "语音名称",
-        "remoteVoiceDescription": "用于兼容 OpenAI 的 TTS 的语音，例如 alloy、echo、nova、shimmer。",
-        "azureVoiceLabel": "语音名称",
-        "azureVoiceDescription": "Azure 语音名称，例如 en-US-JennyNeural。点击「加载语音」即可浏览。",
-        "loadVoices": "加载语音",
-        "voicesLoading": "加载中…",
-        "voicesPick": "从 {{count}} 个语音中选择…",
-        "loadModels": "加载模型",
-        "modelsLoading": "加载中…",
-        "modelsPick": "从 {{count}} 个模型中选择…",
-        "modelsUse": "使用“{{model}}”",
-        "voicesUse": "使用“{{voice}}”",
-        "elevenVoiceLabel": "语音 ID",
-        "elevenVoiceDescription": "ElevenLabs 语音 ID（可在其控制台的 Voices 标签页中找到）。",
-        "promptLabel": "摘要提示词",
-        "promptDescription": "用于生成每条回答的简短语音摘要的指令。"
-      },
-      "appearance": {
-        "title": "面板外观",
-        "previewLabel": "预览",
-        "previewDescription": "按您设置的文字大小和不透明度实时预览面板。",
-        "previewUser": "嗨，你能做什么？",
-        "previewAssistant": "很多事！随便问我——我甚至能看到你的屏幕。",
-        "fontSizeLabel": "文字大小",
-        "fontSizeDescription": "助手面板中聊天文字的大小。",
-        "fontSizes": {
-          "small": "小",
-          "medium": "中",
-          "large": "大"
-        },
-        "panelSizeLabel": "面板尺寸",
-        "panelSizeDescription": "悬浮助手面板的整体尺寸。您也可以拖动边缘来调整大小。",
-        "panelSizes": {
-          "mini": "小",
-          "compact": "紧凑",
-          "standard": "标准",
-          "large": "大"
-        },
-        "opacityLabel": "面板不透明度",
-        "opacityDescription": "悬浮面板的不透明程度。100% 为完全不透明；数值越低，桌面越会朦胧透出。"
+    "profiles": {
+      "active": "使用中",
+      "add": "新建",
+      "newName": "新角色",
+      "copyName": "{{name}} 副本",
+      "import": "导入",
+      "export": "导出",
+      "duplicate": "复制",
+      "delete": "删除",
+      "restore": "恢复默认",
+      "restoreMissing": "恢复内置角色",
+      "more": "更多操作",
+      "edit": "展开",
+      "close": "收起",
+      "fields": {
+        "avatar": "上传图片",
+        "avatarClear": "移除"
       }
+    },
+    "cleanupModels": {
+      "title": "助手大脑",
+      "whereLabel": "运行位置",
+      "onDevice": "在我的设备上",
+      "cloud": "云端提供商",
+      "downloadModel": "浏览并下载模型",
+      "downloadModelDescription": "选择推荐的模型，或搜索 Hugging Face。",
+      "downloadModelAction": "浏览模型",
+      "catalogTitle": "选择一个本地模型",
+      "catalogDescription": "下载一个私密的本地模型。它只留在这台电脑上，无需 API 密钥。",
+      "currentModelTitle": "当前模型",
+      "currentModelDescription": "已为本设备上的内置助手选用。",
+      "recommendedTitle": "推荐模型",
+      "recommendedDescription": "三个以对话为先的选择：最快、推荐，以及能力更强但更慢。",
+      "acceleratorDetected": "{{name}} · 报告显存 {{memory}} GB",
+      "acceleratorDetectedDedicated": "{{name}} · 独立显存 {{memory}} GB",
+      "acceleratorDetectedIntegrated": "{{name}} · 共享显存 {{memory}} GB",
+      "acceleratorDetectedNoMemory": "已检测到 {{name}} · 未报告显存",
+      "acceleratorUnknownWithMemory": "无法获取显存信息 · 回退到 CPU 时可用系统内存 {{memory}} GB",
+      "acceleratorUnknown": "无法获取显存信息 · 无法预估响应速度",
+      "details": "详情",
+      "detailFile": "文件",
+      "detailLocation": "位置",
+      "detailFormat": "格式",
+      "detailId": "模型 ID",
+      "switchBeforeDelete": "删除此模型前，请先把内置助手切换到其他模型。",
+      "deleteModelConfirm": "删除 {{modelName}}？其已下载的文件和保存的条目都将被移除。",
+      "deleteModelFailed": "无法删除该模型。",
+      "finderSectionTitle": "更多本地模型",
+      "finderTitle": "浏览 Hugging Face",
+      "finderDescription": "搜索数千个 GGUF 模型，并直接下载到 SpeakoFlow。",
+      "finderAction": "查找模型",
+      "huggingFaceTitle": "我的模型",
+      "catalogEmpty": "当前没有可用的推荐本地模型。",
+      "custom": "自定义"
     }
   },
   "footer": {
@@ -1511,138 +1184,12 @@
     "recording": "正在录制",
     "transcribing": "正在转录…",
     "processing": "处理中…",
-    "generating": "正在用 Flow 撰写…",
-    "vision": "正在查看您的屏幕…",
     "notices": {
-      "flowNotConfigured": "Flow 需要一个助手模型——已作为普通语音输入粘贴",
-      "flowFailed": "Flow 无法生成——未粘贴任何内容",
-      "flowEmpty": "请在激活短语之后说出指令",
       "cleanupFallback": "AI 清理未运行——已粘贴原始文本"
     },
     "listening": "正在聆听…",
     "locked": "免持录制中——再次按下快捷键即可停止",
     "cancel": "取消",
-    "done": "完成",
-    "askAssistant": "改为询问助手，而不是把这些文字输入进去"
-  },
-  "assistant": {
-    "title": "助手",
-    "character": {
-      "switch": "切换角色"
-    },
-    "empty": "用助手快捷键语音提问，\n或在下方输入。",
-    "inputPlaceholder": "输入消息…",
-    "inputPlaceholderScreen": "询问您屏幕上的内容…",
-    "queuedUntilReady": "已排队——本条回复结束后立即发送。",
-    "send": "发送",
-    "stop": "停止",
-    "cancel": "取消",
-    "finish": "结束并发送",
-    "clear": "清空对话",
-    "hide": "隐藏面板",
-    "copy": "复制",
-    "copyCode": "复制代码",
-    "regenerate": "重新生成回答（原回答仍保留在历史记录中）",
-    "summarizing": "正在总结较早的消息…",
-    "screenAttached": "屏幕",
-    "attachScreen": "屏幕视觉——在关闭之前，为每条消息附上您的屏幕",
-    "detachScreen": "关闭屏幕视觉",
-    "attach": {
-      "file": "附加图片或文件",
-      "snip": "截取屏幕的一部分",
-      "image": "图片",
-      "imageCount": "{{count}} 张图片",
-      "imageCount_other": "{{count}} 张图片",
-      "remove": "移除附件",
-      "dropHint": "拖放到此处附加"
-    },
-    "snip": {
-      "hint": "拖动以截取区域——按 Esc 取消"
-    },
-    "webSearch": {
-      "enable": "开启网络搜索",
-      "disable": "关闭网络搜索"
-    },
-    "tts": {
-      "enable": "开启语音摘要",
-      "disable": "关闭语音摘要",
-      "loading": "正在加载 Kokoro 语音模型...",
-      "loadingShort": "语音模型 {{progress}}%"
-    },
-    "pill": {
-      "talk": "点击说话",
-      "stop": "停止并发送",
-      "idle": "助手",
-      "expand": "展开面板",
-      "collapse": "收起为胶囊",
-      "close": "关闭助手",
-      "cancel": "取消，不发送",
-      "cancelTurn": "取消",
-      "dismiss": "关闭",
-      "disarmScreen": "屏幕视觉已开启——点击可关闭",
-      "armScreen": "屏幕视觉已关闭——点击可开启"
-    },
-    "status": {
-      "listening": "正在聆听…",
-      "locked": "正在聆听",
-      "transcribing": "正在转录…",
-      "searching": "正在搜索网络...",
-      "thinking": "正在思考...",
-      "speaking": "正在朗读..."
-    },
-    "tool": {
-      "search": "正在搜索网络",
-      "screen": "正在查看您的屏幕",
-      "working": "正在处理",
-      "elapsed": "{{seconds}}秒"
-    },
-    "errors": {
-      "generic": "出了点问题。请重试。",
-      "genericShort": "出了点问题",
-      "no_provider": "还没有设置助手模型。请在“设置 → 助手”中选择一个提供商。",
-      "no_providerShort": "未设置模型",
-      "no_model": "您的提供商尚未选择模型。请在“设置 → 助手”中选择一个。",
-      "no_modelShort": "未选择模型",
-      "engine_start": "内置模型无法启动。请重试，或在“设置 → 助手”中换一个模型。",
-      "engine_startShort": "模型无法启动",
-      "provider": "模型无法作答。请检查您的 API 密钥和网络连接，然后重试。",
-      "providerShort": "未能获得回答",
-      "empty_reply": "模型结束了却没有写出回答。请再问一次，或在“设置 → 助手”中换一个模型。",
-      "empty_replyShort": "回答为空",
-      "vision_unsupported": "此模型无法读取您的屏幕。请在“设置 → 助手”中选择支持视觉的模型，或不使用屏幕视觉再问一次。",
-      "vision_unsupportedShort": "模型无法识别图像",
-      "screenshot_too_large": "此提供商无法接受这么大的屏幕截图。请重试——系统会进一步压缩。",
-      "screenshot_too_largeShort": "屏幕截图过大",
-      "screen_capture": "无法捕获屏幕。请重试，或不使用屏幕视觉提问。",
-      "screen_captureShort": "屏幕捕获失败",
-      "transcription": "无法转录您的语音。请重新说一次。",
-      "transcriptionShort": "转录失败",
-      "tts": "语音回复失败。请检查您的 TTS 设置，或在面板中阅读回答。",
-      "ttsShort": "语音回复失败",
-      "tts_local": "本地语音无法加载。请检查网络连接，或在“设置”中更换 TTS 引擎。",
-      "tts_localShort": "语音无法加载",
-      "tts_blocked": "您的系统阻止了语音自动播放。点击面板任意位置即可听到回复。",
-      "tts_blockedShort": "轻点面板即可收听",
-      "tts_playback": "无法在您的输出设备上播放语音。请检查扬声器/输出设置，然后重试。",
-      "tts_playbackShort": "语音播放失败",
-      "mic_denied": "麦克风访问被阻止。请在系统隐私设置中允许。",
-      "mic_deniedShort": "麦克风访问被阻止",
-      "mic_unavailable": "未找到麦克风。请连接一个后重试。",
-      "mic_unavailableShort": "未找到麦克风",
-      "mic_error": "麦克风无法启动，可能正被其他应用占用。",
-      "mic_errorShort": "麦克风无法启动",
-      "file_read": "无法附加该文件。",
-      "file_readShort": "无法附加文件"
-    },
-    "notices": {
-      "web_search_failed": "网络搜索没有返回结果——将不使用搜索结果作答。",
-      "web_search_failedShort": "没有网络搜索结果"
-    },
-    "engineSetup": {
-      "downloading": "正在设置本地引擎（首次运行）… {{percent}}%",
-      "preparing": "正在设置本地引擎（首次运行）…",
-      "extracting": "正在安装本地引擎…",
-      "short": "正在设置引擎…"
-    }
+    "done": "完成"
   }
 }

@@ -24,14 +24,14 @@
   "sidebar": {
     "general": "General",
     "dictation": "Dictation",
-    "assistant": "Assistant",
     "history": "History",
     "about": "About",
     "debug": "Debug",
-    "characters": "Profiles",
     "memory": "Memory",
     "collapse": "Collapse sidebar",
-    "expand": "Expand sidebar"
+    "expand": "Expand sidebar",
+    "profiles": "Profiles",
+    "personalization": "Personalization"
   },
   "window": {
     "minimize": "Minimize",
@@ -42,10 +42,10 @@
   "sectionSubtitles": {
     "general": "Shortcuts, your microphone, and how the app looks.",
     "dictation": "The model that turns your voice into text, and how it's cleaned up.",
-    "assistant": "Set up the assistant, then tune its voice, screen vision, and web search.",
-    "history": "Your recent dictations, Flow generations, and assistant chats, stored on this device.",
+    "history": "Your recent dictations, stored on this device.",
     "about": "Version, app language, data locations, and credits.",
-    "debug": "Diagnostics and developer tools."
+    "debug": "Diagnostics and developer tools.",
+    "personalization": "Profiles you switch between, and what SpeakoFlow remembers about how you write."
   },
   "onboarding": {
     "subtitle": "To get started, choose a transcription model",
@@ -77,8 +77,8 @@
       "downloadStarted": "Downloading your model in the background."
     },
     "aiModel": {
-      "title": "Add local AI (optional)",
-      "subtitle": "An assistant to talk to, plus our own model that cleans up your dictation. Take either, or both.",
+      "title": "Add AI cleanup",
+      "subtitle": "Optional. A small on-device model that tidies up what you dictate.",
       "tiers": {
         "small": {
           "description": "Runs on any machine. Great for tidying up your writing."
@@ -90,9 +90,6 @@
           "description": "The sharpest answers, and it can see your screen."
         }
       },
-      "seesScreen": "Vision model",
-      "textOnly": "Text only",
-      "recommendedForAssistant": "Recommended for assistant",
       "download": "Download model",
       "useDownloaded": "Use downloaded model",
       "skip": "Skip for now",
@@ -114,15 +111,15 @@
       "subtitle": "Two shortcuts are all you need. Press, talk, done.",
       "dictateLabel": "Dictate anywhere",
       "dictateCaption": "Hold, talk, let go. Your words type themselves.",
-      "assistantKeysLabel": "Ask the assistant",
-      "assistantKeysCaption": "Hold and ask. It can even see your screen.",
       "changeAnytime": "You can change these anytime in Settings.",
       "hotkeyLabel": "Your dictation keys",
-      "downloadingAssistant": "Your assistant is moving in. {{percentage}}% there.",
       "downloadingVoice": "Your voice model is landing. {{percentage}}% there.",
       "downloadingGeneric": "Still downloading. {{percentage}}% there.",
       "signOff": "That's it. Go say something.",
-      "openApp": "Open SpeakoFlow"
+      "openApp": "Open SpeakoFlow",
+      "cleanupKeysLabel": "Dictate and clean up",
+      "cleanupKeysCaption": "Same as above, then AI tidies the text before it lands.",
+      "downloadingCleanup": "Getting the cleanup model ready — {{percentage}}%"
     },
     "errors": {
       "selectModel": "Couldn't select that model. Please try again.",
@@ -317,15 +314,15 @@
     "personalMemory": {
       "enable": {
         "label": "Remember me",
-        "description": "Let the assistant keep and use a personal memory. Off by default."
+        "description": "Let AI cleanup use a personal memory, so it keeps your names, terms, and phrasing instead of correcting them. Off by default."
       },
       "incognito": {
-        "label": "Incognito chat",
-        "description": "For this conversation, don't use memory and don't learn anything new."
+        "label": "Incognito",
+        "description": "For now, don't use memory and don't learn anything new from what you dictate."
       },
       "detail": {
         "label": "Memory detail",
-        "description": "How much memory to add to each reply. More detail is richer but a little slower.",
+        "description": "How much memory is added to a cleanup pass. More context costs a little speed.",
         "options": {
           "light": "Light",
           "balanced": "Balanced",
@@ -350,7 +347,7 @@
         "add": "Add",
         "addPlaceholder": "Add something to remember…",
         "delete": "Delete note",
-        "learned": "learned",
+        "learned": "Learned",
         "added": "added by you"
       },
       "confidence": {
@@ -362,8 +359,8 @@
         "label": "Manage"
       },
       "distill": {
-        "label": "Learn from this chat now",
-        "description": "Pull durable facts from your current conversation into memory, right now.",
+        "label": "Learn from my dictations now",
+        "description": "Read your recent dictations and pull durable facts into memory, right now.",
         "button": "Update memory"
       },
       "export": "Export",
@@ -373,6 +370,11 @@
         "confirm": "Delete everything the assistant remembers?",
         "yes": "Delete all",
         "cancel": "Cancel"
+      },
+      "caption": "Names, terms, and habits AI cleanup should keep, kept on this device.",
+      "autoLearn": {
+        "label": "Learn on its own",
+        "description": "Let SpeakoFlow pull durable facts out of past dictations by itself. Off by default — with it off, memory only ever holds what you add or ask for."
       }
     },
     "modelSettings": {
@@ -937,16 +939,6 @@
         "title": "Spoken emoji",
         "description": "Say “happy emoji” or “thumbs up emoji” to insert 😊 or 👍. Common aliases and minor speech-to-text errors are handled on your device; unknown names stay as text."
       },
-      "flow": {
-        "groupTitle": "Generate with Flow",
-        "enableLabel": "Generate with Flow",
-        "enableDescription": "Start a dictation with the activation phrase to have AI write the result for you — “Hey Flow, write a polite email asking to reschedule” pastes the finished email.",
-        "phraseLabel": "Activation phrase",
-        "phraseDescription": "Flow activates only when a dictation begins with this phrase. Anywhere else, the same words paste as normal dictation. Uses your assistant's model; leave empty to reset to “Hey Flow”.",
-        "phrasePlaceholder": "Hey Flow",
-        "screenLabel": "Allow screen access",
-        "screenDescription": "Let Flow take one screenshot when a command clearly refers to your screen, like “look at this email and draft a reply”. The model decides if it's needed. Separate from the assistant's screen access."
-      },
       "output": {
         "title": "Output options"
       }
@@ -957,29 +949,14 @@
         "title": "Recording storage",
         "description": "These controls affect dictation and Flow recordings. Starred recordings are always kept. Assistant chats have separate storage."
       },
-      "filters": {
-        "label": "History type",
-        "all": "All",
-        "recordings": "Dictations",
-        "flow": "Flow",
-        "assistant": "Assistant chats"
-      },
       "openFolder": "Open recordings folder",
       "loading": "Loading history…",
       "empty": "Nothing here yet. Your dictations, Flow generations, and assistant chats will appear here.",
-      "emptyRecordings": "No dictations yet.",
-      "emptyFlow": "No Flow generations yet.",
-      "emptyAssistant": "No assistant chats yet.",
       "recordingLabel": "Dictation",
-      "flowLabel": "Flow",
-      "flowTranscriptLabel": "You said",
       "originalTranscriptionLabel": "Original transcription",
-      "flowOutputLabel": "Flow output",
       "finalTextLabel": "Final text",
       "cleanupNoChanges": "AI cleanup ran, nothing to fix",
-      "flowNoOutput": "No Flow output was generated.",
       "copyToClipboard": "Copy transcription to clipboard",
-      "copyFlowOutput": "Copy Flow output",
       "copyFinalText": "Copy final text",
       "save": "Save transcription",
       "unsave": "Remove from saved",
@@ -988,18 +965,7 @@
       "retranscribe": "Re-transcribe",
       "retranscribeError": "Couldn't re-transcribe. Please try again.",
       "transcribing": "Transcribing…",
-      "transcriptionFailed": "Transcription failed — use the retry icon to try again.",
-      "assistantLabel": "Assistant chat",
-      "copyConversation": "Copy conversation",
-      "resumeConversation": "Continue this conversation in the assistant",
-      "showConversation": "Show conversation",
-      "hideConversation": "Hide conversation",
-      "roleUser": "You",
-      "roleAssistant": "Assistant",
-      "screenshotAttached": "Vision",
-      "messageCount_one": "{{count}} message",
-      "messageCount_other": "{{count}} messages",
-      "deleteAssistantError": "Couldn't delete the conversation. Please try again."
+      "transcriptionFailed": "Transcription failed — use the retry icon to try again."
     },
     "debug": {
       "title": "Debug",
@@ -1113,324 +1079,74 @@
         "button": "Donate"
       }
     },
-    "assistant": {
-      "enable": {
-        "title": "Assistant",
-        "label": "Enable the assistant",
-        "description": "Turn this off to make SpeakoFlow dictation-only. The floating panel is closed and never loaded, its hotkeys are freed, and the memory it uses is returned. Generate with Flow and AI cleanup keep working."
-      },
-      "shortcuts": {
-        "title": "Shortcuts"
-      },
-      "brain": {
-        "title": "Assistant brain",
-        "whereLabel": "Where it runs",
-        "onDevice": "On my device",
-        "cloud": "Cloud provider",
-        "downloadModel": "Browse and download models",
-        "downloadModelDescription": "Pick a recommended model or search Hugging Face.",
-        "downloadModelAction": "Browse models",
-        "catalogTitle": "Choose an on-device model",
-        "catalogDescription": "Download a private local model. It stays on this machine and needs no API key.",
-        "currentModelTitle": "Current model",
-        "currentModelDescription": "Selected for the built-in assistant on this device.",
-        "recommendedTitle": "Recommended models",
-        "recommendedDescription": "Three conversation-first choices: quickest, recommended, and more capable but slower.",
-        "acceleratorDetected": "{{name}} · {{memory}} GB reported graphics memory",
-        "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB dedicated VRAM",
-        "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB shared graphics memory",
-        "acceleratorDetectedNoMemory": "{{name}} detected · graphics memory not reported",
-        "acceleratorUnknownWithMemory": "Graphics memory unavailable · {{memory}} GB system RAM for CPU fallback",
-        "acceleratorUnknown": "Graphics memory unavailable · response speed cannot be predicted",
-        "details": "Details",
-        "detailFile": "File",
-        "detailLocation": "Location",
-        "detailFormat": "Format",
-        "detailId": "Model ID",
-        "switchBeforeDelete": "This model is in use. Switch to another one before deleting it.",
-        "deleteModelConfirm": "Delete {{modelName}}? Its downloaded files and saved entry will be removed.",
-        "deleteModelFailed": "Could not delete the model.",
-        "finderSectionTitle": "More on-device models",
-        "finderTitle": "Browse Hugging Face",
-        "finderDescription": "Search thousands of GGUF models and download one directly to SpeakoFlow.",
-        "finderAction": "Find a model",
-        "huggingFaceTitle": "Your models",
-        "catalogEmpty": "No recommended local models are available right now."
-      },
-      "subpages": {
-        "profilesCaption": "Switch the assistant's name, role, and personality.",
-        "memoryCaption": "What the assistant remembers about you between chats."
-      },
-      "tapToLock": {
-        "label": "Tap to lock",
-        "info": "While holding the assistant shortcut, tap this to lock hands-free so you can let go and keep talking. Pick a key that isn't part of your assistant shortcut (one that overlaps is ignored), or clear it to turn this off.",
-        "off": "Off",
-        "clear": "Clear"
-      },
-      "provider": {
-        "title": "Assistant provider",
-        "saveFailed": "Couldn’t switch the Assistant provider.",
-        "providerLabel": "Provider",
-        "providerDescription": "The provider that answers assistant questions.",
-        "baseUrlLabel": "Base URL",
-        "baseUrlDescription": "OpenAI-compatible base URL. Azure URLs are normalized automatically.",
-        "apiKeyLabel": "API key",
-        "apiKeyDescription": "Shared with AI cleanup.",
-        "apiKeyPlaceholder": "Enter API key…",
-        "modelLabel": "Model",
-        "modelDescription": "Model or deployment name to use for assistant answers.",
-        "modelPlaceholder": "e.g. gpt-4o-mini",
-        "modelSearchPlaceholder": "Search or type a model…",
-        "modelUse": "Use \"{{model}}\"",
-        "loadModels": "Load models",
-        "loadingModels": "Loading…",
-        "noModelsFound": "No models returned. Type the model name instead.",
-        "builtinModelDescription": "Pick a downloaded local model. It runs on your machine with no API key.",
-        "builtinModelPlaceholder": "Select a downloaded model",
-        "builtinNoModels": "No models on your machine yet — download one below.",
-        "builtinReady": "Runs fully on your machine. No API key, no setup.",
-        "builtinEngineMissing": "First use downloads a small local engine automatically (one time), then runs fully offline. No setup needed.",
-        "builtinEngineDownloading": "Downloading the local engine… {{percent}}%",
-        "builtinEnginePreparing": "Downloading the local engine…",
-        "builtinEngineExtracting": "Installing the local engine…",
-        "builtinEngineReady": "Local engine ready.",
-        "contextSizeLabel": "Context window",
-        "contextSizeDescription": "How much the local model can keep in mind at once — the system instructions, your chat history, any screenshot (a single image can eat a big chunk), and its reply. Bigger holds more and keeps screen vision and web search reliable, but uses more memory. The default is 8192; 16384 is a good step up if your machine has the RAM to spare. You can lower it later to save memory.",
-        "unloadTimeoutLabel": "Unload from memory after",
-        "unloadTimeoutDescription": "Free up memory by unloading the local model after it has been idle this long. It reloads automatically on next use."
-      },
-      "systemPrompt": {
-        "title": "System prompt",
-        "label": "Assistant system prompt",
-        "description": "Sets the assistant's behavior."
-      },
-      "characters": {
-        "title": "Profiles",
-        "description": "Task-focused profiles you can switch between. The active profile sets the assistant's name, role, and instructions — and how long its replies run. Switch anytime from the panel header.",
-        "galleryLabel": "Your profiles",
-        "editSection": "Edit profile",
-        "avatarLabel": "Avatar",
-        "active": "Active",
-        "meowsOnly": "Meows only",
-        "builtin": "Built-in",
-        "custom": "Custom",
-        "new": "New",
-        "newName": "New profile",
-        "copyName": "{{name}} copy",
-        "createAi": "Create with AI",
-        "import": "Import",
-        "aiTitle": "Describe your profile",
-        "aiClose": "Close",
-        "aiPlaceholder": "e.g. a concise release-notes writer, or a patient tutor who explains every step",
-        "aiDictate": "Dictate the description",
-        "aiDictateStop": "Stop dictation",
-        "generate": "Generate",
-        "avatarUpload": "Upload image",
-        "avatarRemove": "Remove",
-        "nameLabel": "Name",
-        "roleLabel": "Role",
-        "rolePlaceholder": "Short description shown on the card (optional)",
-        "promptLabel": "Instructions (system prompt)",
-        "responseLength": {
-          "label": "Response length",
-          "hint": "How long this profile's replies run. \"Inherit\" follows your global Assistant setting.",
-          "options": {
-            "inherit": "Inherit global",
-            "short": "Short",
-            "medium": "Medium",
-            "long": "Long"
-          }
-        },
-        "greetingLabel": "Greeting (optional)",
-        "greetingPlaceholder": "Optional opening line shown in an empty chat",
-        "catNote": "The Cat ignores the AI entirely — it just meows. Nothing to configure here.",
-        "duplicate": "Duplicate",
-        "export": "Export",
-        "restoreDefault": "Restore default",
-        "restoreBuiltins": "Restore built-ins",
-        "moreActions": "More actions",
-        "expand": "Expand",
-        "collapse": "Collapse",
-        "delete": "Delete",
-        "deleteConfirm": "Delete this profile? This can't be undone.",
-        "emptyState": "No profiles yet. Create your first one to give the assistant a personality."
-      },
-      "behavior": {
-        "title": "Behavior"
-      },
-      "memory": {
-        "label": "Conversation memory",
-        "description": "How many recent messages are sent as context each turn. 0 disables memory."
-      },
-      "autoSummarize": {
-        "label": "Summarize long chats",
-        "description": "When a conversation grows past the model's context window, automatically condense older messages into a running summary so the chat keeps its context instead of forgetting the start. A subtle indicator shows while it runs."
-      },
-      "responseLength": {
-        "label": "Response length",
-        "description": "Preferred reply length. \"No effect\" leaves your prompt untouched.",
-        "options": {
-          "default": "No effect",
-          "short": "Short",
-          "medium": "Medium",
-          "long": "Long"
+    "profiles": {
+      "active": "Active",
+      "add": "New",
+      "newName": "New profile",
+      "copyName": "{{name}} copy",
+      "import": "Import",
+      "export": "Export",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "restore": "Restore default",
+      "restoreMissing": "Restore built-ins",
+      "more": "More actions",
+      "edit": "Expand",
+      "close": "Collapse",
+      "fields": {
+        "avatar": "Upload image",
+        "avatarClear": "Remove",
+        "namePlaceholder": "Name",
+        "descriptionPlaceholder": "Short description shown on the card (optional)",
+        "instructions": "Instructions",
+        "instructionsPlaceholder": "e.g. Lay the result out as a message body, with a greeting line if one was dictated.",
+        "instructionsHint": "Added on top of the cleanup prompt and the tone. Say what KIND of text this is — a message, a chat line, a note — not what to correct.",
+        "prompt": "Cleanup prompt",
+        "tone": "Tone",
+        "inherit": "Use my global setting",
+        "useMemory": {
+          "label": "Use personal memory",
+          "description": "Let cleanup see what SpeakoFlow remembers about you — names, terms, how you write. Needs memory switched on."
         }
       },
-      "vision": {
-        "title": "Screen vision",
-        "modeLabel": "Screen access",
-        "modes": {
-          "off": "Off",
-          "manual": "Manual",
-          "agentDecides": "Agent decides",
-          "descriptions": {
-            "off": "Screen capture is disabled. Camera and region controls are hidden.",
-            "manual": "You choose when to attach the full screen or a region. Voice capture timing applies.",
-            "agent_decides": "The model may request a screen capture when it needs current visual context. Every screenshot sent is shown in the conversation."
-          }
-        },
-        "timing": {
-          "label": "When to capture",
-          "description": "For voice questions: capture the moment you start asking, or wait until the message is sent. Typed messages always capture on send.",
-          "descriptionAgent": "Both options prepare the screenshot in advance, so the assistant never makes you wait for one. The difference is what the image shows: \"When I ask\" grabs the screen as it looked when you started speaking, \"When the message sends\" grabs it as it looks now. Either way the image stays on your device and is only sent if the assistant actually asks to see it.",
-          "options": {
-            "immediate": "When I ask",
-            "on_send": "When the message sends"
-          }
-        },
-        "screenRecording": {
-          "description": "Screen vision needs macOS Screen Recording permission. Grant it in System Settings, then restart SpeakoFlow for it to take effect.",
-          "grant": "Open System Settings"
-        }
-      },
-      "webSearch": {
-        "title": "Web search",
-        "enableLabel": "Allow web search",
-        "enableDescription": "Let the assistant search the web when a question needs current information.",
-        "openRouterNativeLabel": "Use OpenRouter's built-in search",
-        "openRouterNativeDescription": "When on, OpenRouter runs the search itself (its :online mode) using your OpenRouter credits. When off, the app searches with your search provider below.",
-        "providerLabel": "Search provider",
-        "providerDescription": "Serper is a good default. Every provider has a free tier, and TinyFish is free with no card.",
-        "providers": {
-          "serper": "Serper (Google, fast)",
-          "brave": "Brave Search",
-          "tavily": "Tavily (AI search)",
-          "exa": "Exa (neural)",
-          "serpapi": "SerpAPI (Google)",
-          "tinyfish": "TinyFish (free, no card)"
-        },
-        "apiKeyLabel": "API key",
-        "apiKeyDescription": "Key for the selected search provider.",
-        "apiKeyPlaceholder": "Enter API key…",
-        "fetchContentLabel": "Read full pages (best quality)",
-        "fetchContentDescription": "Read the full text of each result instead of snippets. Better answers, but slower.",
-        "maxResultsLabel": "Sources to use",
-        "maxResultsDescription": "How many results to read (1–10).",
-        "depthLabel": "Search depth",
-        "depthDescription": "Quick for simple facts, Standard for most questions, Deep for hard ones.",
-        "depthOptions": {
-          "low": "Quick",
-          "medium": "Standard",
-          "high": "Deep"
-        },
-        "localSmartLabel": "Smart search decisions (local model)",
-        "localSmartDescription": "Let the local model decide when to search. Off uses a fast keyword check instead.",
-        "creditBudgetLabel": "Daily Firecrawl credit limit",
-        "creditBudgetDescription": "Daily cap on Firecrawl credits before search pauses. 0 = no limit.",
-        "testLabel": "Test search",
-        "testDescription": "Run a sample search with the current provider and key.",
-        "testButton": "Test search",
-        "testing": "Searching…",
-        "testResult": "Got {{count}} results."
-      },
-      "tts": {
-        "title": "Voice output",
-        "enableLabel": "Speak responses aloud",
-        "enableDescription": "Read the assistant's replies out loud.",
-        "stopOnDictationLabel": "Stop speech when dictation starts",
-        "stopOnDictationDescription": "Stop any reply that's still playing when you start dictating.",
-        "engineLabel": "Engine",
-        "engineDescription": "Kokoro runs locally for free. The other engines use your API key.",
-        "kokoroSetupLabel": "Kokoro voice model",
-        "kokoroSetupDescription": "Download it once, then spoken replies run privately on this device.",
-        "kokoroDownload": "Download Kokoro",
-        "kokoroDownloading": "Downloading Kokoro",
-        "kokoroReady": "Ready on this device",
-        "kokoroRetry": "Try download again",
-        "engines": {
-          "kokoro": "Kokoro (local, free)",
-          "openai": "OpenAI-compatible",
-          "openrouter": "OpenRouter",
-          "elevenlabs": "ElevenLabs",
-          "azure": "Azure AI Speech"
-        },
-        "voiceLabel": "Voice",
-        "voiceDescription": "Kokoro voice for spoken replies.",
-        "dtypeLabel": "Kokoro precision",
-        "dtypeDescription": "fp32 is highest quality; q8 is faster on CPU. Changing this reloads the model. If the voice comes out garbled or like noise instead of speech, choose \"q8 on CPU\" — some graphics drivers corrupt audio generated on the GPU.",
-        "speedLabel": "Playback speed",
-        "speedDescription": "1× is normal. ElevenLabs supports 0.7×–1.2× only.",
-        "speedValue": "{{value}}×",
-        "speedCustomLabel": "Custom playback speed",
-        "testLabel": "Test voice",
-        "testDescription": "Play a short sample with the current settings.",
-        "testButton": "Test voice",
-        "testing": "Testing…",
-        "testOk": "Played ✓",
-        "testPhrase": "Hi! This is a test of SpeakoFlow's voice output.",
-        "downloadStart": "Downloading Kokoro voice…",
-        "downloadProgress": "Downloading Kokoro voice… {{progress}}%",
-        "downloadReady": "Kokoro voice ready ✓",
-        "downloadError": "Couldn't download the Kokoro voice model",
-        "baseUrlLabel": "Base URL",
-        "baseUrlDescription": "OpenAI-compatible TTS URL. A base URL or a full /audio/speech URL both work.",
-        "azureBaseUrlLabel": "Speech URL",
-        "azureBaseUrlDescription": "Your Azure Speech URL from the portal, e.g. https://eastus2.tts.speech.microsoft.com.",
-        "apiKeyLabel": "API key",
-        "apiKeyDescription": "Separate from the assistant's key.",
-        "modelLabel": "Model",
-        "modelDescription": "Model or deployment name, e.g. gpt-4o-mini-tts (OpenAI/Azure) or eleven_flash_v2_5 (ElevenLabs).",
-        "remoteVoiceLabel": "Voice name",
-        "remoteVoiceDescription": "Voice for OpenAI-compatible TTS, e.g. alloy, echo, nova, shimmer.",
-        "azureVoiceLabel": "Voice name",
-        "azureVoiceDescription": "Azure voice name, e.g. en-US-JennyNeural. Click Load voices to browse.",
-        "loadVoices": "Load voices",
-        "voicesLoading": "Loading…",
-        "voicesPick": "Pick from {{count}} voices…",
-        "loadModels": "Load models",
-        "modelsLoading": "Loading…",
-        "modelsPick": "Pick from {{count}} models…",
-        "modelsUse": "Use \"{{model}}\"",
-        "voicesUse": "Use \"{{voice}}\"",
-        "elevenVoiceLabel": "Voice ID",
-        "elevenVoiceDescription": "ElevenLabs voice ID (from the Voices tab in their dashboard).",
-        "promptLabel": "Summary Prompt",
-        "promptDescription": "Instructions for generating the brief spoken summary of each answer."
-      },
-      "appearance": {
-        "title": "Panel appearance",
-        "previewLabel": "Preview",
-        "previewDescription": "Live preview of the panel with your text size and opacity.",
-        "previewUser": "Hey, what can you do?",
-        "previewAssistant": "Lots! Ask me anything — I can even look at your screen.",
-        "fontSizeLabel": "Text size",
-        "fontSizeDescription": "Size of the chat text in the assistant panel.",
-        "fontSizes": {
-          "small": "Small",
-          "medium": "Medium",
-          "large": "Large"
-        },
-        "panelSizeLabel": "Panel size",
-        "panelSizeDescription": "Overall size of the floating assistant panel. You can also drag its edges to resize.",
-        "panelSizes": {
-          "mini": "Small",
-          "compact": "Compact",
-          "standard": "Standard",
-          "large": "Large"
-        },
-        "opacityLabel": "Panel opacity",
-        "opacityDescription": "How opaque the floating panel is. 100% is fully solid; lower values let the desktop blur through."
-      }
+      "caption": "Switch the cleanup prompt, tone, and instructions in one move.",
+      "noInstructions": "No extra instructions"
+    },
+    "cleanupModels": {
+      "title": "Assistant brain",
+      "whereLabel": "Where it runs",
+      "onDevice": "On my device",
+      "cloud": "Cloud provider",
+      "downloadModel": "Browse and download models",
+      "downloadModelDescription": "Pick a recommended model or search Hugging Face.",
+      "downloadModelAction": "Browse models",
+      "catalogTitle": "Choose an on-device model",
+      "catalogDescription": "Download a private local model. It stays on this machine and needs no API key.",
+      "currentModelTitle": "Current model",
+      "currentModelDescription": "Selected for the built-in assistant on this device.",
+      "recommendedTitle": "Recommended models",
+      "recommendedDescription": "Three conversation-first choices: quickest, recommended, and more capable but slower.",
+      "acceleratorDetected": "{{name}} · {{memory}} GB reported graphics memory",
+      "acceleratorDetectedDedicated": "{{name}} · {{memory}} GB dedicated VRAM",
+      "acceleratorDetectedIntegrated": "{{name}} · {{memory}} GB shared graphics memory",
+      "acceleratorDetectedNoMemory": "{{name}} detected · graphics memory not reported",
+      "acceleratorUnknownWithMemory": "Graphics memory unavailable · {{memory}} GB system RAM for CPU fallback",
+      "acceleratorUnknown": "Graphics memory unavailable · response speed cannot be predicted",
+      "details": "Details",
+      "detailFile": "File",
+      "detailLocation": "Location",
+      "detailFormat": "Format",
+      "detailId": "Model ID",
+      "switchBeforeDelete": "This model is in use. Switch to another one before deleting it.",
+      "deleteModelConfirm": "Delete {{modelName}}? Its downloaded files and saved entry will be removed.",
+      "deleteModelFailed": "Could not delete the model.",
+      "finderSectionTitle": "More on-device models",
+      "finderTitle": "Browse Hugging Face",
+      "finderDescription": "Search thousands of GGUF models and download one directly to SpeakoFlow.",
+      "finderAction": "Find a model",
+      "huggingFaceTitle": "Your models",
+      "catalogEmpty": "No recommended local models are available right now.",
+      "custom": "Custom"
     }
   },
   "footer": {
@@ -1511,138 +1227,12 @@
     "recording": "Recording",
     "transcribing": "Transcribing…",
     "processing": "Processing…",
-    "generating": "Writing with Flow…",
-    "vision": "Looking at your screen…",
     "notices": {
-      "flowNotConfigured": "Flow needs an assistant model — pasted as dictation",
-      "flowFailed": "Flow couldn't generate — nothing was pasted",
-      "flowEmpty": "Say a command after the activation phrase",
       "cleanupFallback": "AI cleanup didn't run — pasted the raw text"
     },
     "listening": "Listening…",
     "locked": "Recording hands-free — press the hotkey again to stop",
     "cancel": "Cancel",
-    "done": "Done",
-    "askAssistant": "Ask the assistant instead of typing this"
-  },
-  "assistant": {
-    "title": "Assistant",
-    "character": {
-      "switch": "Switch persona"
-    },
-    "empty": "Ask by voice with your assistant shortcut,\nor type below.",
-    "inputPlaceholder": "Message…",
-    "inputPlaceholderScreen": "Ask about your screen…",
-    "queuedUntilReady": "Queued — sending as soon as this reply finishes.",
-    "send": "Send",
-    "stop": "Stop",
-    "cancel": "Cancel",
-    "finish": "Finish & send",
-    "clear": "Clear conversation",
-    "hide": "Hide panel",
-    "copy": "Copy",
-    "copyCode": "Copy code",
-    "regenerate": "Regenerate answer (the old one stays in History)",
-    "summarizing": "Summarizing earlier messages…",
-    "screenAttached": "Screen",
-    "attachScreen": "Screen vision — attach your screen to each message until turned off",
-    "detachScreen": "Turn off screen vision",
-    "attach": {
-      "file": "Attach an image or file",
-      "snip": "Snip a region of the screen",
-      "image": "Image",
-      "imageCount": "{{count}} image",
-      "imageCount_other": "{{count}} images",
-      "remove": "Remove attachment",
-      "dropHint": "Drop to attach"
-    },
-    "snip": {
-      "hint": "Drag to snip a region — Esc to cancel"
-    },
-    "webSearch": {
-      "enable": "Enable web search",
-      "disable": "Disable web search"
-    },
-    "tts": {
-      "enable": "Enable voice summaries",
-      "disable": "Disable voice summaries",
-      "loading": "Loading Kokoro voice model...",
-      "loadingShort": "Voice model {{progress}}%"
-    },
-    "pill": {
-      "talk": "Click to talk",
-      "stop": "Stop and send",
-      "idle": "Assistant",
-      "expand": "Expand panel",
-      "collapse": "Collapse to pill",
-      "close": "Close assistant",
-      "cancel": "Cancel without sending",
-      "cancelTurn": "Cancel",
-      "dismiss": "Dismiss",
-      "disarmScreen": "Screen vision is on — click to turn it off",
-      "armScreen": "Screen vision is off — click to turn it on"
-    },
-    "status": {
-      "listening": "Listening…",
-      "locked": "Listening",
-      "transcribing": "Transcribing…",
-      "searching": "Searching the web...",
-      "thinking": "Thinking...",
-      "speaking": "Speaking..."
-    },
-    "tool": {
-      "search": "Searching the web",
-      "screen": "Looking at your screen",
-      "working": "Working on it",
-      "elapsed": "{{seconds}}s"
-    },
-    "errors": {
-      "generic": "Something went wrong. Please try again.",
-      "genericShort": "Something went wrong",
-      "no_provider": "No assistant model is set up yet. Pick a provider in Settings → Assistant.",
-      "no_providerShort": "No model set up",
-      "no_model": "Your provider has no model selected. Choose one in Settings → Assistant.",
-      "no_modelShort": "No model selected",
-      "engine_start": "The built-in model couldn't start. Try again, or pick a different model in Settings → Assistant.",
-      "engine_startShort": "Model couldn't start",
-      "provider": "The model couldn't answer. Check your API key and connection, then try again.",
-      "providerShort": "Couldn't get an answer",
-      "empty_reply": "The model finished without writing a reply. Try asking again, or pick a different model in Settings → Assistant.",
-      "empty_replyShort": "Empty reply",
-      "vision_unsupported": "This model can't read your screen. Pick a vision-capable model in Settings → Assistant, or ask again without screen vision.",
-      "vision_unsupportedShort": "Model can't see images",
-      "screenshot_too_large": "The screen capture was too large for this provider. Please try again — it will be compressed harder.",
-      "screenshot_too_largeShort": "Screen capture too large",
-      "screen_capture": "Couldn't capture the screen. Try again, or ask without screen vision.",
-      "screen_captureShort": "Screen capture failed",
-      "transcription": "Couldn't transcribe your voice. Please try speaking again.",
-      "transcriptionShort": "Transcription failed",
-      "tts": "The spoken reply failed. Check your TTS settings, or read the answer in the panel.",
-      "ttsShort": "Voice reply failed",
-      "tts_local": "The local voice couldn't load. Check your connection or switch TTS engines in Settings.",
-      "tts_localShort": "Voice couldn't load",
-      "tts_blocked": "Your system blocked the voice from playing on its own. Click anywhere in the panel to hear the reply.",
-      "tts_blockedShort": "Tap the panel to hear it",
-      "tts_playback": "Couldn't play the voice on your output device. Check your speaker/output settings, then try again.",
-      "tts_playbackShort": "Voice playback failed",
-      "mic_denied": "Microphone access is blocked. Allow it in your system privacy settings.",
-      "mic_deniedShort": "Mic access blocked",
-      "mic_unavailable": "No microphone was found. Connect one and try again.",
-      "mic_unavailableShort": "No microphone found",
-      "mic_error": "The microphone couldn't start. It may be in use by another app.",
-      "mic_errorShort": "Mic couldn't start",
-      "file_read": "That file couldn't be attached.",
-      "file_readShort": "Couldn't attach file"
-    },
-    "notices": {
-      "web_search_failed": "Web search didn't return results — answering without them.",
-      "web_search_failedShort": "No web results"
-    },
-    "engineSetup": {
-      "downloading": "Setting up the local engine (first run)… {{percent}}%",
-      "preparing": "Setting up the local engine (first run)…",
-      "extracting": "Installing the local engine…",
-      "short": "Setting up engine…"
-    }
+    "done": "Done"
   }
 }
