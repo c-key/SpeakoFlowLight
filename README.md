@@ -231,11 +231,14 @@ Intel step.
 
 AI cleanup needs a model. Choose one in Settings → Dictation:
 
-- **On my device (offline).** Download SpeakoFlow Mini — 795 MB, no key needed.
-  This is the recommended setup and the only one that keeps everything local.
-- **Local server.** Point SpeakoFlow at Ollama or LM Studio.
-- **Cloud.** Bring your own API key for any OpenAI-compatible provider. Inert
-  unless you configure it; see [FORK.md](FORK.md) on staying local-only.
+- **The built-in engine (recommended).** Download SpeakoFlow Mini (795 MB),
+  Gemma 3 1B, or Gemma 4 E2B — no key, no setup, nothing leaves the machine.
+- **Apple Intelligence** on macOS, which Apple runs on the device.
+- **A local server** you already run: Ollama or LM Studio.
+- **Your own OpenAI-compatible server**, if you have one.
+
+There is no cloud option: the hosted providers upstream shipped are removed, so
+apart from downloading a model, nothing goes out. See [FORK.md](FORK.md).
 
 ## Build from source
 

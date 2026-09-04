@@ -100,18 +100,19 @@ content is sent, though the host can see your IP address like any download.
 
 If you use the AI text-cleanup feature, the transcript being cleaned up — plus
 your active profile's instructions and, if you switched it on, the relevant part
-of your personal memory — is sent to the **model provider you have configured**.
-You control which provider that is:
+of your personal memory — is handed to the cleanup engine. **In this build every
+engine you can select runs on your own machine:**
 
-- a **fully offline, built-in model** that runs on your machine (nothing leaves
-  your device), or
-- a **local server** you run (e.g. Ollama or LM Studio), or
-- a **cloud provider you choose** (e.g. OpenAI, Anthropic, Azure, OpenRouter,
-  and others) using **your own API key**.
+- the **built-in model**, served by a bundled engine on a loopback port,
+- **Apple Intelligence** on macOS, which Apple runs on the device,
+- a **local server** you run yourself (e.g. Ollama or LM Studio), or
+- **your own OpenAI-compatible server**, whose address you enter.
 
-SpeakoFlow does not proxy or copy this traffic — it goes directly from your
-machine to the provider you selected. What that provider does with the data is
-governed by **their** privacy policy.
+Upstream also offered a dozen hosted providers here. They are removed: the
+provider list ships only the local targets above, and a `settings.json` carried
+over from upstream has its cloud entries dropped when it is loaded. The one
+address you can type in is the local server's, so if you point it somewhere
+remote, that is your decision and that service's privacy policy applies.
 
 ### 4. Removed in this build
 
@@ -128,12 +129,17 @@ recommended local setup it never leaves the machine either.
 
 ## Third-party providers
 
-The optional cloud features above rely on services you choose and authenticate
-with your own credentials. SpeakoFlow is not affiliated with these providers and
-has no visibility into the data you exchange with them. When you use such a
-service, its own terms and privacy policy apply. If you prefer that nothing ever
-leaves your machine, keep the cleanup provider set to **On my device**: the only
-outbound traffic left is then model downloads and the update check.
+Two remain, and neither sees your dictation:
+
+- **Hugging Face**, when you download a model. This is the only outbound
+  traffic this build makes on its own.
+- **A server you configure yourself** under "your own OpenAI-compatible
+  server". If you give it a remote address, that service's terms and privacy
+  policy apply — SpeakoFlow neither proxies nor copies that traffic, and has no
+  visibility into it.
+
+The automatic update check is gone: this build has no updater, so it does not
+call home at startup.
 
 ---
 

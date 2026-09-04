@@ -39,5 +39,8 @@ set "CMAKE_GENERATOR=Ninja"
 set "CFLAGS=/FS"
 set "CXXFLAGS=/FS"
 
+rem `bun tauri dev` wants the repo root; cargo wants the crate. Pick per command
+rem so both spellings work without a --manifest-path.
 cd /d "%~dp0.."
+if /i "%~1"=="cargo" cd src-tauri
 %*

@@ -77,11 +77,21 @@ defines and refuses to open.
 Nothing is sent anywhere except model downloads from Hugging Face. Web search
 and remote TTS are gone entirely.
 
-The cloud cleanup providers (OpenAI, Groq, Anthropic, …) are **still in the
-settings model** — removing them would have meant rewriting the provider
-resolver, which is the same code path the built-in local engine uses. They are
-inert unless you enter an API key and select one. To be certain, keep the
-cleanup provider on **On my device** (the built-in llama.cpp engine).
+The cloud cleanup providers are gone too. `default_post_process_providers()`
+lists only local targets — the bundled llama.cpp engine (`builtin`, on a
+loopback port), Apple Intelligence (macOS, on-device), Ollama / LM Studio
+(`local`), and your own OpenAI-compatible server (`custom`, whose base URL you
+can edit).
+
+The provider *resolver* is untouched, because the built-in engine uses the same
+code path. What changed is what can be in the list:
+`ensure_post_process_defaults()` now also **removes** providers that are no
+longer defaults, along with their API-key slots, and resets the selection to
+`builtin`. Without that, an upgraded `settings.json` from upstream would keep
+its cloud entries — precisely for the installs that already had a route off the
+machine. Upstream's per-provider quirks (the Anthropic header, Azure base-URL
+normalization) stay in `llm_client.rs` for the same reason the streaming half
+does: they cost nothing and keep that file mergeable.
 
 ## Keeping up with upstream
 

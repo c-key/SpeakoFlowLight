@@ -17,7 +17,7 @@
 - `scripts/sync-upstream.sh` holt neue Upstream-Commits und merged sie;
   `--check` zeigt nur, was neu ist. Getestet (Syntax + `--check`-Pfad).
 - Eigene App-Identität: `productName` „SpeakoFlow Light“,
-  `identifier` `com.speakoflow.light`, Keychain-Service ebenso. Damit ist die
+  `identifier` `speakoflow.light`, Keychain-Service ebenso. Damit ist die
   App parallel zum Original installierbar und teilt keine Einstellungen.
   **Nebenwirkung:** eigenes App-Data-Verzeichnis, also werden bereits
   heruntergeladene Modelle nicht automatisch gefunden. Über
@@ -95,71 +95,74 @@ Konflikt-Rezepten), `README.md`, `PRIVACY.md`, `AGENTS.md`, `BUILD.md`
 
 **Verifikation**
 
-Alles Folgende läuft durch:
+Stand der letzten vollständigen Runde (vor dem Cloud-Umbau, siehe unten):
 
-- `cargo fmt --check`
-- `cargo check` — fehlerfrei und **ohne Warnungen** (28 Minuten kalt).
-- `cargo test` — **280 Tests bestanden**, 0 fehlgeschlagen, 3 ignoriert (die
-  drei brauchen einen laufenden llama-server und sind upstream ebenso markiert).
-- `bun run lint` (ESLint), `tsc --noEmit` und `bun run build`
-  (Vite-Produktionsbuild) — alle sauber.
-- `src/bindings.ts` ist neu generiert: die App wurde einmal gebaut und
-  gestartet, tauri-specta hat die Datei geschrieben (128 KB → 82 KB, weil rund
-  70 Commands weg sind).
+- `cargo fmt --check`, `cargo check` (ohne Warnungen), `cargo test`
+  (280 bestanden, 0 fehlgeschlagen, 3 ignoriert — die brauchen einen laufenden
+  llama-server), `tsc --noEmit`, `bun run lint` und `bun run build`.
+- `src/bindings.ts` ist neu generiert (App einmal gebaut und gestartet,
+  128 KB → 82 KB, rund 70 Commands weniger).
+- Deutsch ist in den Übersetzungen vollständig.
+- Die App läuft und diktiert: Mikrofon in 380 ms, Transkription in 2972 ms,
+  Einfügen per Ctrl+V. Vulkan findet beide GPUs (Intel Iris Xe, NVIDIA T500).
 
-Was dabei noch aufgefallen und behoben wurde:
+## Commits
 
-- Die Warnungen des Umbaus sind abgearbeitet. `llm_client.rs` behält sein
-  totes SSE-/Tool-Calling-Gerüst hinter einem begründeten
-  `#![allow(dead_code)]`, weil Upstream diese Datei aktiv weiterentwickelt und
-  ein Löschen jeden Merge dort zum Konflikt machen würde — dasselbe gilt für
-  den nie verdrahteten Tap-to-Lock-Parser in `lock_watch.rs` (der war auch
-  upstream schon tot, siehe FORK.md).
-- `commands/models.rs` schützte beim Löschen noch das Assistant-Modell
-  (Feld existiert nicht mehr) — jetzt nur noch das Cleanup-Modell.
-- Erst mit den neuen Bindings sichtbar: `ModelsSettings.tsx` wies
-  Sprachmodelle noch dem Assistant-Provider zu (jetzt: immer Cleanup, eine
-  Rolle statt zwei Ternaries), `TapToLock.tsx` bot noch den
-  `assistant_tap_to_lock_key`, und `ProfilesSettings.tsx` behandelte das
-  optionale `use_memory` als `boolean`.
-- Die i18n-Dateien hatten noch sechs Keys entfernter Features (Screen-Vision-
-  und Assistant-Onboarding-Texte). Die sind aus allen 21 Sprachen raus, die
-  `untranslated-baseline.json` ist entsprechend geschrumpft, und **Deutsch ist
-  jetzt vollständig** — `bun scripts/check-translations.ts` meldet einen
-  kompletten Key-Satz nur für DE.
-- Mit `onboarding.aiModel.seesScreen` fiel auch die „Sieht deinen
-  Bildschirm"-Plakette im Modellkatalog weg: in einer App ohne Screen Vision
-  eine Unterscheidung ohne Unterschied.
-- **Eigene Falle:** Tailwind v4 scannt das ganze Projektverzeichnis nach
-  Klassennamen, auch Markdown. Ein Windows-Pfad in STATUS.md enthielt
-  einen Backslash gefolgt von `f4793559`, was Tailwind als Unicode-Escape las und den Build mit
-  *"Invalid code point 16021813"* abbrechen ließ. Deshalb steht die
-  Build-Umgebung jetzt als `scripts/dev-env.win.bat` im Repo statt als Pfad in
-  dieser Datei.
+Drei Commits liegen auf `main`, `upstream-mirror` bleibt bei `2e5c7f5`:
+
+- `ba5807b` feat: fork as SpeakoFlow Light — remove the assistant, Flow and screen vision
+- `30fc8a5` i18n: move the assistant strings to profiles and cleanup
+- `8364706` docs: describe the fork and how to track upstream
+
+Die Profil-/Memory-Umwidmung steckt bewusst im ersten Commit: `settings.rs`,
+`actions.rs` und `lib.rs` lassen sich nicht in zwei Zustände teilen, die beide
+kompilieren.
 
 ## Was noch zu tun ist
 
-1. **App durchklicken.** Sie startet (das war Teil der Bindings-Generierung),
-   aber die Oberfläche ist noch nicht bedient worden: Diktat, Diktat +
-   Cleanup, Einstellungen → Personalisierung → Profile/Gedächtnis, Verlauf.
-   Beim Start ohne Vite-Server zeigt das Fenster erwartungsgemäß einen
-   Ladefehler — dafür `scriptsdev-env.win.bat bun tauri dev` benutzen.
+### 1. Repo veröffentlichen — dann den Quellcode-Link reaktivieren
 
-2. **Commit.** Bisher ist *nichts* committed — alle Änderungen liegen im
-   Arbeitsverzeichnis. Vorschlag für die Aufteilung:
-   - `feat: fork as SpeakoFlow Light — remove the assistant, Flow and screen vision`
-   - `feat(profiles): re-point profiles and memory at AI cleanup`
-   - `docs: describe the fork and how to track upstream`
+Auf der Info-Seite ist der Button „Repository nicht verfügbar“ **absichtlich
+deaktiviert**: er zeigte auf das Upstream-Repository, also auf genau die App,
+von der dieser Fork weggeht. Sobald der Fork auf einem eigenen öffentlichen
+Git-Remote liegt:
 
-3. **Offene Punkte, die bewusst so sind** (stehen auch in FORK.md):
-   - Übersetzungen: die 18 Sprachen außer Deutsch und Englisch fallen für
-     neue/umformulierte Strings auf Englisch zurück. `bun scripts/check-translations.ts` listet
-     sie.
-   - `docs-site/` beschreibt weiterhin Assistant, Flow und Screen Vision. Das
-     ist die Upstream-Website und wird aus diesem Repo nicht gebaut.
-   - Die Migrationsliste in `managers/history.rs` behält die Tabelle
-     `assistant_history` absichtlich (eine `rusqlite_migration`-Liste darf nie
-     schrumpfen).
+1. In `src/components/settings/about/AboutSettings.tsx` das `disabled` am
+   Button entfernen und `openUrl("<neue Repo-URL>")` wieder eintragen.
+2. Die Texte `settings.about.sourceCode.description` und `.button` in `en` und
+   `de` zurück auf „View on GitHub“ / „Auf GitHub ansehen“ stellen.
+3. In `README.md` und `BUILD.md` steht als Klon-Adresse `<this fork>` — dort
+   die echte URL eintragen.
+4. `git remote add origin <URL>` und `git push -u origin main upstream-mirror`.
+
+Der Lizenz-Button zeigt bewusst auf <https://opensource.org/license/mit> statt
+auf die `LICENSE`-Datei des Ursprungsprojekts.
+
+### 2. App durchklicken (nach den letzten Änderungen)
+
+Zuletzt geändert und in der laufenden App noch nicht geprüft: die
+Anbieterauswahl unter Diktat → AI Cleanup (nur lokale Ziele, der doppelte
+Eintrag `custom` ist weg), das Onboarding mit drei Cleanup-Karten und die
+Info-Seite (Version mit `-light`, Lizenz-Link, deaktivierter Repo-Button).
+
+### 3. Datenordner nach der Identifier-Änderung
+
+Der Bundle-Identifier heißt jetzt `speakoflow.light` statt
+`com.speakoflow.light` — die App liest also aus `%APPDATA%/speakoflow.light/`
+und findet den bisherigen Testverlauf nicht mehr. Der alte Ordner
+`%APPDATA%/com.speakoflow.light/` kann gelöscht werden; er enthält nur
+`settings.json` und `history.db` aus den Testläufen.
+
+### 4. Bewusst offen (steht auch in FORK.md)
+
+- Übersetzungen: die 18 Sprachen außer Deutsch und Englisch fallen für
+  neue/umformulierte Strings auf Englisch zurück.
+  `bun scripts/check-translations.ts` listet sie.
+- `docs-site/` beschreibt weiterhin Assistant, Flow und Screen Vision. Das ist
+  die Upstream-Website und wird aus diesem Repo nicht gebaut.
+- Die Migrationsliste in `managers/history.rs` behält die Tabelle
+  `assistant_history` absichtlich (eine `rusqlite_migration`-Liste darf nie
+  schrumpfen).
 
 ## Build-Umgebung auf diesem Rechner
 
