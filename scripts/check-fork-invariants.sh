@@ -78,6 +78,14 @@ for crate in tauri-plugin-updater xcap tauri-nspanel; do
     fail "src-tauri/Cargo.toml depends on '$crate' again"
   fi
 done
+
+# The npm side: the updater plugin, the panel's Kokoro voice, and the markdown
+# renderer that formatted assistant replies.
+for pkg in "@tauri-apps/plugin-updater" "kokoro-js" "react-markdown" "remark-gfm"; do
+  if grep -q "\"$pkg\"" package.json 2>/dev/null; then
+    fail "package.json depends on '$pkg' again"
+  fi
+done
 [ "$failures" -eq 0 ] && pass "no dependency of a removed feature"
 
 # ----------------------------------------------------------------------- modules

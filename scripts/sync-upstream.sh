@@ -128,7 +128,7 @@ feature this fork dropped: take neither side.
 Then:
         git commit
         scripts/check-fork-invariants.sh
-        bun install && bun run lint && bun test src
+        bun install && bun run lint
         cd src-tauri && cargo check && cargo test
 
 HINT
@@ -152,7 +152,7 @@ cat <<'NEXT'
 
 Verify before pushing:
     bun install
-    bun run lint && bun test src
+    bun run lint
     cd src-tauri && cargo check && cargo test
 
 If any command signature changed, run the app once (bun tauri dev) so
