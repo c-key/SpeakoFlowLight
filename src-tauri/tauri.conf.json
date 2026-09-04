@@ -57,7 +57,6 @@
       }
     },
     "windows": {
-      "signCommand": "trusted-signing-cli -e https://eus.codesigning.azure.net/ -a SpeakoFlow-Signing -c speakoflow-dev -d SpeakoFlow %1",
       "nsis": {
         "template": "nsis/installer.nsi"
       }
