@@ -95,6 +95,27 @@ does: they cost nothing and keep that file mergeable.
 
 ## Keeping up with upstream
 
+**The policy is: adopt everything, except changes for a removed feature.**
+Upstream fixes, transcription work, dependency bumps, new locales and UI
+improvements are all meant to land here. A change is skipped only when it
+exists to serve the assistant, Flow, screen vision, TTS, web search, the
+updater, or a cloud cleanup provider. A commit that mixes both is merged for
+the part that applies and dropped for the rest. The same goes for release
+notes: read them after a sync, and skip only what the list above covers.
+
+Two mechanisms keep that honest:
+
+- `scripts/fork-removed-paths.txt` — the removed paths, machine-readable. The
+  sync script resolves a conflict on one of them by keeping it deleted.
+- `scripts/check-fork-invariants.sh` — run after every merge (the sync script
+  does it): fails if a removed file, dependency, module, the updater or a
+  non-local provider base URL is back, or if the app identity changed. It also
+  warns about newly added files whose names suggest a removed feature, which is
+  the case no path list can anticipate.
+
+[CLAUDE.md](CLAUDE.md) states the same policy for AI assistants working in this
+repository.
+
 Two branches:
 
 - **`upstream-mirror`** — an untouched mirror of `upstream/main`. Never commit here.

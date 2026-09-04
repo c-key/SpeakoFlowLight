@@ -2,6 +2,11 @@
 
 This file provides guidance to AI coding assistants working with code in this repository.
 
+**Read [CLAUDE.md](CLAUDE.md) first.** This is a fork of SpeakoFlow with the
+assistant removed; CLAUDE.md states the upstream-adoption policy and the
+invariants that keep the removed features out, and [FORK.md](FORK.md) records
+what changed where.
+
 ## Development Commands
 
 **Prerequisites:**

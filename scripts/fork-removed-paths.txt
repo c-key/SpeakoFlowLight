@@ -1,0 +1,44 @@
+# Paths this fork removed, and that must stay removed.
+#
+# Read by scripts/check-fork-invariants.sh (fails if one is back in the index)
+# and by scripts/sync-upstream.sh (resolves a merge conflict on one of these by
+# keeping it deleted). Regenerate the list with:
+#
+#     git diff --diff-filter=D --name-only upstream-mirror main
+#
+# A line ending in "/" is a directory prefix; anything else is a shell glob
+# matched against the repository-relative path. "#" starts a comment.
+
+# The assistant: panel window, its backend, and the persona/chat plumbing.
+src-tauri/src/assistant.rs
+src-tauri/src/commands/assistant.rs
+src/assistant/
+src/components/settings/assistant/
+
+# Generate with Flow.
+src-tauri/src/flow.rs
+src/components/settings/dictation/GenerateWithFlowGroup.tsx
+
+# Screen vision.
+src-tauri/src/screenshot.rs
+src/components/ScreenRecordingPermission.tsx
+
+# Text-to-speech (both the streaming backend and the in-panel Kokoro player).
+src-tauri/src/tts.rs
+src-tauri/src/speech_stream.rs
+
+# Web search.
+src-tauri/src/web_search.rs
+
+# The updater: it pointed at upstream's releases, so a hit would have replaced
+# this build with the one it was forked away from.
+src/components/update-checker/
+src/components/settings/UpdateChecksToggle.tsx
+
+# Cloud cleanup providers: with only local engines left there is no mode to
+# switch and no key to enter.
+src/components/settings/PostProcessingSettingsApi/ProviderModeToggle.tsx
+src/components/settings/PostProcessingSettingsApi/ApiKeyField.tsx
+
+# Dead on arrival in this build: a picker for the assistant's model.
+src/components/footer/LlmModelSelector.tsx

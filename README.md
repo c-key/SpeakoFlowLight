@@ -240,6 +240,21 @@ AI cleanup needs a model. Choose one in Settings → Dictation:
 There is no cloud option: the hosted providers upstream shipped are removed, so
 apart from downloading a model, nothing goes out. See [FORK.md](FORK.md).
 
+## Staying current with upstream
+
+This fork tracks [SpeakoFlow](https://github.com/AbhishekBarali/SpeakoFlow) and
+adopts its changes by default — fixes, transcription work, dependency bumps, new
+languages. The exceptions are changes that only serve a feature removed here
+(assistant, Flow, screen vision, TTS, web search, updater, cloud providers).
+
+```sh
+scripts/sync-upstream.sh --check      # what is new upstream
+scripts/sync-upstream.sh              # merge it in
+scripts/check-fork-invariants.sh      # verify nothing removed came back
+```
+
+[FORK.md](FORK.md) has the details and the per-file conflict guidance.
+
 ## Build from source
 
 Requires [Rust](https://rustup.rs/) and [Bun](https://bun.sh/).

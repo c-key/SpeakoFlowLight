@@ -18,6 +18,8 @@ set -euo pipefail
 MIRROR="upstream-mirror"
 FORK="main"
 REMOTE="upstream"
+REMOVED_LIST="$(dirname "$0")/fork-removed-paths.txt"
+INVARIANTS="$(dirname "$0")/check-fork-invariants.sh"
 
 die() {
   printf '\033[31merror:\033[0m %s\n' "$1" >&2
@@ -61,10 +63,50 @@ git checkout --quiet "$MIRROR"
 # fails, something has been committed to the mirror and needs sorting out first.
 git merge --ff-only "$REMOTE/main"
 
+# Is this path one of the removed ones (scripts/fork-removed-paths.txt)?
+is_removed_path() {
+  local path="$1" pattern
+  [ -f "$REMOVED_LIST" ] || return 1
+  while IFS= read -r pattern; do
+    pattern="${pattern%%#*}"
+    pattern="$(printf '%s' "$pattern" | tr -d '\r' | sed 's/[[:space:]]*$//')"
+    [ -z "$pattern" ] && continue
+    case "$pattern" in
+      */) case "$path" in "$pattern"*) return 0 ;; esac ;;
+      # shellcheck disable=SC2053 # deliberate glob match, not a comparison
+      *) [[ $path == $pattern ]] && return 0 ;;
+    esac
+  done <"$REMOVED_LIST"
+  return 1
+}
+
+# Upstream touching a file this fork deleted is the one conflict with a known
+# answer: keep it deleted. Resolving those automatically is what keeps routine
+# syncs routine — whatever is left afterwards is a real decision.
+resolve_removed_paths() {
+  local resolved="" path
+  while IFS= read -r path; do
+    [ -z "$path" ] && continue
+    if is_removed_path "$path"; then
+      git rm --quiet --force -- "$path" >/dev/null 2>&1 || true
+      resolved="$resolved$path"$'\n'
+    fi
+  done < <(git diff --name-only --diff-filter=U)
+
+  if [ -n "$resolved" ]; then
+    note "Kept deleted (they belong to removed features):"
+    printf '%s' "$resolved" | sed 's/^/    /'
+  fi
+  [ -z "$(git diff --name-only --diff-filter=U)" ]
+}
+
 note "Merging $MIRROR into $FORK"
 git checkout --quiet "$FORK"
 if git merge --no-edit "$MIRROR"; then
   note "Merged cleanly."
+elif resolve_removed_paths; then
+  git commit --no-edit --quiet
+  note "Merged. Every conflict was a file this fork had removed."
 else
   cat <<'HINT'
 
@@ -85,11 +127,21 @@ feature this fork dropped: take neither side.
 
 Then:
         git commit
+        scripts/check-fork-invariants.sh
         bun install && bun run lint && bun test src
         cd src-tauri && cargo check && cargo test
 
 HINT
   exit 1
+fi
+
+# A clean merge is not the same as a correct one: upstream can add a file for a
+# removed feature, re-add a dependency, or put a cloud provider back, all
+# without conflicting with anything.
+note "Checking fork invariants"
+if ! bash "$INVARIANTS"; then
+  printf '\n'
+  die "the merge brought back something this fork removed — fix it before pushing (the merge itself is committed; 'git revert -m 1 HEAD' undoes it)"
 fi
 
 if [ "$start_branch" != "$FORK" ]; then
@@ -105,4 +157,8 @@ Verify before pushing:
 
 If any command signature changed, run the app once (bun tauri dev) so
 tauri-specta regenerates src/bindings.ts, then commit it.
+
+Upstream release notes are worth a read after a sync: a new feature that only
+makes sense with the assistant, TTS, web search, screen vision or the updater
+is one this fork skips. FORK.md says why.
 NEXT
