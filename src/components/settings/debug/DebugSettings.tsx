@@ -8,7 +8,6 @@ import { SettingsGroup } from "../../ui/SettingsGroup";
 import { SectionHeader } from "../../ui/SectionHeader";
 import { SoundPicker } from "../SoundPicker";
 import { ClamshellMicrophoneSelector } from "../ClamshellMicrophoneSelector";
-import { UpdateChecksToggle } from "../UpdateChecksToggle";
 
 export const DebugSettings: React.FC = () => {
   const { t } = useTranslation();
@@ -21,7 +20,6 @@ export const DebugSettings: React.FC = () => {
       />
       <SettingsGroup>
         <LogLevelSelector grouped={true} />
-        <UpdateChecksToggle descriptionMode="tooltip" grouped={true} />
         <SoundPicker
           label={t("settings.debug.soundTheme.label")}
           description={t("settings.debug.soundTheme.description")}

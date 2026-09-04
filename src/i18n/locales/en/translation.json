@@ -1,7 +1,7 @@
 {
   "appearance": {
     "title": "Appearance",
-    "description": "Choose a light, dark, or system-matched theme for the app and assistant panel.",
+    "description": "Choose a light, dark, or system-matched theme for the app.",
     "system": "System",
     "light": "Light",
     "dark": "Dark",
@@ -14,7 +14,6 @@
   },
   "tray": {
     "home": "Home",
-    "checkUpdates": "Check for updates…",
     "copyLastTranscript": "Copy last transcript",
     "unloadModel": "Unload model",
     "model": "Model",
@@ -79,21 +78,10 @@
     "aiModel": {
       "title": "Add AI cleanup",
       "subtitle": "Optional. A small on-device model that tidies up what you dictate.",
-      "tiers": {
-        "small": {
-          "description": "Runs on any machine. Great for tidying up your writing."
-        },
-        "mid": {
-          "description": "A quick all-rounder that can also answer questions."
-        },
-        "capable": {
-          "description": "The sharpest answers, and it can see your screen."
-        }
-      },
       "download": "Download model",
       "useDownloaded": "Use downloaded model",
       "skip": "Skip for now",
-      "skipHint": "You can add either of these later in Settings.",
+      "skipHint": "You can add a cleanup model later in Settings → Dictation.",
       "continue": "Continue",
       "downloadingHint": "It downloads in the background. Start using the app right away.",
       "downloadStarted": "Downloading your model in the background."
@@ -180,9 +168,6 @@
       },
       "gemma-3-4b": {
         "description": "Fast, clean answers with screen vision, but less capable than current Gemma 4 models."
-      },
-      "kokoro-82m": {
-        "description": "Built-in local voice for the assistant. No download needed."
       },
       "small": {
         "name": "Whisper Small",
@@ -331,19 +316,19 @@
       },
       "aboutYou": {
         "label": "About you",
-        "caption": "A short, always-on summary the assistant keeps in mind.",
+        "caption": "A short, always-on summary that AI cleanup keeps in mind.",
         "fieldLabel": "Summary",
-        "placeholder": "e.g. Prefers short, direct answers. Works in Rust and TypeScript. Building a desktop voice assistant.",
-        "hint": "Always included when memory is on. Keep it to a few sentences — this is the assistant's at-a-glance picture of you.",
+        "placeholder": "e.g. Writes in German and English. Works in Rust and TypeScript. Names that come up: Priya, Meierhofer.",
+        "hint": "Always included when memory is on. Keep it to a few sentences — it is background for the cleanup model, not instructions.",
         "edit": "Edit",
         "done": "Done",
-        "empty": "Nothing saved yet — the assistant fills this in as it learns, or click Edit to write your own.",
+        "empty": "Nothing saved yet — it fills in as your dictations are learned from, or click Edit to write your own.",
         "collapsedEmpty": "Nothing saved yet"
       },
       "notes": {
         "label": "Notes",
         "caption": "Specific things worth remembering — learned or added by you.",
-        "empty": "No notes yet. Add one below, or let the assistant learn them from your chats.",
+        "empty": "No notes yet. Add one below, or let them be learned from your dictations.",
         "add": "Add",
         "addPlaceholder": "Add something to remember…",
         "delete": "Delete note",
@@ -367,7 +352,7 @@
       "import": "Import",
       "wipe": {
         "button": "Wipe memory",
-        "confirm": "Delete everything the assistant remembers?",
+        "confirm": "Delete everything in your personal memory?",
         "yes": "Delete all",
         "cancel": "Cancel"
       },
@@ -390,7 +375,6 @@
         "sounds": "Sounds",
         "startup": "Startup and tray",
         "overlay": "Overlay",
-        "updates": "Updates",
         "system": "System"
       },
       "shortcut": {
@@ -416,18 +400,6 @@
           "transcribe_with_post_process": {
             "name": "Dictate and clean up",
             "description": "Dictate, then clean it up with AI before it's typed out."
-          },
-          "assistant": {
-            "name": "Ask assistant",
-            "description": "Ask the assistant by voice; the answer streams into the floating panel."
-          },
-          "assistant_vision": {
-            "name": "Ask with screen",
-            "description": "Ask by voice with your screen attached so it can see what you're looking at."
-          },
-          "assistant_panel_toggle": {
-            "name": "Show or hide panel",
-            "description": "Shows or hides the floating assistant panel."
           }
         },
         "errors": {
@@ -469,15 +441,13 @@
       "deleteTitle": "Delete model",
       "categories": {
         "stt": "Transcription",
-        "llm": "Assistant",
-        "tts": "Speech"
+        "llm": "Cleanup"
       },
       "categoryDescriptions": {
         "stt": "Models trade accuracy for speed — pick one that fits your machine.",
-        "llm": "Local models for the built-in assistant and AI cleanup.",
-        "tts": "Voices for the assistant's spoken replies. Kokoro runs on your machine."
+        "llm": "Local language models for AI cleanup."
       },
-      "llmHint": "After downloading, pick this model in the Assistant section under the built-in (local) provider.",
+      "llmHint": "After downloading, pick this model under Dictation → AI cleanup.",
       "ttsHint": "Speech models run on your machine and need no download.",
       "filters": {
         "all": "All",
@@ -591,8 +561,7 @@
       },
       "aiCorrection": {
         "label": "AI cleanup (in development)",
-        "description": "Experimental: clean up your dictation with AI. Rough and unpolished — off by default.",
-        "info": "Runs a language model over your dictation to fix punctuation, remove filler words, and optionally adjust the tone. Applies to dictation only (not the assistant chat) and runs on its own shortcut. It adds a delay since the model runs after transcription; if it fails or times out, your raw text is pasted instead. Uses your assistant's model by default. This feature is still in development — you can't yet pick a built-in local model from its own list, and it needs more tuning before it's a main feature."
+        "description": "Experimental: clean up your dictation with AI. Rough and unpolished — off by default."
       },
       "postProcessTimeout": {
         "title": "AI cleanup timeout",
@@ -773,7 +742,6 @@
         "checking": "Checking AI cleanup setup…",
         "checkFailed": "Couldn’t check AI cleanup setup.",
         "ready": "Ready — {{provider}}.",
-        "assistantFallback": "Ready — using your Assistant model ({{provider}}).",
         "selectPrompt": "Select a cleanup prompt.",
         "selectModel": "Select a model for this provider.",
         "addApiKey": "Add an API key for this provider.",
@@ -827,11 +795,7 @@
         "title": "API (OpenAI-compatible)",
         "location": {
           "title": "Where it runs",
-          "description": "Run cleanup privately with a downloaded model or use a cloud provider."
-        },
-        "provider": {
-          "title": "Provider",
-          "description": "Select an OpenAI-compatible provider."
+          "description": "Cleanup runs on this machine. Pick the bundled engine, a local server, or Apple Intelligence."
         },
         "appleIntelligence": {
           "title": "Apple Intelligence",
@@ -841,13 +805,8 @@
         },
         "baseUrl": {
           "title": "Base URL",
-          "description": "API base URL for the selected provider. Editable for Custom, Local, and Azure OpenAI (set it to your resource, e.g. https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API key",
-          "description": "API key for the selected provider.",
-          "placeholder": "sk-..."
+          "description": "Address of the local server that runs cleanup, e.g. http://localhost:11434/v1 for Ollama or LM Studio.",
+          "placeholder": "http://localhost:11434/v1"
         },
         "builtin": {
           "modelDescription": "Pick a model you've downloaded. It runs on your machine with no API key or setup.",
@@ -912,8 +871,8 @@
         "groupTitle": "AI cleanup",
         "modelGroupTitle": "Cleanup model",
         "unloadTimeout": {
-          "title": "Keep cleanup model loaded",
-          "description": "How long the on-device cleanup model stays in memory after you stop using it. Longer means no reload before your next dictation; an idle model uses memory but no CPU. Separate from the assistant's setting."
+          "title": "Unload cleanup model",
+          "description": "How long the on-device cleanup model stays in memory once you stop using it, before its memory is freed. \"Never\" keeps it loaded, so there is no reload before your next dictation; an idle model holds memory but uses no CPU."
         },
         "model": {
           "emptyTitle": "No cleanup model yet",
@@ -947,11 +906,11 @@
       "title": "History",
       "storage": {
         "title": "Recording storage",
-        "description": "These controls affect dictation and Flow recordings. Starred recordings are always kept. Assistant chats have separate storage."
+        "description": "These controls affect your dictation recordings. Starred recordings are always kept."
       },
       "openFolder": "Open recordings folder",
       "loading": "Loading history…",
-      "empty": "Nothing here yet. Your dictations, Flow generations, and assistant chats will appear here.",
+      "empty": "Nothing here yet. Your dictations will appear here.",
       "recordingLabel": "Dictation",
       "originalTranscriptionLabel": "Original transcription",
       "finalTextLabel": "Final text",
@@ -977,10 +936,6 @@
         "title": "Log level",
         "description": ""
       },
-      "updateChecks": {
-        "label": "Check for updates",
-        "description": ""
-      },
       "soundTheme": {
         "label": "Sound theme",
         "description": ""
@@ -991,12 +946,12 @@
       },
       "historyLimit": {
         "title": "Recording limit",
-        "description": "Maximum unstarred dictation and Flow recordings to keep. Starred recordings are always kept, and assistant chats are not counted.",
+        "description": "Maximum unstarred dictation recordings to keep. Starred recordings are always kept.",
         "entries": "recordings"
       },
       "recordingRetention": {
         "title": "Auto-delete recordings",
-        "description": "Choose how unstarred recordings are cleaned up. Changes apply immediately and never affect assistant chats.",
+        "description": "Choose how unstarred recordings are cleaned up. Changes apply immediately.",
         "never": "Never",
         "preserveLimit": "Keep a set number",
         "days3": "After 3 days",
@@ -1051,11 +1006,6 @@
         "title": "Version",
         "description": ""
       },
-      "updates": {
-        "title": "Updates",
-        "button": "Check for updates",
-        "disabledHint": "Automatic update checks are off. Turn them on in General."
-      },
       "folders": {
         "title": "Folders"
       },
@@ -1065,13 +1015,13 @@
       },
       "sourceCode": {
         "title": "Source code",
-        "description": "",
-        "button": "View on GitHub"
+        "description": "Not published yet — this build is a private fork.",
+        "button": "Repository unavailable"
       },
       "license": {
         "title": "License",
-        "description": "SpeakoFlow is open source under the MIT License, building on Handy (also MIT) by CJ Pais.",
-        "button": "View license"
+        "description": "MIT-licensed, like the SpeakoFlow build it is forked from and the Handy project (by CJ Pais) that one builds on.",
+        "button": "Read the MIT License"
       },
       "supportDevelopment": {
         "title": "Support development",
@@ -1113,7 +1063,6 @@
       "noInstructions": "No extra instructions"
     },
     "cleanupModels": {
-      "title": "Assistant brain",
       "whereLabel": "Where it runs",
       "onDevice": "On my device",
       "cloud": "Cloud provider",
@@ -1123,7 +1072,7 @@
       "catalogTitle": "Choose an on-device model",
       "catalogDescription": "Download a private local model. It stays on this machine and needs no API key.",
       "currentModelTitle": "Current model",
-      "currentModelDescription": "Selected for the built-in assistant on this device.",
+      "currentModelDescription": "Selected for AI cleanup on this device.",
       "recommendedTitle": "Recommended models",
       "recommendedDescription": "Three conversation-first choices: quickest, recommended, and more capable but slower.",
       "acceleratorDetected": "{{name}} · {{memory}} GB reported graphics memory",
@@ -1151,23 +1100,13 @@
   },
   "footer": {
     "downloadingModel": "Downloading {{model}}…",
-    "checkingUpdates": "Checking for updates…",
-    "updateAvailable": "Update available: {{version}}",
-    "updateAvailableShort": "Update available",
     "upToDate": "Up to date",
-    "downloadUpdate": "Download update",
     "restart": "Restart",
-    "updateCheckingDisabled": "Update checking disabled",
     "downloading": "Downloading… {{progress}}%",
     "installing": "Installing…",
     "preparing": "Preparing…",
-    "checkForUpdates": "Check for updates",
     "checkFailed": "Update check failed",
-    "updateFailed": "Update failed",
-    "clickToRetry": "Click to try again",
-    "portableUpdateTitle": "Manual update required",
-    "portableUpdateMessage": "Portable installs cannot be updated automatically. To update: download the latest NSIS installer from GitHub Releases, install it to the same folder, then copy your Data/ folder (settings, models, recordings) from the old version to the new one.",
-    "portableUpdateButton": "Open GitHub Releases"
+    "clickToRetry": "Click to try again"
   },
   "common": {
     "loading": "Loading…",

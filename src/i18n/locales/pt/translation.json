@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Aparência",
-    "description": "Escolha um tema claro, escuro ou igual ao do sistema para o app e o painel do assistente.",
     "system": "Sistema",
     "light": "Claro",
     "dark": "Escuro",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Início",
-    "checkUpdates": "Verificar Atualizações…",
     "copyLastTranscript": "Copiar última transcrição",
     "unloadModel": "Descarregar modelo",
     "model": "Modelo",
@@ -73,21 +71,9 @@
       "downloadStarted": "Baixando seu modelo em segundo plano."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Roda em qualquer máquina. Ótimo para ajeitar seus textos."
-        },
-        "mid": {
-          "description": "Um coringa rápido que também responde perguntas."
-        },
-        "capable": {
-          "description": "As respostas mais afiadas, e ele consegue ver sua tela."
-        }
-      },
       "download": "Baixar modelo",
       "useDownloaded": "Usar modelo baixado",
       "skip": "Ignorar por agora",
-      "skipHint": "Você pode fazer isso depois em Configurações > Assistente > No meu dispositivo.",
       "continue": "Continuar",
       "downloadingHint": "Seu modelo está sendo baixado em segundo plano — você pode começar a usar o app imediatamente.",
       "downloadStarted": "Baixando seu modelo de IA em segundo plano."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Respostas rápidas e limpas com visão de tela, mas menos capaz que os modelos Gemma 4 atuais."
-      },
-      "kokoro-82m": {
-        "description": "Voz local integrada para o assistente. Não precisa de download."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "Sobre você",
-        "caption": "Um resumo curto e sempre ativo que o assistente mantém em mente.",
         "fieldLabel": "Resumo",
-        "placeholder": "Ex.: Prefere respostas curtas e diretas. Trabalha com Rust e TypeScript. Está criando um assistente de voz para desktop.",
-        "hint": "Sempre incluído quando a memória está ativada. Mantenha em poucas frases — este é o retrato rápido que o assistente tem de você.",
         "edit": "Editar",
         "done": "Concluído",
-        "empty": "Nada salvo ainda — o assistente preenche isso conforme aprende, ou clique em Editar para escrever o seu.",
         "collapsedEmpty": "Nada salvo ainda"
       },
       "notes": {
         "label": "Notas",
         "caption": "Coisas específicas que valem ser lembradas — aprendidas ou adicionadas por você.",
-        "empty": "Nenhuma nota ainda. Adicione uma abaixo ou deixe o assistente aprender nas suas conversas.",
         "add": "Adicionar",
         "addPlaceholder": "Adicione algo para lembrar…",
         "delete": "Excluir nota",
@@ -343,7 +321,6 @@
       "import": "Importar",
       "wipe": {
         "button": "Apagar memória",
-        "confirm": "Excluir tudo o que o assistente lembra?",
         "yes": "Excluir tudo",
         "cancel": "Cancelar"
       }
@@ -361,7 +338,6 @@
         "sounds": "Sons",
         "startup": "Inicialização e bandeja",
         "overlay": "Sobreposição",
-        "updates": "Atualizações",
         "system": "Sistema"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Tecla de Pós-Processamento",
             "description": "Dite e a IA faz a limpeza antes de o texto ser digitado."
-          },
-          "assistant": {
-            "name": "Perguntar ao assistente",
-            "description": "Pergunte ao assistente por voz; a resposta vai aparecendo no painel flutuante."
-          },
-          "assistant_vision": {
-            "name": "Perguntar com a tela",
-            "description": "Pergunte por voz com sua tela anexada, para que ele veja o que você está olhando."
-          },
-          "assistant_panel_toggle": {
-            "name": "Mostrar ou ocultar o painel",
-            "description": "Mostra ou oculta o painel flutuante do assistente."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} é o seu modelo ativo. Excluí-lo interromperá as transcrições até que você selecione um novo modelo. Tem certeza?",
       "deleteTitle": "Excluir Modelo",
       "categories": {
-        "stt": "Transcrição",
-        "llm": "Assistente",
-        "tts": "Fala"
+        "stt": "Transcrição"
       },
       "categoryDescriptions": {
-        "stt": "Os modelos trocam precisão por velocidade — escolha um que caiba na sua máquina.",
-        "llm": "Modelos locais para o assistente integrado e a limpeza com IA.",
-        "tts": "Vozes para as respostas faladas do assistente. O Kokoro roda na sua máquina."
+        "stt": "Os modelos trocam precisão por velocidade — escolha um que caiba na sua máquina."
       },
-      "llmHint": "Depois de baixar, escolha este modelo na seção Assistente, no provedor integrado (local).",
       "ttsHint": "Os modelos de fala rodam na sua máquina e não precisam de download.",
       "filters": {
         "all": "Todos",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "Limpeza com IA (em desenvolvimento)",
-        "description": "Experimental: limpe seu ditado com IA. Ainda bruto e sem acabamento — desativado por padrão.",
-        "info": "Passa um modelo de linguagem pelo seu ditado para corrigir a pontuação, remover palavras de preenchimento e, se você quiser, ajustar o tom. Vale apenas para o ditado (não para a conversa com o assistente) e roda no seu próprio atalho. Isso adiciona uma espera, já que o modelo roda depois da transcrição; se falhar ou expirar, o texto bruto é colado no lugar. Usa o modelo do seu assistente por padrão. Este recurso ainda está em desenvolvimento — você ainda não pode escolher um modelo local integrado a partir de uma lista própria, e ele precisa de mais ajustes antes de virar um recurso principal."
+        "description": "Experimental: limpe seu ditado com IA. Ainda bruto e sem acabamento — desativado por padrão."
       },
       "postProcessTimeout": {
         "title": "Tempo limite da limpeza com IA",
@@ -744,7 +702,6 @@
         "checking": "Verificando a configuração da limpeza com IA…",
         "checkFailed": "Não foi possível verificar a configuração da limpeza com IA.",
         "ready": "Pronto — {{provider}}.",
-        "assistantFallback": "Pronto — usando o modelo do seu Assistente ({{provider}}).",
         "selectPrompt": "Selecione um prompt de limpeza.",
         "selectModel": "Selecione um modelo para este provedor.",
         "addApiKey": "Adicione uma chave da API para este provedor.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (Compatível com OpenAI)",
-        "location": {
-          "title": "Onde ele roda",
-          "description": "Faça a limpeza de forma privada com um modelo baixado ou use um provedor na nuvem."
-        },
-        "provider": {
-          "title": "Provedor",
-          "description": "Selecione um provedor compatível com OpenAI."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Executa totalmente no dispositivo. Nenhuma chave de API ou acesso à rede é necessário.",
           "requirements": "Requer um Mac Apple Silicon executando macOS Tahoe (26.0) ou posterior. Apple Intelligence deve estar habilitado nas Configurações do Sistema.",
           "unavailable": "Apple Intelligence não está disponível neste dispositivo. Requer um Mac Apple Silicon executando macOS Tahoe (26.0) ou posterior com Apple Intelligence habilitado nas Configurações do Sistema."
-        },
-        "baseUrl": {
-          "title": "URL Base",
-          "description": "URL base da API para o provedor selecionado. Editável para Custom, Local e Azure OpenAI (aponte para o seu recurso, por exemplo https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "Chave da API",
-          "description": "Chave da API para o provedor selecionado.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "Escolha um modelo que você baixou. Ele roda na sua máquina, sem chave da API e sem configuração.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "Limpeza com IA",
         "modelGroupTitle": "Modelo de limpeza",
-        "unloadTimeout": {
-          "title": "Manter o modelo de limpeza carregado",
-          "description": "Por quanto tempo o modelo de limpeza que roda no dispositivo fica na memória depois que você para de usá-lo. Mais tempo significa nenhum recarregamento antes do próximo ditado; um modelo parado ocupa memória, mas não usa CPU. Independente da configuração do assistente."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Nenhum modelo de limpeza ainda",
           "emptyDescription": "O SpeakoFlow Mini é um download pequeno feito para isso.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Histórico",
       "storage": {
-        "title": "Armazenamento de gravações",
-        "description": "Estes controles afetam as gravações de ditado e do Flow. As gravações salvas são sempre mantidas. As conversas com o assistente têm armazenamento separado."
+        "title": "Armazenamento de gravações"
       },
       "openFolder": "Abrir Pasta de Gravações",
       "loading": "Carregando histórico…",
-      "empty": "Nada aqui ainda. Seus ditados, gerações do Flow e conversas com o assistente vão aparecer aqui.",
       "recordingLabel": "Ditado",
       "originalTranscriptionLabel": "Transcrição original",
       "finalTextLabel": "Texto final",
@@ -948,10 +882,6 @@
         "title": "Nível de Log",
         "description": "Definir a verbosidade do registro"
       },
-      "updateChecks": {
-        "label": "Verificar Atualizações",
-        "description": "Verificar automaticamente novas versões do SpeakoFlow"
-      },
       "soundTheme": {
         "label": "Tema de Som",
         "description": "Escolha um tema de som para feedback de início e parada de gravação"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Limite de Histórico",
-        "description": "Número máximo de gravações de ditado e do Flow não salvas a manter. As gravações salvas são sempre mantidas, e as conversas com o assistente não entram na conta.",
         "entries": "gravações"
       },
       "recordingRetention": {
         "title": "Excluir Gravações Automaticamente",
-        "description": "Escolha como as gravações sem estrela são limpas. As mudanças valem na hora e nunca afetam as conversas com o assistente.",
         "never": "Nunca",
         "preserveLimit": "Manter um número fixo",
         "days3": "Após 3 dias",
@@ -1022,27 +950,12 @@
         "title": "Versão",
         "description": "Versão atual do SpeakoFlow"
       },
-      "updates": {
-        "title": "Atualizações",
-        "button": "Verificar atualizações",
-        "disabledHint": "A verificação automática de atualizações está desativada. Ative em Geral."
-      },
       "folders": {
         "title": "Pastas"
       },
       "appDataDirectory": {
         "title": "Diretório de Dados do App",
         "description": "Local onde o SpeakoFlow armazena seus dados"
-      },
-      "sourceCode": {
-        "title": "Código Fonte",
-        "description": "Visualizar código fonte e contribuir",
-        "button": "Ver no GitHub"
-      },
-      "license": {
-        "title": "Licença",
-        "description": "O SpeakoFlow é código aberto sob a Licença MIT, construído sobre o Handy (também MIT), de CJ Pais.",
-        "button": "Ver licença"
       },
       "supportDevelopment": {
         "title": "Apoiar o Desenvolvimento",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Cérebro do assistente",
       "whereLabel": "Onde ele roda",
       "onDevice": "No meu dispositivo",
       "cloud": "Provedor na nuvem",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Escolha um modelo que roda neste dispositivo",
       "catalogDescription": "Baixe um modelo local e privado. Ele fica nesta máquina e não precisa de chave da API.",
       "currentModelTitle": "Modelo atual",
-      "currentModelDescription": "Selecionado para o assistente integrado neste dispositivo.",
       "recommendedTitle": "Modelos recomendados",
       "recommendedDescription": "Três escolhas pensadas para conversa: a mais rápida, a recomendada e a mais capaz, porém mais lenta.",
       "acceleratorDetected": "{{name}} · {{memory}} GB de memória de vídeo informada",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "Baixando {{model}}…",
-    "checkingUpdates": "Verificando atualizações…",
-    "updateAvailable": "Atualização disponível: {{version}}",
-    "updateAvailableShort": "Atualização disponível",
     "upToDate": "Atualizado",
-    "downloadUpdate": "Baixar Atualização",
     "restart": "Reiniciar",
-    "updateCheckingDisabled": "Verificação de Atualização Desabilitada",
     "downloading": "Baixando… {{progress}}%",
     "installing": "Instalando…",
     "preparing": "Preparando…",
-    "checkForUpdates": "Verificar atualizações",
     "checkFailed": "Falha ao verificar atualizações",
-    "updateFailed": "Falha na atualização",
-    "clickToRetry": "Clique para tentar novamente",
-    "portableUpdateTitle": "Atualização manual necessária",
-    "portableUpdateMessage": "Instalações portáteis não podem ser atualizadas automaticamente. Para atualizar: baixe o instalador NSIS mais recente do GitHub Releases, instale-o na mesma pasta e, em seguida, copie sua pasta Data/ (configurações, modelos, gravações) da versão antiga para a nova.",
-    "portableUpdateButton": "Abrir GitHub Releases"
+    "clickToRetry": "Clique para tentar novamente"
   },
   "common": {
     "loading": "Carregando…",

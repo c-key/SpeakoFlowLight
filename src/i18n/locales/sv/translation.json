@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Utseende",
-    "description": "Välj ett ljust, mörkt eller systemanpassat tema för appen och assistentpanelen.",
     "system": "System",
     "light": "Ljust",
     "dark": "Mörkt",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Hem",
-    "checkUpdates": "Sök efter uppdateringar…",
     "copyLastTranscript": "Kopiera senaste transkriptionen",
     "unloadModel": "Avlasta modell",
     "model": "Modell",
@@ -73,21 +71,9 @@
       "downloadStarted": "Laddar ner din modell i bakgrunden."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Körs på alla datorer. Bra för att snygga till din text."
-        },
-        "mid": {
-          "description": "En snabb allroundmodell som också kan svara på frågor."
-        },
-        "capable": {
-          "description": "De skarpaste svaren, och den kan se din skärm."
-        }
-      },
       "download": "Ladda ner modell",
       "useDownloaded": "Använd nedladdad modell",
       "skip": "Hoppa över tills vidare",
-      "skipHint": "Du kan göra det här senare i Inställningar > Assistent > På min enhet.",
       "continue": "Fortsätt",
       "downloadingHint": "Din modell laddas ner i bakgrunden — du kan börja använda appen direkt.",
       "downloadStarted": "Laddar ner din AI-modell i bakgrunden."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Snabba, rena svar med skärmvisning, men mindre kapabel än nuvarande Gemma 4-modeller."
-      },
-      "kokoro-82m": {
-        "description": "Inbyggd lokal röst för assistenten. Ingen nedladdning behövs."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "Om dig",
-        "caption": "En kort, alltid aktiv sammanfattning som assistenten har i minnet.",
         "fieldLabel": "Sammanfattning",
-        "placeholder": "t.ex. Föredrar korta, direkta svar. Arbetar i Rust och TypeScript. Bygger en röstassistent för datorn.",
-        "hint": "Inkluderas alltid när minnet är på. Håll det till några meningar — det här är assistentens snabba bild av dig.",
         "edit": "Redigera",
         "done": "Klar",
-        "empty": "Inget sparat ännu — assistenten fyller i detta medan den lär sig, eller klicka på Redigera för att skriva ditt eget.",
         "collapsedEmpty": "Inget sparat ännu"
       },
       "notes": {
         "label": "Anteckningar",
         "caption": "Specifika saker värda att minnas — inlärda eller tillagda av dig.",
-        "empty": "Inga anteckningar ännu. Lägg till en nedan, eller låt assistenten lära sig dem från dina chattar.",
         "add": "Lägg till",
         "addPlaceholder": "Lägg till något att minnas…",
         "delete": "Ta bort anteckning",
@@ -343,7 +321,6 @@
       "import": "Importera",
       "wipe": {
         "button": "Rensa minnet",
-        "confirm": "Ta bort allt som assistenten minns?",
         "yes": "Ta bort allt",
         "cancel": "Avbryt"
       }
@@ -361,7 +338,6 @@
         "sounds": "Ljud",
         "startup": "Uppstart och systemfält",
         "overlay": "Överlagring",
-        "updates": "Uppdateringar",
         "system": "System"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Snabbkommando för efterbearbetning",
             "description": "Diktera, och låt AI:n rensa upp texten innan den skrivs ut."
-          },
-          "assistant": {
-            "name": "Fråga assistenten",
-            "description": "Fråga assistenten med röst; svaret strömmar in i den flytande panelen."
-          },
-          "assistant_vision": {
-            "name": "Fråga med skärmen",
-            "description": "Fråga med röst och bifoga skärmen så att den ser vad du tittar på."
-          },
-          "assistant_panel_toggle": {
-            "name": "Visa eller dölj panelen",
-            "description": "Visar eller döljer den flytande assistentpanelen."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} är din aktiva modell. Om du tar bort den avbryts transkriptioner tills du väljer en ny modell. Är du säker?",
       "deleteTitle": "Ta bort modell",
       "categories": {
-        "stt": "Transkribering",
-        "llm": "Assistent",
-        "tts": "Tal"
+        "stt": "Transkribering"
       },
       "categoryDescriptions": {
-        "stt": "Modeller byter noggrannhet mot hastighet — välj en som passar din dator.",
-        "llm": "Lokala modeller för den inbyggda assistenten och AI-rensning.",
-        "tts": "Röster för assistentens talade svar. Kokoro körs på din dator."
+        "stt": "Modeller byter noggrannhet mot hastighet — välj en som passar din dator."
       },
-      "llmHint": "När nedladdningen är klar väljer du modellen i avsnittet Assistent under den inbyggda (lokala) leverantören.",
       "ttsHint": "Talmodeller körs på din dator och behöver inte laddas ner.",
       "filters": {
         "all": "Alla",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "AI-rensning (under utveckling)",
-        "description": "Experimentellt: rensa upp din diktering med AI. Grovt och ofärdigt — av som standard.",
-        "info": "Kör en språkmodell över din diktering för att rätta skiljetecken, ta bort utfyllnadsord och eventuellt justera tonen. Gäller endast diktering (inte assistentchatten) och körs på sitt eget kortkommando. Det ger en fördröjning eftersom modellen körs efter transkriberingen; om den misslyckas eller tar för lång tid klistras din råa text in i stället. Använder assistentens modell som standard. Funktionen är fortfarande under utveckling — du kan ännu inte välja en inbyggd lokal modell från en egen lista, och den behöver mer finjustering innan den blir en huvudfunktion."
+        "description": "Experimentellt: rensa upp din diktering med AI. Grovt och ofärdigt — av som standard."
       },
       "postProcessTimeout": {
         "title": "Tidsgräns för AI-rensning",
@@ -744,7 +702,6 @@
         "checking": "Kontrollerar inställningarna för AI-rensning…",
         "checkFailed": "Kunde inte kontrollera inställningarna för AI-rensning.",
         "ready": "Klart — {{provider}}.",
-        "assistantFallback": "Klart — använder din assistentmodell ({{provider}}).",
         "selectPrompt": "Välj en prompt för rensning.",
         "selectModel": "Välj en modell för den här leverantören.",
         "addApiKey": "Lägg till en API-nyckel för den här leverantören.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (OpenAI-kompatibelt)",
-        "location": {
-          "title": "Var den körs",
-          "description": "Kör rensningen privat med en nedladdad modell eller använd en molnleverantör."
-        },
-        "provider": {
-          "title": "Leverantör",
-          "description": "Välj en OpenAI-kompatibel leverantör."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Körs helt lokalt på enheten. Ingen API-nyckel eller nätverksåtkomst krävs.",
           "requirements": "Kräver en Apple Silicon Mac som kör macOS Tahoe (26.0) eller senare. Apple Intelligence måste vara aktiverat i systeminställningarna.",
           "unavailable": "Apple Intelligence är inte tillgängligt på den här enheten. Kräver en Apple Silicon Mac som kör macOS Tahoe (26.0) eller senare med Apple Intelligence aktiverat i systeminställningarna."
-        },
-        "baseUrl": {
-          "title": "Bas-URL",
-          "description": "API-bas-URL för den valda leverantören. Redigerbar för Custom, Local och Azure OpenAI (ställ in den på din resurs, t.ex. https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API-nyckel",
-          "description": "API-nyckel för den valda leverantören.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "Välj en modell du har laddat ner. Den körs på din dator utan API-nyckel eller konfiguration.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "AI-rensning",
         "modelGroupTitle": "Modell för rensning",
-        "unloadTimeout": {
-          "title": "Håll rensningsmodellen laddad",
-          "description": "Hur länge rensningsmodellen på enheten stannar i minnet efter att du slutat använda den. Längre betyder ingen omladdning före nästa diktering; en vilande modell tar minne men ingen CPU. Skild från assistentens inställning."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Ingen rensningsmodell än",
           "emptyDescription": "SpeakoFlow Mini är en liten nedladdning byggd för just detta.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Historik",
       "storage": {
-        "title": "Lagring av inspelningar",
-        "description": "Dessa inställningar påverkar dikterings- och Flow-inspelningar. Sparade inspelningar behålls alltid. Assistentchattar lagras separat."
+        "title": "Lagring av inspelningar"
       },
       "openFolder": "Öppna mapp för inspelningar",
       "loading": "Laddar historik…",
-      "empty": "Inget här ännu. Dina dikteringar, Flow-genereringar och assistentchattar visas här.",
       "recordingLabel": "Diktering",
       "originalTranscriptionLabel": "Ursprunglig transkription",
       "finalTextLabel": "Slutlig text",
@@ -948,10 +882,6 @@
         "title": "Loggnivå",
         "description": "Ställ in loggningens detaljrikedom"
       },
-      "updateChecks": {
-        "label": "Sök efter uppdateringar",
-        "description": "Sök automatiskt efter nya versioner av SpeakoFlow"
-      },
       "soundTheme": {
         "label": "Ljudtema",
         "description": "Välj ett ljudtema för återkoppling vid start och stopp av inspelning"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Historikgräns",
-        "description": "Högsta antal osparade dikterings- och Flow-inspelningar att behålla. Sparade inspelningar behålls alltid, och assistentchattar räknas inte.",
         "entries": "inspelningar"
       },
       "recordingRetention": {
         "title": "Radera inspelningar automatiskt",
-        "description": "Välj hur osparade inspelningar rensas bort. Ändringar tillämpas direkt och påverkar aldrig assistentchattar.",
         "never": "Aldrig",
         "preserveLimit": "Behåll ett bestämt antal",
         "days3": "Efter 3 dagar",
@@ -1022,27 +950,12 @@
         "title": "Version",
         "description": "Nuvarande version av SpeakoFlow"
       },
-      "updates": {
-        "title": "Uppdateringar",
-        "button": "Sök efter uppdateringar",
-        "disabledHint": "Automatisk uppdateringskontroll är av. Slå på den under Allmänt."
-      },
       "folders": {
         "title": "Mappar"
       },
       "appDataDirectory": {
         "title": "Mapp för appdata",
         "description": "Plats där SpeakoFlow lagrar sina data"
-      },
-      "sourceCode": {
-        "title": "Källkod",
-        "description": "Visa källkod och bidra",
-        "button": "Visa på GitHub"
-      },
-      "license": {
-        "title": "Licens",
-        "description": "SpeakoFlow är öppen källkod under MIT-licensen och bygger på Handy (också MIT) av CJ Pais.",
-        "button": "Visa licensen"
       },
       "supportDevelopment": {
         "title": "Stöd utvecklingen",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Assistentens hjärna",
       "whereLabel": "Var den körs",
       "onDevice": "På min enhet",
       "cloud": "Molnleverantör",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Välj en modell på enheten",
       "catalogDescription": "Ladda ner en privat lokal modell. Den stannar på den här datorn och kräver ingen API-nyckel.",
       "currentModelTitle": "Nuvarande modell",
-      "currentModelDescription": "Vald för den inbyggda assistenten på den här enheten.",
       "recommendedTitle": "Rekommenderade modeller",
       "recommendedDescription": "Tre samtalsinriktade val: snabbast, rekommenderad och mer kapabel men långsammare.",
       "acceleratorDetected": "{{name}} · {{memory}} GB rapporterat grafikminne",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "Laddar ner {{model}}…",
-    "checkingUpdates": "Söker efter uppdateringar…",
-    "updateAvailable": "Uppdatering tillgänglig: {{version}}",
-    "updateAvailableShort": "Uppdatering tillgänglig",
     "upToDate": "Uppdaterad",
-    "downloadUpdate": "Ladda ner uppdatering",
     "restart": "Starta om",
-    "updateCheckingDisabled": "Uppdateringskontroll inaktiverad",
     "downloading": "Laddar ner… {{progress}}%",
     "installing": "Installerar…",
     "preparing": "Förbereder…",
-    "checkForUpdates": "Sök efter uppdateringar",
     "checkFailed": "Uppdateringskontrollen misslyckades",
-    "updateFailed": "Uppdateringen misslyckades",
-    "clickToRetry": "Klicka för att försöka igen",
-    "portableUpdateTitle": "Manuell uppdatering krävs",
-    "portableUpdateMessage": "Portabla installationer kan inte uppdateras automatiskt. Så uppdaterar du: ladda ner det senaste NSIS-installationsprogrammet från GitHub Releases, installera det i samma mapp och kopiera sedan din Data/-mapp (inställningar, modeller, inspelningar) från den gamla versionen till den nya.",
-    "portableUpdateButton": "Öppna GitHub Releases"
+    "clickToRetry": "Klicka för att försöka igen"
   },
   "common": {
     "loading": "Laddar…",

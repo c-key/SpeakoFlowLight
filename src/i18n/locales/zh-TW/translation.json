@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "外觀",
-    "description": "為應用程式與助理面板選擇淺色、深色或跟隨系統的主題。",
     "system": "系統",
     "light": "淺色",
     "dark": "深色",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "首頁",
-    "checkUpdates": "檢查更新…",
     "copyLastTranscript": "複製最新轉錄",
     "unloadModel": "卸載模型",
     "model": "模型",
@@ -73,21 +71,9 @@
       "downloadStarted": "正在背景下載您的模型。"
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "任何電腦都能執行。很適合用來整理您寫的文字。"
-        },
-        "mid": {
-          "description": "速度快的全能選擇，也能回答問題。"
-        },
-        "capable": {
-          "description": "回答最精準，還能看見您的螢幕。"
-        }
-      },
       "download": "下載模型",
       "useDownloaded": "使用已下載的模型",
       "skip": "暫時略過",
-      "skipHint": "您可以稍後在「設定」→「助理」→「在我的裝置上」中完成。",
       "continue": "繼續",
       "downloadingHint": "您的模型正在背景下載——您可以立即開始使用應用程式。",
       "downloadStarted": "正在背景下載您的 AI 模型。"
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "回答快速俐落，並支援螢幕視覺，但能力不如目前的 Gemma 4 模型。"
-      },
-      "kokoro-82m": {
-        "description": "助理的內建本機語音。無需下載。"
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "關於您",
-        "caption": "助理會一直記在心上的簡短摘要。",
         "fieldLabel": "摘要",
-        "placeholder": "例如：偏好簡短直接的回答。使用 Rust 與 TypeScript 開發。正在打造桌面語音助理。",
-        "hint": "記憶開啟時一律會納入。請保持在幾句話以內——這是助理對您的快速印象。",
         "edit": "編輯",
         "done": "完成",
-        "empty": "尚未儲存任何內容——助理會在學習過程中補上，您也可以點選「編輯」自行撰寫。",
         "collapsedEmpty": "尚未儲存任何內容"
       },
       "notes": {
         "label": "筆記",
         "caption": "值得記住的具體事項——由助理學習或您自行新增。",
-        "empty": "還沒有任何筆記。請在下方新增，或讓助理從您的對話中學習。",
         "add": "新增",
         "addPlaceholder": "新增要記住的內容…",
         "delete": "刪除筆記",
@@ -343,7 +321,6 @@
       "import": "匯入",
       "wipe": {
         "button": "清除記憶",
-        "confirm": "要刪除助理記住的所有內容嗎？",
         "yes": "全部刪除",
         "cancel": "取消"
       }
@@ -361,7 +338,6 @@
         "sounds": "聲音",
         "startup": "啟動與系統匣",
         "overlay": "懸浮窗",
-        "updates": "更新",
         "system": "系統"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "後處理快捷鍵",
             "description": "先語音輸入，再用 AI 整理，然後才輸入文字。"
-          },
-          "assistant": {
-            "name": "詢問助理",
-            "description": "用語音詢問助理；回答會即時串流到浮動面板中。"
-          },
-          "assistant_vision": {
-            "name": "連同螢幕提問",
-            "description": "用語音提問並附上您的螢幕畫面，讓它看見您正在看的內容。"
-          },
-          "assistant_panel_toggle": {
-            "name": "顯示或隱藏面板",
-            "description": "顯示或隱藏助理浮動面板。"
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} 是您目前使用的模型。刪除後將停止轉錄，直到您選擇新的模型。確定要刪除嗎？",
       "deleteTitle": "刪除模型",
       "categories": {
-        "stt": "轉錄",
-        "llm": "助理",
-        "tts": "語音"
+        "stt": "轉錄"
       },
       "categoryDescriptions": {
-        "stt": "各模型在準確度與速度之間取捨——請挑選適合您電腦的一個。",
-        "llm": "供內建助理與 AI 整理使用的本機模型。",
-        "tts": "助理朗讀回覆時使用的語音。Kokoro 在您的電腦上執行。"
+        "stt": "各模型在準確度與速度之間取捨——請挑選適合您電腦的一個。"
       },
-      "llmHint": "下載完成後，請在「助理」區段的內建（本機）供應商下選擇此模型。",
       "ttsHint": "語音模型在您的電腦上執行，無需下載。",
       "filters": {
         "all": "全部",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "AI 整理（開發中）",
-        "description": "實驗性功能：用 AI 整理您的語音輸入。仍粗糙未完善——預設為關閉。",
-        "info": "以語言模型處理您的語音輸入，修正標點、移除語助詞，並可選擇調整語氣。僅套用於語音輸入（不含助理對話），並使用專屬的快捷鍵。由於模型在轉錄之後執行，會增加一些延遲；若失敗或逾時，則會改為貼上未經處理的原始文字。預設使用您的助理模型。此功能仍在開發中——目前還無法從專屬清單中選擇內建的本機模型，成為正式功能前也還需要更多調整。"
+        "description": "實驗性功能：用 AI 整理您的語音輸入。仍粗糙未完善——預設為關閉。"
       },
       "postProcessTimeout": {
         "title": "AI 整理逾時",
@@ -744,7 +702,6 @@
         "checking": "正在檢查 AI 整理的設定…",
         "checkFailed": "無法檢查 AI 整理的設定。",
         "ready": "已就緒——{{provider}}。",
-        "assistantFallback": "已就緒——使用您的助理模型（{{provider}}）。",
         "selectPrompt": "請選擇整理提示詞。",
         "selectModel": "請為此供應商選擇模型。",
         "addApiKey": "請為此供應商新增 API 金鑰。",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API（相容 OpenAI）",
-        "location": {
-          "title": "執行位置",
-          "description": "使用已下載的模型在本機私密執行整理，或改用雲端供應商。"
-        },
-        "provider": {
-          "title": "供應商",
-          "description": "選擇一個相容 OpenAI 的供應商"
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "完全在裝置上運行，無需 API 金鑰或網路存取",
           "requirements": "需要執行 macOS Tahoe（26.0）或更高版本的 Apple Silicon Mac。必須在系統設定中啟用 Apple Intelligence",
           "unavailable": "Apple Intelligence 在此裝置上不可用。需要執行 macOS Tahoe（26.0）或更高版本的 Apple Silicon Mac，並在系統設定中啟用 Apple Intelligence"
-        },
-        "baseUrl": {
-          "title": "基礎網址",
-          "description": "所選供應商的 API 基礎網址。Custom、Local 與 Azure OpenAI 可以編輯（請填入您自己的資源，例如 https://your-resource.openai.azure.com/openai/v1）。",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API 金鑰",
-          "description": "所選供應商的 API 金鑰",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "選擇您已下載的模型。它會在您的電腦上執行，不需要 API 金鑰或任何設定。",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "AI 整理",
         "modelGroupTitle": "整理模型",
-        "unloadTimeout": {
-          "title": "讓整理模型保持載入",
-          "description": "停止使用後，裝置上的整理模型會在記憶體中保留多久。時間越長，下次語音輸入前就不必重新載入；閒置的模型會佔用記憶體，但不佔用 CPU。與助理的同類設定各自獨立。"
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "還沒有整理模型",
           "emptyDescription": "SpeakoFlow Mini 是專為此打造的小型下載。",
@@ -917,12 +853,10 @@
     "history": {
       "title": "歷史紀錄",
       "storage": {
-        "title": "錄音儲存",
-        "description": "這些設定會影響語音輸入與 Flow 的錄音。已儲存的錄音一律保留。助理對話另外儲存。"
+        "title": "錄音儲存"
       },
       "openFolder": "開啟錄音資料夾",
       "loading": "載入歷史紀錄中…",
-      "empty": "這裡還沒有內容。您的語音輸入、Flow 生成與助理對話會顯示在這裡。",
       "recordingLabel": "語音輸入",
       "originalTranscriptionLabel": "原始轉錄",
       "finalTextLabel": "最終文字",
@@ -948,10 +882,6 @@
         "title": "日誌等級",
         "description": "設定日誌的詳細程度"
       },
-      "updateChecks": {
-        "label": "檢查更新",
-        "description": "自動檢查 SpeakoFlow 的新版本"
-      },
       "soundTheme": {
         "label": "聲音主題",
         "description": "選擇錄製開始和停止回饋的聲音主題"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "歷史紀錄上限",
-        "description": "未儲存的語音輸入與 Flow 錄音最多保留幾筆。已儲存的錄音一律保留，助理對話不計入。",
         "entries": "筆錄音"
       },
       "recordingRetention": {
         "title": "自動刪除錄音",
-        "description": "選擇未加星號的錄音如何清理。變更會立即生效，且永遠不會影響助理對話。",
         "never": "從不",
         "preserveLimit": "保留指定數量",
         "days3": "3 天後",
@@ -1022,27 +950,12 @@
         "title": "版本",
         "description": "SpeakoFlow 的目前版本"
       },
-      "updates": {
-        "title": "更新",
-        "button": "檢查更新",
-        "disabledHint": "自動檢查更新已關閉。可在「一般」中開啟。"
-      },
       "folders": {
         "title": "資料夾"
       },
       "appDataDirectory": {
         "title": "應用程式資料目錄",
         "description": "SpeakoFlow 儲存資料的位置"
-      },
-      "sourceCode": {
-        "title": "原始碼",
-        "description": "檢視原始碼並參與貢獻",
-        "button": "在 GitHub 上檢視"
-      },
-      "license": {
-        "title": "授權",
-        "description": "SpeakoFlow 以 MIT 授權開放原始碼，並以 CJ Pais 的 Handy（同為 MIT 授權）為基礎。",
-        "button": "檢視授權"
       },
       "supportDevelopment": {
         "title": "支持開發",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "助理大腦",
       "whereLabel": "執行位置",
       "onDevice": "在我的裝置上",
       "cloud": "雲端供應商",
@@ -1080,7 +992,6 @@
       "catalogTitle": "選擇一個裝置端模型",
       "catalogDescription": "下載私密的本機模型。它只留在這台電腦上，不需要 API 金鑰。",
       "currentModelTitle": "目前的模型",
-      "currentModelDescription": "已為這台裝置上的內建助理選用。",
       "recommendedTitle": "推薦模型",
       "recommendedDescription": "三個以對話為優先的選擇：最快、推薦，以及能力更強但較慢。",
       "acceleratorDetected": "{{name}} · 回報的顯示記憶體 {{memory}} GB",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "正在下載 {{model}}…",
-    "checkingUpdates": "檢查更新中…",
-    "updateAvailable": "有可用更新: {{version}}",
-    "updateAvailableShort": "有可用更新",
     "upToDate": "已是最新版本",
-    "downloadUpdate": "下載更新",
     "restart": "重新啟動",
-    "updateCheckingDisabled": "更新檢查已停用",
     "downloading": "下載中… {{progress}}%",
     "installing": "安裝中…",
     "preparing": "準備中…",
-    "checkForUpdates": "檢查更新",
     "checkFailed": "檢查更新失敗",
-    "updateFailed": "更新失敗",
-    "clickToRetry": "點選以重試",
-    "portableUpdateTitle": "需要手動更新",
-    "portableUpdateMessage": "可攜式安裝無法自動更新。更新方式：從 GitHub Releases 下載最新的 NSIS 安裝程式，安裝到同一個資料夾，然後把舊版的 Data/ 資料夾（設定、模型、錄音）複製到新版。",
-    "portableUpdateButton": "開啟 GitHub Releases"
+    "clickToRetry": "點選以重試"
   },
   "common": {
     "loading": "載入中…",

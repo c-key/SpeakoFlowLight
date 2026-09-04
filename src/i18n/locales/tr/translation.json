@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Görünüm",
-    "description": "Uygulama ve asistan paneli için açık, koyu veya sistemle uyumlu bir tema seçin.",
     "system": "Sistem",
     "light": "Açık",
     "dark": "Koyu",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Ana Ekran",
-    "checkUpdates": "Güncellemeleri Kontrol Et…",
     "copyLastTranscript": "Son transkripti kopyala",
     "unloadModel": "Modeli boşalt",
     "model": "Model",
@@ -73,21 +71,9 @@
       "downloadStarted": "Modeliniz arka planda indiriliyor."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Her makinede çalışır. Yazdıklarınızı toparlamak için harika."
-        },
-        "mid": {
-          "description": "Soruları da yanıtlayabilen, hızlı ve çok yönlü bir model."
-        },
-        "capable": {
-          "description": "En isabetli yanıtlar, üstelik ekranınızı görebiliyor."
-        }
-      },
       "download": "Modeli indir",
       "useDownloaded": "İndirilen modeli kullan",
       "skip": "Şimdilik atla",
-      "skipHint": "Bunu daha sonra Ayarlar > Asistan > Cihazımda bölümünden yapabilirsiniz.",
       "continue": "Devam et",
       "downloadingHint": "Modeliniz arka planda indiriliyor — uygulamayı hemen kullanmaya başlayabilirsiniz.",
       "downloadStarted": "Yapay zekâ modeliniz arka planda indiriliyor."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Ekran görüşüyle hızlı ve temiz yanıtlar, ancak mevcut Gemma 4 modellerinden daha yetersiz."
-      },
-      "kokoro-82m": {
-        "description": "Asistan için yerleşik yerel ses. İndirme gerekmez."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "Hakkınızda",
-        "caption": "Asistanın her zaman akılda tuttuğu kısa bir özet.",
         "fieldLabel": "Özet",
-        "placeholder": "Örn. Kısa ve net yanıtları tercih ediyor. Rust ve TypeScript ile çalışıyor. Masaüstü bir sesli asistan geliştiriyor.",
-        "hint": "Hafıza açıkken her zaman dahil edilir. Birkaç cümleyle sınırlı tutun — bu, asistanın sizi bir bakışta gördüğü resimdir.",
         "edit": "Düzenle",
         "done": "Bitti",
-        "empty": "Henüz bir şey kaydedilmedi — asistan öğrendikçe burayı doldurur ya da kendiniz yazmak için Düzenle'ye tıklayın.",
         "collapsedEmpty": "Henüz bir şey kaydedilmedi"
       },
       "notes": {
         "label": "Notlar",
         "caption": "Hatırlanmaya değer belirli şeyler — öğrenilen ya da sizin eklediğiniz.",
-        "empty": "Henüz not yok. Aşağıya bir tane ekleyin veya asistanın sohbetlerinizden öğrenmesine izin verin.",
         "add": "Ekle",
         "addPlaceholder": "Hatırlanacak bir şey ekleyin…",
         "delete": "Notu sil",
@@ -343,7 +321,6 @@
       "import": "İçe aktar",
       "wipe": {
         "button": "Hafızayı sil",
-        "confirm": "Asistanın hatırladığı her şey silinsin mi?",
         "yes": "Tümünü sil",
         "cancel": "İptal"
       }
@@ -361,7 +338,6 @@
         "sounds": "Sesler",
         "startup": "Başlangıç ve tepsi",
         "overlay": "Kaplama",
-        "updates": "Güncellemeler",
         "system": "Sistem"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Son İşlem Kısayolu",
             "description": "Dikte edin, ardından metin yazılmadan önce yapay zekâ onu temizler."
-          },
-          "assistant": {
-            "name": "Asistana sor",
-            "description": "Asistana sesle sorun; yanıt yüzen panele akar."
-          },
-          "assistant_vision": {
-            "name": "Ekranla sor",
-            "description": "Ekranınız ekli olarak sesle sorun; böylece neye baktığınızı görebilir."
-          },
-          "assistant_panel_toggle": {
-            "name": "Paneli göster veya gizle",
-            "description": "Yüzen asistan panelini gösterir veya gizler."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} aktif modelinizdir. Silmek, yeni bir model seçene kadar transkripsiyonları durduracaktır. Emin misiniz?",
       "deleteTitle": "Modeli Sil",
       "categories": {
-        "stt": "Transkripsiyon",
-        "llm": "Asistan",
-        "tts": "Konuşma"
+        "stt": "Transkripsiyon"
       },
       "categoryDescriptions": {
-        "stt": "Modeller doğruluktan ödün verip hız kazanır — makinenize uygun olanı seçin.",
-        "llm": "Yerleşik asistan ve yapay zekâ temizleme için yerel modeller.",
-        "tts": "Asistanın sesli yanıtları için sesler. Kokoro makinenizde çalışır."
+        "stt": "Modeller doğruluktan ödün verip hız kazanır — makinenize uygun olanı seçin."
       },
-      "llmHint": "İndirdikten sonra bu modeli Asistan bölümünde, yerleşik (yerel) sağlayıcının altından seçin.",
       "ttsHint": "Konuşma modelleri makinenizde çalışır ve indirme gerektirmez.",
       "filters": {
         "all": "Tümü",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "Yapay zekâ temizleme (geliştirme aşamasında)",
-        "description": "Deneysel: diktenizi yapay zekâ ile temizleyin. Ham ve cilasız — varsayılan olarak kapalı.",
-        "info": "Noktalama işaretlerini düzeltmek, dolgu sözcüklerini kaldırmak ve isteğe bağlı olarak tonu ayarlamak için diktenizin üzerinde bir dil modeli çalıştırır. Yalnızca dikteye uygulanır (asistan sohbetine değil) ve kendi kısayoluyla çalışır. Model transkripsiyondan sonra çalıştığı için gecikme ekler; başarısız olursa veya zaman aşımına uğrarsa ham metniniz yapıştırılır. Varsayılan olarak asistanınızın modelini kullanır. Bu özellik hâlâ geliştirme aşamasında — henüz kendi listesinden yerleşik bir yerel model seçemiyorsunuz ve ana bir özellik olabilmesi için daha fazla ayar gerekiyor."
+        "description": "Deneysel: diktenizi yapay zekâ ile temizleyin. Ham ve cilasız — varsayılan olarak kapalı."
       },
       "postProcessTimeout": {
         "title": "Yapay zekâ temizleme zaman aşımı",
@@ -744,7 +702,6 @@
         "checking": "Yapay zekâ temizleme kurulumu denetleniyor…",
         "checkFailed": "Yapay zekâ temizleme kurulumu denetlenemedi.",
         "ready": "Hazır — {{provider}}.",
-        "assistantFallback": "Hazır — Asistan modeliniz kullanılıyor ({{provider}}).",
         "selectPrompt": "Bir temizleme prompt'u seçin.",
         "selectModel": "Bu sağlayıcı için bir model seçin.",
         "addApiKey": "Bu sağlayıcı için bir API anahtarı ekleyin.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (OpenAI Uyumlu)",
-        "location": {
-          "title": "Nerede çalışır",
-          "description": "Temizlemeyi indirdiğiniz bir modelle gizli tutun ya da bir bulut sağlayıcısı kullanın."
-        },
-        "provider": {
-          "title": "Sağlayıcı",
-          "description": "OpenAI uyumlu bir sağlayıcı seçin."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Tamamen cihaz üzerinde çalışır. API anahtarı veya ağ erişimi gerekmez.",
           "requirements": "macOS Tahoe (26.0) veya üzeri çalıştıran bir Apple Silicon Mac gerektirir. Sistem Ayarları'nda Apple Intelligence etkin olmalıdır.",
           "unavailable": "Apple Intelligence bu cihazda kullanılamıyor. macOS Tahoe (26.0) veya üzeri ve Sistem Ayarları'nda Apple Intelligence etkin olan bir Apple Silicon Mac gerektirir."
-        },
-        "baseUrl": {
-          "title": "Temel URL",
-          "description": "Seçili sağlayıcı için API temel URL'si. Custom, Local ve Azure OpenAI için düzenlenebilir (kendi kaynağınıza ayarlayın, örn. https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API Anahtarı",
-          "description": "Seçili sağlayıcı için API anahtarı.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "İndirdiğiniz bir modeli seçin. API anahtarı veya kurulum gerekmeden makinenizde çalışır.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "Yapay zekâ temizleme",
         "modelGroupTitle": "Temizleme modeli",
-        "unloadTimeout": {
-          "title": "Temizleme modelini yüklü tut",
-          "description": "Cihazdaki temizleme modelinin, kullanmayı bıraktıktan sonra ne kadar süre bellekte kalacağı. Daha uzun süre, sonraki diktenizden önce yeniden yükleme olmaması demektir; boşta duran bir model bellek kullanır ama CPU kullanmaz. Asistanın ayarından ayrıdır."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Henüz temizleme modeli yok",
           "emptyDescription": "SpeakoFlow Mini, tam bu iş için hazırlanmış küçük bir indirmedir.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Geçmiş",
       "storage": {
-        "title": "Kayıt depolama",
-        "description": "Bu denetimler dikte ve Flow kayıtlarını etkiler. Kaydedilen kayıtlar her zaman saklanır. Asistan sohbetleri ayrı olarak depolanır."
+        "title": "Kayıt depolama"
       },
       "openFolder": "Kayıtlar Klasörünü Aç",
       "loading": "Geçmiş yükleniyor…",
-      "empty": "Burada henüz bir şey yok. Dikteleriniz, Flow üretimleriniz ve asistan sohbetleriniz burada görünecek.",
       "recordingLabel": "Dikte",
       "originalTranscriptionLabel": "Özgün transkripsiyon",
       "finalTextLabel": "Son metin",
@@ -948,10 +882,6 @@
         "title": "Log Seviyesi",
         "description": "Loglamanın ayrıntı düzeyini ayarla"
       },
-      "updateChecks": {
-        "label": "Güncellemeleri Kontrol Et",
-        "description": "SpeakoFlow için yeni sürümleri otomatik olarak kontrol eder"
-      },
       "soundTheme": {
         "label": "Ses Teması",
         "description": "Kayıt başlangıç ve bitişi için sesli geri bildirim temasını seçin"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Geçmiş Limiti",
-        "description": "Saklanacak en fazla kaydedilmemiş dikte ve Flow kaydı sayısı. Kaydedilen kayıtlar her zaman saklanır ve asistan sohbetleri sayılmaz.",
         "entries": "kayıt"
       },
       "recordingRetention": {
         "title": "Kayıtları Otomatik Sil",
-        "description": "Kaydedilmemiş kayıtların nasıl temizlendiğini seçin. Değişiklikler hemen uygulanır ve asistan sohbetlerini asla etkilemez.",
         "never": "Asla",
         "preserveLimit": "Belirli bir sayıda tut",
         "days3": "3 gün sonra",
@@ -1022,27 +950,12 @@
         "title": "Sürüm",
         "description": "SpeakoFlow'nin mevcut sürümü"
       },
-      "updates": {
-        "title": "Güncellemeler",
-        "button": "Güncellemeleri kontrol et",
-        "disabledHint": "Otomatik güncelleme kontrolü kapalı. Genel bölümünden açabilirsiniz."
-      },
       "folders": {
         "title": "Klasörler"
       },
       "appDataDirectory": {
         "title": "Uygulama Veri Dizini",
         "description": "SpeakoFlow'nin verilerini sakladığı konum"
-      },
-      "sourceCode": {
-        "title": "Kaynak Kodu",
-        "description": "Kaynak kodunu görüntüle ve katkıda bulun",
-        "button": "GitHub'da Görüntüle"
-      },
-      "license": {
-        "title": "Lisans",
-        "description": "SpeakoFlow, MIT Lisansı altında açık kaynaktır ve CJ Pais'in Handy (o da MIT) projesi üzerine kuruludur.",
-        "button": "Lisansı görüntüle"
       },
       "supportDevelopment": {
         "title": "Geliştirmeyi Destekle",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Asistanın beyni",
       "whereLabel": "Nerede çalışır",
       "onDevice": "Cihazımda",
       "cloud": "Bulut sağlayıcısı",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Cihaz içi bir model seçin",
       "catalogDescription": "Gizliliğinizi koruyan yerel bir model indirin. Bu makinede kalır ve API anahtarı gerektirmez.",
       "currentModelTitle": "Mevcut model",
-      "currentModelDescription": "Bu cihazdaki yerleşik asistan için seçildi.",
       "recommendedTitle": "Önerilen modeller",
       "recommendedDescription": "Sohbeti önceleyen üç seçenek: en hızlı, önerilen ve daha yetenekli ama daha yavaş.",
       "acceleratorDetected": "{{name}} · bildirilen {{memory}} GB grafik belleği",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "{{model}} indiriliyor…",
-    "checkingUpdates": "Güncellemeler kontrol ediliyor…",
-    "updateAvailable": "Güncelleme mevcut: {{version}}",
-    "updateAvailableShort": "Güncelleme mevcut",
     "upToDate": "Güncel",
-    "downloadUpdate": "Güncellemeyi İndir",
     "restart": "Yeniden Başlat",
-    "updateCheckingDisabled": "Güncelleme Kontrolü Devre Dışı",
     "downloading": "İndiriliyor… %{{progress}}",
     "installing": "Yükleniyor…",
     "preparing": "Hazırlanıyor…",
-    "checkForUpdates": "Güncellemeleri kontrol et",
     "checkFailed": "Güncelleme kontrolü başarısız oldu",
-    "updateFailed": "Güncelleme başarısız oldu",
-    "clickToRetry": "Tekrar denemek için tıklayın",
-    "portableUpdateTitle": "Elle güncelleme gerekiyor",
-    "portableUpdateMessage": "Taşınabilir kurulumlar otomatik olarak güncellenemez. Güncellemek için: GitHub Releases'ten en son NSIS yükleyicisini indirin, aynı klasöre kurun, ardından Data/ klasörünüzü (ayarlar, modeller, kayıtlar) eski sürümden yenisine kopyalayın.",
-    "portableUpdateButton": "GitHub Releases'i aç"
+    "clickToRetry": "Tekrar denemek için tıklayın"
   },
   "common": {
     "loading": "Yükleniyor…",

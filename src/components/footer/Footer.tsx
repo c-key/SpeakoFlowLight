@@ -3,7 +3,6 @@ import { getVersion } from "@tauri-apps/api/app";
 
 import ModelSelector from "../model-selector";
 import DownloadIndicator from "../model-selector/DownloadIndicator";
-import UpdateChecker from "../update-checker";
 
 const Footer: React.FC = () => {
   const [version, setVersion] = useState("");
@@ -31,9 +30,6 @@ const Footer: React.FC = () => {
     // while scrolling. The footer never scrolls (it's a fixed flex sibling), so
     // this only fixes paint order, nothing else.
     <div className="relative z-50 w-full border-t border-hairline bg-canvas-soft">
-      {/* About and tray actions still use this controller's event listener, but
-          update status no longer competes for permanent footer space. */}
-      <UpdateChecker className="hidden" />
       <div className="relative flex items-center justify-between px-5 py-2.5 text-xs text-muted">
         <ModelSelector />
         {/* One cohesive, collapsible download indicator, centered so it no longer

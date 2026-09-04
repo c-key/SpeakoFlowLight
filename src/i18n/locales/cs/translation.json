@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Vzhled",
-    "description": "Vyberte pro aplikaci a panel asistenta světlý, tmavý nebo systémový vzhled.",
     "system": "Systémový",
     "light": "Světlý",
     "dark": "Tmavý",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Domů",
-    "checkUpdates": "Zkontrolovat aktualizace…",
     "copyLastTranscript": "Zkopírovat poslední přepis",
     "unloadModel": "Uvolnit model",
     "model": "Model",
@@ -73,21 +71,9 @@
       "downloadStarted": "Váš model se stahuje na pozadí."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Běží na jakémkoli počítači. Ideální pro úpravu vašich textů."
-        },
-        "mid": {
-          "description": "Rychlý všestranný model, který umí i odpovídat na otázky."
-        },
-        "capable": {
-          "description": "Nejlepší odpovědi a vidí i vaši obrazovku."
-        }
-      },
       "download": "Stáhnout model",
       "useDownloaded": "Použít stažený model",
       "skip": "Zatím přeskočit",
-      "skipHint": "Můžete to udělat později v Nastavení > Asistent > Na mém zařízení.",
       "continue": "Pokračovat",
       "downloadingHint": "Váš model se stahuje na pozadí — aplikaci můžete začít používat ihned.",
       "downloadStarted": "Stahování vašeho modelu AI na pozadí."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Rychlé, čisté odpovědi se zobrazením obrazovky, ale méně schopný než současné modely Gemma 4."
-      },
-      "kokoro-82m": {
-        "description": "Vestavěný místní hlas pro asistenta. Není potřeba nic stahovat."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "O vás",
-        "caption": "Krátké, vždy aktivní shrnutí, které má asistent na paměti.",
         "fieldLabel": "Shrnutí",
-        "placeholder": "např. Preferuje krátké a přímé odpovědi. Pracuje v Rustu a TypeScriptu. Vyvíjí desktopového hlasového asistenta.",
-        "hint": "Vždy se přidává, když je paměť zapnutá. Nechte to na pár vět — je to obrázek o vás, který má asistent na první pohled.",
         "edit": "Upravit",
         "done": "Hotovo",
-        "empty": "Zatím nic uloženo — asistent to doplní, jak se bude učit, nebo klikněte na Upravit a napište si vlastní.",
         "collapsedEmpty": "Zatím nic uloženo"
       },
       "notes": {
         "label": "Poznámky",
         "caption": "Konkrétní věci, které je dobré si pamatovat — naučené nebo přidané vámi.",
-        "empty": "Zatím žádné poznámky. Přidejte nějakou níže, nebo je nechte asistenta odvodit z vašich chatů.",
         "add": "Přidat",
         "addPlaceholder": "Přidejte něco k zapamatování…",
         "delete": "Smazat poznámku",
@@ -343,7 +321,6 @@
       "import": "Importovat",
       "wipe": {
         "button": "Vymazat paměť",
-        "confirm": "Smazat vše, co si asistent pamatuje?",
         "yes": "Smazat vše",
         "cancel": "Zrušit"
       }
@@ -361,7 +338,6 @@
         "sounds": "Zvuky",
         "startup": "Spuštění a systémová lišta",
         "overlay": "Překryv",
-        "updates": "Aktualizace",
         "system": "Systém"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Klávesa pro následné zpracování",
             "description": "Diktujte, text pak před vypsáním vyčistí AI."
-          },
-          "assistant": {
-            "name": "Zeptat se asistenta",
-            "description": "Zeptejte se asistenta hlasem; odpověď se průběžně vypisuje v plovoucím panelu."
-          },
-          "assistant_vision": {
-            "name": "Zeptat se s obrazovkou",
-            "description": "Zeptejte se hlasem a přiložte svou obrazovku, aby asistent viděl, na co se díváte."
-          },
-          "assistant_panel_toggle": {
-            "name": "Zobrazit nebo skrýt panel",
-            "description": "Zobrazí nebo skryje plovoucí panel asistenta."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} je váš aktivní model. Jeho smazáním se zastaví přepisy, dokud nevyberete nový model. Opravdu chcete pokračovat?",
       "deleteTitle": "Smazat model",
       "categories": {
-        "stt": "Přepis",
-        "llm": "Asistent",
-        "tts": "Řeč"
+        "stt": "Přepis"
       },
       "categoryDescriptions": {
-        "stt": "Modely vyměňují přesnost za rychlost — vyberte ten, který se hodí pro váš počítač.",
-        "llm": "Místní modely pro vestavěného asistenta a čištění pomocí AI.",
-        "tts": "Hlasy pro mluvené odpovědi asistenta. Kokoro běží na vašem zařízení."
+        "stt": "Modely vyměňují přesnost za rychlost — vyberte ten, který se hodí pro váš počítač."
       },
-      "llmHint": "Po stažení vyberte tento model v sekci Asistent u vestavěného (místního) poskytovatele.",
       "ttsHint": "Modely řeči běží na vašem zařízení a není potřeba nic stahovat.",
       "filters": {
         "all": "Vše",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "Čištění pomocí AI (ve vývoji)",
-        "description": "Experimentální: vyčistěte své diktování pomocí AI. Zatím hrubé a nedoladěné — ve výchozím nastavení vypnuto.",
-        "info": "Spustí nad vaším diktováním jazykový model, který opraví interpunkci, odstraní vycpávková slova a případně upraví tón. Platí pouze pro diktování (nikoli pro chat s asistentem) a má vlastní zkratku. Přidává zpoždění, protože model běží až po přepisu; pokud selže nebo vyprší časový limit, vloží se místo toho váš původní text. Ve výchozím nastavení používá model vašeho asistenta. Tato funkce je stále ve vývoji — vestavěný místní model si zatím nemůžete vybrat z vlastního seznamu a než se stane hlavní funkcí, potřebuje ještě doladit."
+        "description": "Experimentální: vyčistěte své diktování pomocí AI. Zatím hrubé a nedoladěné — ve výchozím nastavení vypnuto."
       },
       "postProcessTimeout": {
         "title": "Časový limit čištění pomocí AI",
@@ -744,7 +702,6 @@
         "checking": "Kontroluji nastavení čištění pomocí AI…",
         "checkFailed": "Nastavení čištění pomocí AI se nepodařilo zkontrolovat.",
         "ready": "Připraveno — {{provider}}.",
-        "assistantFallback": "Připraveno — používá se model vašeho asistenta ({{provider}}).",
         "selectPrompt": "Vyberte prompt pro čištění.",
         "selectModel": "Vyberte model pro tohoto poskytovatele.",
         "addApiKey": "Přidejte API klíč pro tohoto poskytovatele.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (kompatibilní s OpenAI)",
-        "location": {
-          "title": "Kde to běží",
-          "description": "Spusťte čištění privátně se staženým modelem, nebo použijte cloudového poskytovatele."
-        },
-        "provider": {
-          "title": "Poskytovatel",
-          "description": "Vyberte poskytovatele kompatibilního s OpenAI."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Běží plně na zařízení. Není potřeba API klíč ani síťové připojení.",
           "requirements": "Vyžaduje Mac s Apple Silicon a macOS Tahoe (26.0) nebo novější. Apple Intelligence musí být povoleno v Nastavení systému.",
           "unavailable": "Apple Intelligence není na tomto zařízení k dispozici. Vyžaduje Mac s Apple Silicon a macOS Tahoe (26.0) nebo novější a povolené Apple Intelligence v Nastavení systému."
-        },
-        "baseUrl": {
-          "title": "Základní URL",
-          "description": "Základní URL API pro vybraného poskytovatele. Lze upravit u Custom, Local a Azure OpenAI (nastavte ji na svůj prostředek, např. https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API klíč",
-          "description": "API klíč pro vybraného poskytovatele.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "Vyberte model, který jste si stáhli. Běží na vašem zařízení bez API klíče a bez nastavování.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "Čištění pomocí AI",
         "modelGroupTitle": "Model pro čištění",
-        "unloadTimeout": {
-          "title": "Ponechat model pro čištění načtený",
-          "description": "Jak dlouho zůstane místní model pro čištění v paměti po tom, co ho přestanete používat. Delší doba znamená žádné načítání před dalším diktováním; nečinný model zabírá paměť, ale ne procesor. Nezávislé na nastavení asistenta."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Zatím žádný model pro čištění",
           "emptyDescription": "SpeakoFlow Mini je malé stažení vytvořené právě pro tohle.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Historie",
       "storage": {
-        "title": "Ukládání nahrávek",
-        "description": "Tato nastavení ovlivňují nahrávky diktování a Flow. Uložené nahrávky se uchovávají vždy. Chaty s asistentem mají vlastní ukládání."
+        "title": "Ukládání nahrávek"
       },
       "openFolder": "Otevřít složku nahrávek",
       "loading": "Načítám historii…",
-      "empty": "Zatím tu nic není. Vaše diktování, generování pomocí Flow a chaty s asistentem se zobrazí tady.",
       "recordingLabel": "Diktování",
       "originalTranscriptionLabel": "Původní přepis",
       "finalTextLabel": "Konečný text",
@@ -948,10 +882,6 @@
         "title": "Úroveň logování",
         "description": "Nastavte úroveň podrobnosti logování"
       },
-      "updateChecks": {
-        "label": "Kontrolovat aktualizace",
-        "description": "Automaticky kontrolovat nové verze SpeakoFlow"
-      },
       "soundTheme": {
         "label": "Zvukový motiv",
         "description": "Vyberte zvukový motiv pro odezvu při startu a ukončení nahrávání"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Limit historie",
-        "description": "Maximální počet neuložených nahrávek diktování a Flow, které se mají uchovat. Uložené nahrávky se uchovávají vždy a chaty s asistentem se nepočítají.",
         "entries": "nahrávek"
       },
       "recordingRetention": {
         "title": "Automatické mazání nahrávek",
-        "description": "Vyberte, jak se mají mazat neuložené nahrávky. Změny se použijí okamžitě a nikdy neovlivní chaty s asistentem.",
         "never": "Nikdy",
         "preserveLimit": "Ponechat určitý počet",
         "days3": "Po 3 dnech",
@@ -1022,27 +950,12 @@
         "title": "Verze",
         "description": "Aktuální verze SpeakoFlow"
       },
-      "updates": {
-        "title": "Aktualizace",
-        "button": "Zkontrolovat aktualizace",
-        "disabledHint": "Automatické kontroly aktualizací jsou vypnuté. Zapněte je v sekci Obecné."
-      },
       "folders": {
         "title": "Složky"
       },
       "appDataDirectory": {
         "title": "Adresář dat aplikace",
         "description": "Umístění, kde SpeakoFlow ukládá data"
-      },
-      "sourceCode": {
-        "title": "Zdrojový kód",
-        "description": "Zobrazit zdrojový kód a přispět",
-        "button": "Zobrazit na GitHubu"
-      },
-      "license": {
-        "title": "Licence",
-        "description": "SpeakoFlow je open source pod licencí MIT a staví na projektu Handy (také MIT) od CJ Paise.",
-        "button": "Zobrazit licenci"
       },
       "supportDevelopment": {
         "title": "Podpořte vývoj",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Mozek asistenta",
       "whereLabel": "Kde to běží",
       "onDevice": "Na mém zařízení",
       "cloud": "Cloudový poskytovatel",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Vyberte model pro toto zařízení",
       "catalogDescription": "Stáhněte si soukromý místní model. Zůstane na tomto počítači a nepotřebuje API klíč.",
       "currentModelTitle": "Aktuální model",
-      "currentModelDescription": "Vybraný pro vestavěného asistenta na tomto zařízení.",
       "recommendedTitle": "Doporučené modely",
       "recommendedDescription": "Tři volby zaměřené na konverzaci: nejrychlejší, doporučená a schopnější, ale pomalejší.",
       "acceleratorDetected": "{{name}} · {{memory}} GB nahlášené grafické paměti",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "Stahuji {{model}}…",
-    "checkingUpdates": "Kontroluji aktualizace…",
-    "updateAvailable": "Dostupná aktualizace: {{version}}",
-    "updateAvailableShort": "Dostupná aktualizace",
     "upToDate": "Vše aktuální",
-    "downloadUpdate": "Stáhnout aktualizaci",
     "restart": "Restartovat",
-    "updateCheckingDisabled": "Kontrola aktualizací vypnuta",
     "downloading": "Stahování… {{progress}}%",
     "installing": "Instalace…",
     "preparing": "Příprava…",
-    "checkForUpdates": "Zkontrolovat aktualizace",
     "checkFailed": "Kontrola aktualizací se nezdařila",
-    "updateFailed": "Aktualizace se nezdařila",
-    "clickToRetry": "Kliknutím to zkuste znovu",
-    "portableUpdateTitle": "Vyžadována ruční aktualizace",
-    "portableUpdateMessage": "Přenosné instalace nelze aktualizovat automaticky. Postup aktualizace: stáhněte si nejnovější instalátor NSIS z GitHub Releases, nainstalujte ho do stejné složky a pak zkopírujte svou složku Data/ (nastavení, modely, nahrávky) ze staré verze do nové.",
-    "portableUpdateButton": "Otevřít GitHub Releases"
+    "clickToRetry": "Kliknutím to zkuste znovu"
   },
   "common": {
     "loading": "Načítání…",

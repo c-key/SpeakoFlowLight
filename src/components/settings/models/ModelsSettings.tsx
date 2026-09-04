@@ -31,7 +31,7 @@ const modelSupportsLanguage = (model: ModelInfo, langCode: string): boolean => {
   return model.supported_languages.includes(langCode);
 };
 
-const CATEGORY_TABS: ModelCategory[] = ["stt", "llm", "tts"];
+const CATEGORY_TABS: ModelCategory[] = ["stt", "llm"];
 
 interface ModelsSettingsProps {
   /** When set, the catalog shows ONLY this category — no category tabs. Used
@@ -174,9 +174,6 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
   const handleModelSelect = async (modelId: string) => {
     const model = models.find((m: ModelInfo) => m.id === modelId);
     const category = model ? getModelCategory(model) : "stt";
-    // TTS (Kokoro) has no "active" selection here — it is configured per
-    // engine in the Assistant tab.
-    if (category === "tts") return;
     if (reportIfLocalFileMissing(model)) return;
 
     setSwitchingModelId(modelId);
@@ -373,9 +370,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
         // Models from a linked folder can't be removed one at a time — the next
         // scan would just find them again. Unlinking the folder is the action
         // that works, so don't offer one that doesn't.
-        categoryFilter === "tts" || model.local_folder
-          ? undefined
-          : handleModelDelete
+        model.local_folder ? undefined : handleModelDelete
       }
       onCancel={handleModelCancel}
       downloadProgress={getDownloadProgress(model.id)}

@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Aspetto",
-    "description": "Scegli un tema chiaro, scuro o coordinato al sistema per l'app e il pannello dell'assistente.",
     "system": "Sistema",
     "light": "Chiaro",
     "dark": "Scuro",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Home",
-    "checkUpdates": "Verifica aggiornamenti…",
     "copyLastTranscript": "Copia l'ultima trascrizione",
     "unloadModel": "Rilascia modello",
     "model": "Modello",
@@ -73,21 +71,9 @@
       "downloadStarted": "Download del tuo modello in background."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Funziona su qualsiasi computer. Ottimo per sistemare i tuoi testi."
-        },
-        "mid": {
-          "description": "Un tuttofare veloce che sa anche rispondere alle domande."
-        },
-        "capable": {
-          "description": "Le risposte più precise, e può vedere il tuo schermo."
-        }
-      },
       "download": "Scarica modello",
       "useDownloaded": "Usa il modello scaricato",
       "skip": "Salta per ora",
-      "skipHint": "Puoi farlo più tardi in Impostazioni > Assistente > Sul mio dispositivo.",
       "continue": "Continua",
       "downloadingHint": "Il tuo modello si sta scaricando in background: puoi iniziare subito a usare l'app.",
       "downloadStarted": "Download del tuo modello IA in background."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Risposte rapide e pulite con visione dello schermo, ma meno capace dei modelli Gemma 4 attuali."
-      },
-      "kokoro-82m": {
-        "description": "Voce locale integrata per l'assistente. Nessun download necessario."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "Su di te",
-        "caption": "Un breve riassunto sempre attivo che l'assistente tiene a mente.",
         "fieldLabel": "Riassunto",
-        "placeholder": "es. Preferisce risposte brevi e dirette. Lavora in Rust e TypeScript. Sta creando un assistente vocale per desktop.",
-        "hint": "Sempre incluso quando la memoria è attiva. Limitalo a poche frasi: è l'immagine di te che l'assistente vede a colpo d'occhio.",
         "edit": "Modifica",
         "done": "Fatto",
-        "empty": "Ancora nulla di salvato: l'assistente lo compila man mano che impara, oppure fai clic su Modifica per scriverlo tu.",
         "collapsedEmpty": "Ancora nulla di salvato"
       },
       "notes": {
         "label": "Note",
         "caption": "Cose specifiche che vale la pena ricordare: imparate o aggiunte da te.",
-        "empty": "Nessuna nota. Aggiungine una qui sotto, oppure lascia che l'assistente le impari dalle tue chat.",
         "add": "Aggiungi",
         "addPlaceholder": "Aggiungi qualcosa da ricordare…",
         "delete": "Elimina nota",
@@ -343,7 +321,6 @@
       "import": "Importa",
       "wipe": {
         "button": "Cancella memoria",
-        "confirm": "Eliminare tutto ciò che l'assistente ricorda?",
         "yes": "Elimina tutto",
         "cancel": "Annulla"
       }
@@ -361,7 +338,6 @@
         "sounds": "Suoni",
         "startup": "Avvio e barra di sistema",
         "overlay": "Overlay",
-        "updates": "Aggiornamenti",
         "system": "Sistema"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Tasto di post-elaborazione",
             "description": "Detta, poi ripulisci il testo con l'IA prima che venga scritto."
-          },
-          "assistant": {
-            "name": "Chiedi all'assistente",
-            "description": "Fai una domanda all'assistente a voce; la risposta appare nel pannello flottante."
-          },
-          "assistant_vision": {
-            "name": "Chiedi con lo schermo",
-            "description": "Chiedi a voce allegando il tuo schermo, così può vedere ciò che stai guardando."
-          },
-          "assistant_panel_toggle": {
-            "name": "Mostra o nascondi il pannello",
-            "description": "Mostra o nasconde il pannello flottante dell'assistente."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} è il tuo modello attivo. Eliminarlo interromperà le trascrizioni fino a quando non selezionerai un nuovo modello. Sei sicuro?",
       "deleteTitle": "Elimina modello",
       "categories": {
-        "stt": "Trascrizione",
-        "llm": "Assistente",
-        "tts": "Sintesi vocale"
+        "stt": "Trascrizione"
       },
       "categoryDescriptions": {
-        "stt": "I modelli bilanciano accuratezza e velocità: scegli quello adatto al tuo computer.",
-        "llm": "Modelli locali per l'assistente integrato e la pulizia IA.",
-        "tts": "Voci per le risposte parlate dell'assistente. Kokoro funziona sul tuo computer."
+        "stt": "I modelli bilanciano accuratezza e velocità: scegli quello adatto al tuo computer."
       },
-      "llmHint": "Dopo il download, seleziona questo modello nella sezione Assistente, sotto il provider integrato (locale).",
       "ttsHint": "I modelli di sintesi vocale funzionano sul tuo computer e non richiedono alcun download.",
       "filters": {
         "all": "Tutti",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "Pulizia IA (in sviluppo)",
-        "description": "Sperimentale: ripulisci la tua dettatura con l'IA. Grezza e non rifinita: disattivata per impostazione predefinita.",
-        "info": "Esegue un modello linguistico sulla tua dettatura per correggere la punteggiatura, rimuovere le parole di riempimento e, facoltativamente, regolare il tono. Vale solo per la dettatura (non per la chat dell'assistente) e si attiva con una scorciatoia dedicata. Aggiunge un ritardo, perché il modello viene eseguito dopo la trascrizione; se fallisce o va in timeout, viene incollato il testo grezzo. Per impostazione predefinita usa il modello del tuo assistente. Questa funzione è ancora in sviluppo: non puoi ancora scegliere un modello locale integrato da un elenco dedicato e serve altra messa a punto prima che diventi una funzione principale."
+        "description": "Sperimentale: ripulisci la tua dettatura con l'IA. Grezza e non rifinita: disattivata per impostazione predefinita."
       },
       "postProcessTimeout": {
         "title": "Timeout della pulizia IA",
@@ -744,7 +702,6 @@
         "checking": "Verifica della configurazione della pulizia IA…",
         "checkFailed": "Impossibile verificare la configurazione della pulizia IA.",
         "ready": "Pronto — {{provider}}.",
-        "assistantFallback": "Pronto — usa il modello del tuo Assistente ({{provider}}).",
         "selectPrompt": "Seleziona un prompt di pulizia.",
         "selectModel": "Seleziona un modello per questo provider.",
         "addApiKey": "Aggiungi una chiave API per questo provider.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (Compatibile con OpenAI)",
-        "location": {
-          "title": "Dove viene eseguita",
-          "description": "Esegui la pulizia in privato con un modello scaricato oppure usa un provider cloud."
-        },
-        "provider": {
-          "title": "Provider",
-          "description": "Seleziona un provider compatibile con OpenAI."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Si esegue completamente in locale. Non è necessaria una chiave API né l'accesso alla rete.",
           "requirements": "Necessita di un Mac con Apple Silicon e macOS Tahoe (26.0) o successivi. Apple Intelligence deve essere abilitata nelle Impostazioni di Sistema.",
           "unavailable": "Apple Intelligence non è disponibile su questo dispositivo. Necessita di un Mac con Apple Silicon e macOS Tahoe (26.0) o successivi con Apple Intelligence abilitata nelle Impostazioni di Sistema."
-        },
-        "baseUrl": {
-          "title": "URL Base",
-          "description": "URL di base dell'API per il provider selezionato. Modificabile per Custom, Local e Azure OpenAI (impostalo sulla tua risorsa, ad esempio https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "Chiave API",
-          "description": "Chiave API per il provider selezionato.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "Scegli un modello che hai scaricato. Funziona sul tuo computer senza chiave API né configurazione.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "Pulizia IA",
         "modelGroupTitle": "Modello di pulizia",
-        "unloadTimeout": {
-          "title": "Mantieni caricato il modello di pulizia",
-          "description": "Quanto tempo il modello di pulizia sul dispositivo resta in memoria dopo che smetti di usarlo. Più tempo significa nessuna ricarica prima della dettatura successiva; un modello inattivo occupa memoria ma non CPU. È indipendente dall'impostazione dell'assistente."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Nessun modello di pulizia",
           "emptyDescription": "SpeakoFlow Mini è un download leggero creato proprio per questo.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Cronologia",
       "storage": {
-        "title": "Archiviazione delle registrazioni",
-        "description": "Questi controlli riguardano le registrazioni di dettatura e di Flow. Le registrazioni salvate vengono sempre conservate. Le chat con l'assistente hanno un'archiviazione separata."
+        "title": "Archiviazione delle registrazioni"
       },
       "openFolder": "Apri la cartella delle registrazioni",
       "loading": "Caricamento cronologia…",
-      "empty": "Qui non c'è ancora niente. Le tue dettature, le generazioni con Flow e le chat con l'assistente compariranno qui.",
       "recordingLabel": "Dettatura",
       "originalTranscriptionLabel": "Trascrizione originale",
       "finalTextLabel": "Testo finale",
@@ -948,10 +882,6 @@
         "title": "Livello di Log",
         "description": "Scegli il livello di dettaglio dei log"
       },
-      "updateChecks": {
-        "label": "Controlla aggiornamenti",
-        "description": "Controlla automaticamente la disponibilità di nuove versioni di SpeakoFlow"
-      },
       "soundTheme": {
         "label": "Tema Sonoro",
         "description": "Scegli un tema sonoro per il feedback di inizio e fine registrazione"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Limite della Cronologia",
-        "description": "Numero massimo di registrazioni di dettatura e di Flow non salvate da conservare. Le registrazioni salvate vengono sempre conservate e le chat con l'assistente non vengono conteggiate.",
         "entries": "registrazioni"
       },
       "recordingRetention": {
         "title": "Eliminazione Automatica Registrazioni",
-        "description": "Scegli come vengono eliminate le registrazioni non salvate. Le modifiche si applicano subito e non riguardano mai le chat con l'assistente.",
         "never": "Mai",
         "preserveLimit": "Conserva un numero fisso",
         "days3": "Dopo 3 giorni",
@@ -1022,27 +950,12 @@
         "title": "Versione",
         "description": "Versione attuale di SpeakoFlow"
       },
-      "updates": {
-        "title": "Aggiornamenti",
-        "button": "Controlla aggiornamenti",
-        "disabledHint": "I controlli automatici degli aggiornamenti sono disattivati. Attivali in Generale."
-      },
       "folders": {
         "title": "Cartelle"
       },
       "appDataDirectory": {
         "title": "Cartella Dati App",
         "description": "Cartella in cui SpeakoFlow salva i dati"
-      },
-      "sourceCode": {
-        "title": "Codice Sorgente",
-        "description": "Vedi e contribuisci al codice sorgente",
-        "button": "Vedi su GitHub"
-      },
-      "license": {
-        "title": "Licenza",
-        "description": "SpeakoFlow è open source con licenza MIT e si basa su Handy (anch'esso MIT) di CJ Pais.",
-        "button": "Visualizza la licenza"
       },
       "supportDevelopment": {
         "title": "Supporta lo Sviluppo",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Cervello dell'assistente",
       "whereLabel": "Dove viene eseguito",
       "onDevice": "Sul mio dispositivo",
       "cloud": "Provider cloud",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Scegli un modello sul dispositivo",
       "catalogDescription": "Scarica un modello locale e privato. Resta su questo computer e non richiede nessuna chiave API.",
       "currentModelTitle": "Modello attuale",
-      "currentModelDescription": "Selezionato per l'assistente integrato su questo dispositivo.",
       "recommendedTitle": "Modelli consigliati",
       "recommendedDescription": "Tre scelte pensate per la conversazione: la più rapida, quella consigliata e una più capace ma più lenta.",
       "acceleratorDetected": "{{name}} · {{memory}} GB di memoria grafica rilevata",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "Download di {{model}}…",
-    "checkingUpdates": "Controllo aggiornamenti…",
-    "updateAvailable": "Aggiornamento disponibile: {{version}}",
-    "updateAvailableShort": "Aggiornamento disponibile",
     "upToDate": "Aggiornato",
-    "downloadUpdate": "Scarica Aggiornamento",
     "restart": "Riavvia",
-    "updateCheckingDisabled": "Controllo Aggiornamenti Disabilitato",
     "downloading": "Download… {{progress}}%",
     "installing": "Installazione…",
     "preparing": "Preparazione…",
-    "checkForUpdates": "Controlla aggiornamenti",
     "checkFailed": "Controllo aggiornamenti non riuscito",
-    "updateFailed": "Aggiornamento non riuscito",
-    "clickToRetry": "Fai clic per riprovare",
-    "portableUpdateTitle": "Aggiornamento manuale necessario",
-    "portableUpdateMessage": "Le installazioni portatili non possono essere aggiornate automaticamente. Per aggiornare: scarica l'ultima versione del programma di installazione NSIS da GitHub Releases, installala nella stessa cartella, quindi copia la cartella Data/ (impostazioni, modelli, registrazioni) dalla vecchia versione a quella nuova..",
-    "portableUpdateButton": "Apri i rilasci su GitHub"
+    "clickToRetry": "Fai clic per riprovare"
   },
   "common": {
     "loading": "Caricamento…",

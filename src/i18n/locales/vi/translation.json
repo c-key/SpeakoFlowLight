@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "Giao diện",
-    "description": "Chọn giao diện sáng, tối hoặc theo hệ thống cho ứng dụng và bảng trợ lý.",
     "system": "Hệ thống",
     "light": "Sáng",
     "dark": "Tối",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "Trang chủ",
-    "checkUpdates": "Kiểm tra cập nhật…",
     "copyLastTranscript": "Sao chép bản chép lời mới nhất",
     "unloadModel": "Dỡ mô hình",
     "model": "Mô hình",
@@ -73,21 +71,9 @@
       "downloadStarted": "Đang tải mô hình của bạn ở chế độ nền."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Chạy được trên mọi máy. Rất tốt để chỉnh gọn câu chữ."
-        },
-        "mid": {
-          "description": "Nhanh nhẹn, đa năng và cũng trả lời được câu hỏi."
-        },
-        "capable": {
-          "description": "Câu trả lời sắc sảo nhất, và nó xem được màn hình của bạn."
-        }
-      },
       "download": "Tải mô hình",
       "useDownloaded": "Dùng mô hình đã tải",
       "skip": "Bỏ qua bây giờ",
-      "skipHint": "Bạn có thể làm việc này sau trong Cài đặt > Trợ lý > Trên máy của tôi.",
       "continue": "Tiếp tục",
       "downloadingHint": "Mô hình của bạn đang được tải xuống ở chế độ nền — bạn có thể bắt đầu sử dụng ứng dụng ngay.",
       "downloadStarted": "Đang tải mô hình AI của bạn ở chế độ nền."
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "Trả lời nhanh, gọn gàng và xem được màn hình, nhưng yếu hơn các mô hình Gemma 4 hiện tại."
-      },
-      "kokoro-82m": {
-        "description": "Giọng nói cục bộ tích hợp cho trợ lý. Không cần tải xuống."
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "Về bạn",
-        "caption": "Bản tóm tắt ngắn, luôn bật, mà trợ lý luôn ghi nhớ.",
         "fieldLabel": "Tóm tắt",
-        "placeholder": "ví dụ: Thích câu trả lời ngắn, thẳng vào vấn đề. Làm việc với Rust và TypeScript. Đang xây dựng một trợ lý giọng nói cho máy tính.",
-        "hint": "Luôn được đưa vào khi bộ nhớ đang bật. Chỉ nên viết vài câu — đây là bức tranh tổng quan của trợ lý về bạn.",
         "edit": "Sửa",
         "done": "Xong",
-        "empty": "Chưa lưu gì cả — trợ lý sẽ tự điền vào khi học được, hoặc nhấn Sửa để tự viết.",
         "collapsedEmpty": "Chưa lưu gì cả"
       },
       "notes": {
         "label": "Ghi chú",
         "caption": "Những điều cụ thể đáng ghi nhớ — do trợ lý học được hoặc do bạn thêm.",
-        "empty": "Chưa có ghi chú nào. Thêm một ghi chú bên dưới, hoặc để trợ lý học từ các cuộc trò chuyện của bạn.",
         "add": "Thêm",
         "addPlaceholder": "Thêm điều cần ghi nhớ…",
         "delete": "Xóa ghi chú",
@@ -343,7 +321,6 @@
       "import": "Nhập",
       "wipe": {
         "button": "Xóa sạch bộ nhớ",
-        "confirm": "Xóa mọi thứ trợ lý đang ghi nhớ?",
         "yes": "Xóa tất cả",
         "cancel": "Hủy"
       }
@@ -361,7 +338,6 @@
         "sounds": "Âm thanh",
         "startup": "Khởi động và khay hệ thống",
         "overlay": "Lớp phủ",
-        "updates": "Cập nhật",
         "system": "Hệ thống"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "Phím tắt xử lý sau",
             "description": "Đọc chính tả, rồi AI dọn dẹp văn bản trước khi nó được gõ ra."
-          },
-          "assistant": {
-            "name": "Hỏi trợ lý",
-            "description": "Hỏi trợ lý bằng giọng nói; câu trả lời hiện dần trong bảng nổi."
-          },
-          "assistant_vision": {
-            "name": "Hỏi kèm màn hình",
-            "description": "Hỏi bằng giọng nói kèm màn hình của bạn để trợ lý thấy được thứ bạn đang xem."
-          },
-          "assistant_panel_toggle": {
-            "name": "Hiện hoặc ẩn bảng",
-            "description": "Hiện hoặc ẩn bảng trợ lý nổi."
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} là mô hình đang hoạt động của bạn. Xóa nó sẽ dừng phiên âm cho đến khi bạn chọn một mô hình mới. Bạn có chắc không?",
       "deleteTitle": "Xóa mô hình",
       "categories": {
-        "stt": "Chuyển đổi",
-        "llm": "Trợ lý",
-        "tts": "Giọng nói"
+        "stt": "Chuyển đổi"
       },
       "categoryDescriptions": {
-        "stt": "Các mô hình đánh đổi độ chính xác lấy tốc độ — hãy chọn mô hình phù hợp với máy của bạn.",
-        "llm": "Mô hình cục bộ cho trợ lý tích hợp và dọn dẹp bằng AI.",
-        "tts": "Giọng đọc cho câu trả lời nói của trợ lý. Kokoro chạy trên máy của bạn."
+        "stt": "Các mô hình đánh đổi độ chính xác lấy tốc độ — hãy chọn mô hình phù hợp với máy của bạn."
       },
-      "llmHint": "Sau khi tải xuống, hãy chọn mô hình này ở mục Trợ lý, dưới nhà cung cấp tích hợp (cục bộ).",
       "ttsHint": "Các mô hình giọng nói chạy trên máy của bạn và không cần tải xuống.",
       "filters": {
         "all": "Tất cả",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "Dọn dẹp bằng AI (đang phát triển)",
-        "description": "Thử nghiệm: dùng AI dọn dẹp phần đọc chính tả của bạn. Còn thô và chưa hoàn thiện — mặc định tắt.",
-        "info": "Chạy một mô hình ngôn ngữ trên phần đọc chính tả của bạn để sửa dấu câu, loại bỏ từ đệm và tùy chọn điều chỉnh văn phong. Chỉ áp dụng cho đọc chính tả (không áp dụng cho trò chuyện với trợ lý) và chạy bằng phím tắt riêng. Nó thêm một khoảng chờ vì mô hình chạy sau khi chuyển đổi; nếu thất bại hoặc quá thời gian, văn bản gốc của bạn sẽ được dán. Mặc định dùng mô hình của trợ lý. Tính năng này vẫn đang phát triển — bạn chưa thể chọn mô hình cục bộ tích hợp từ danh sách riêng của nó, và nó cần tinh chỉnh thêm trước khi trở thành một tính năng chính."
+        "description": "Thử nghiệm: dùng AI dọn dẹp phần đọc chính tả của bạn. Còn thô và chưa hoàn thiện — mặc định tắt."
       },
       "postProcessTimeout": {
         "title": "Thời gian chờ dọn dẹp bằng AI",
@@ -744,7 +702,6 @@
         "checking": "Đang kiểm tra thiết lập dọn dẹp bằng AI…",
         "checkFailed": "Không thể kiểm tra thiết lập dọn dẹp bằng AI.",
         "ready": "Sẵn sàng — {{provider}}.",
-        "assistantFallback": "Sẵn sàng — đang dùng mô hình Trợ lý của bạn ({{provider}}).",
         "selectPrompt": "Hãy chọn một prompt dọn dẹp.",
         "selectModel": "Hãy chọn một mô hình cho nhà cung cấp này.",
         "addApiKey": "Hãy thêm khóa API cho nhà cung cấp này.",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API (Tương thích OpenAI)",
-        "location": {
-          "title": "Nơi chạy",
-          "description": "Chạy dọn dẹp riêng tư bằng một mô hình đã tải, hoặc dùng nhà cung cấp đám mây."
-        },
-        "provider": {
-          "title": "Nhà cung cấp",
-          "description": "Chọn một nhà cung cấp tương thích OpenAI."
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "Chạy hoàn toàn trên thiết bị. Không cần khóa API hoặc truy cập mạng.",
           "requirements": "Yêu cầu Mac Apple Silicon chạy macOS Tahoe (26.0) trở lên. Apple Intelligence phải được bật trong Cài đặt Hệ thống.",
           "unavailable": "Apple Intelligence không khả dụng trên thiết bị này. Yêu cầu Mac Apple Silicon chạy macOS Tahoe (26.0) trở lên với Apple Intelligence được bật trong Cài đặt Hệ thống."
-        },
-        "baseUrl": {
-          "title": "URL cơ sở",
-          "description": "URL cơ sở API cho nhà cung cấp đã chọn. Có thể chỉnh sửa với Custom, Local và Azure OpenAI (hãy đặt thành tài nguyên của bạn, ví dụ https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "Khóa API",
-          "description": "Khóa API cho nhà cung cấp đã chọn.",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "Chọn một mô hình bạn đã tải. Nó chạy trên máy của bạn, không cần khóa API hay thiết lập.",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "Dọn dẹp bằng AI",
         "modelGroupTitle": "Mô hình dọn dẹp",
-        "unloadTimeout": {
-          "title": "Giữ mô hình dọn dẹp trong bộ nhớ",
-          "description": "Mô hình dọn dẹp trên máy sẽ nằm trong bộ nhớ bao lâu sau khi bạn ngừng dùng. Lâu hơn nghĩa là không phải nạp lại trước lần đọc chính tả kế tiếp; mô hình đang rảnh chiếm bộ nhớ nhưng không dùng CPU. Cài đặt này tách riêng với cài đặt của trợ lý."
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "Chưa có mô hình dọn dẹp nào",
           "emptyDescription": "SpeakoFlow Mini là một bản tải nhỏ được làm riêng cho việc này.",
@@ -917,12 +853,10 @@
     "history": {
       "title": "Lịch sử",
       "storage": {
-        "title": "Lưu trữ bản ghi âm",
-        "description": "Các tùy chọn này ảnh hưởng đến bản ghi đọc chính tả và Flow. Bản ghi đã lưu luôn được giữ lại. Trò chuyện với trợ lý được lưu trữ riêng."
+        "title": "Lưu trữ bản ghi âm"
       },
       "openFolder": "Mở thư mục ghi âm",
       "loading": "Đang tải lịch sử…",
-      "empty": "Chưa có gì ở đây. Nội dung đọc chính tả, nội dung do Flow tạo và trò chuyện với trợ lý của bạn sẽ xuất hiện ở đây.",
       "recordingLabel": "Đọc chính tả",
       "originalTranscriptionLabel": "Bản chuyển đổi gốc",
       "finalTextLabel": "Văn bản cuối",
@@ -948,10 +882,6 @@
         "title": "Mức nhật ký",
         "description": "Đặt mức độ chi tiết của nhật ký"
       },
-      "updateChecks": {
-        "label": "Kiểm tra cập nhật",
-        "description": "Tự động kiểm tra phiên bản mới của SpeakoFlow"
-      },
       "soundTheme": {
         "label": "Chủ đề âm thanh",
         "description": "Chọn chủ đề âm thanh cho phản hồi bắt đầu và kết thúc ghi âm"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "Giới hạn lịch sử",
-        "description": "Số bản ghi đọc chính tả và Flow chưa lưu tối đa cần giữ. Bản ghi đã lưu luôn được giữ lại, và trò chuyện với trợ lý không được tính.",
         "entries": "bản ghi"
       },
       "recordingRetention": {
         "title": "Tự động xóa ghi âm",
-        "description": "Chọn cách dọn các bản ghi chưa lưu. Thay đổi có hiệu lực ngay và không bao giờ ảnh hưởng đến trò chuyện với trợ lý.",
         "never": "Không bao giờ",
         "preserveLimit": "Giữ một số lượng nhất định",
         "days3": "Sau 3 ngày",
@@ -1022,27 +950,12 @@
         "title": "Phiên bản",
         "description": "Phiên bản hiện tại của SpeakoFlow"
       },
-      "updates": {
-        "title": "Cập nhật",
-        "button": "Kiểm tra cập nhật",
-        "disabledHint": "Tự động kiểm tra cập nhật đang tắt. Bật lại trong mục Chung."
-      },
       "folders": {
         "title": "Thư mục"
       },
       "appDataDirectory": {
         "title": "Thư mục dữ liệu ứng dụng",
         "description": "Vị trí SpeakoFlow lưu trữ dữ liệu"
-      },
-      "sourceCode": {
-        "title": "Mã nguồn",
-        "description": "Xem mã nguồn và đóng góp",
-        "button": "Xem trên GitHub"
-      },
-      "license": {
-        "title": "Giấy phép",
-        "description": "SpeakoFlow là mã nguồn mở theo Giấy phép MIT, dựa trên Handy (cũng MIT) của CJ Pais.",
-        "button": "Xem giấy phép"
       },
       "supportDevelopment": {
         "title": "Hỗ trợ phát triển",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "Bộ não trợ lý",
       "whereLabel": "Nơi chạy",
       "onDevice": "Trên máy của tôi",
       "cloud": "Nhà cung cấp đám mây",
@@ -1080,7 +992,6 @@
       "catalogTitle": "Chọn một mô hình chạy trên thiết bị",
       "catalogDescription": "Tải một mô hình cục bộ riêng tư. Nó nằm lại trên máy này và không cần khóa API.",
       "currentModelTitle": "Mô hình hiện tại",
-      "currentModelDescription": "Đã chọn cho trợ lý tích hợp trên thiết bị này.",
       "recommendedTitle": "Mô hình được đề xuất",
       "recommendedDescription": "Ba lựa chọn ưu tiên trò chuyện: nhanh nhất, được đề xuất, và mạnh hơn nhưng chậm hơn.",
       "acceleratorDetected": "{{name}} · {{memory}} GB bộ nhớ đồ họa được báo cáo",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "Đang tải {{model}}…",
-    "checkingUpdates": "Đang kiểm tra cập nhật…",
-    "updateAvailable": "Có bản cập nhật: {{version}}",
-    "updateAvailableShort": "Có bản cập nhật",
     "upToDate": "Đã cập nhật",
-    "downloadUpdate": "Tải cập nhật",
     "restart": "Khởi động lại",
-    "updateCheckingDisabled": "Đã tắt kiểm tra cập nhật",
     "downloading": "Đang tải… {{progress}}%",
     "installing": "Đang cài đặt…",
     "preparing": "Đang chuẩn bị…",
-    "checkForUpdates": "Kiểm tra cập nhật",
     "checkFailed": "Kiểm tra cập nhật thất bại",
-    "updateFailed": "Cập nhật thất bại",
-    "clickToRetry": "Nhấn để thử lại",
-    "portableUpdateTitle": "Cần cập nhật thủ công",
-    "portableUpdateMessage": "Bản cài đặt di động không thể tự cập nhật. Để cập nhật: tải bộ cài NSIS mới nhất từ GitHub Releases, cài vào cùng thư mục, rồi sao chép thư mục Data/ của bạn (cài đặt, mô hình, bản ghi âm) từ phiên bản cũ sang phiên bản mới.",
-    "portableUpdateButton": "Mở GitHub Releases"
+    "clickToRetry": "Nhấn để thử lại"
   },
   "common": {
     "loading": "Đang tải…",

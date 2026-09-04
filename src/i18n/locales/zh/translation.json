@@ -1,7 +1,6 @@
 {
   "appearance": {
     "title": "外观",
-    "description": "为应用和助手面板选择浅色、深色或跟随系统的主题。",
     "system": "系统",
     "light": "浅色",
     "dark": "深色",
@@ -14,7 +13,6 @@
   },
   "tray": {
     "home": "主页",
-    "checkUpdates": "检查更新…",
     "copyLastTranscript": "复制最新转录",
     "unloadModel": "卸载模型",
     "model": "模型",
@@ -73,21 +71,9 @@
       "downloadStarted": "正在后台下载您的模型。"
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "任何电脑都能运行。非常适合润色文字。"
-        },
-        "mid": {
-          "description": "反应迅速的全能选手，还能回答问题。"
-        },
-        "capable": {
-          "description": "回答最精准，还能看到您的屏幕。"
-        }
-      },
       "download": "下载模型",
       "useDownloaded": "使用已下载的模型",
       "skip": "暂时跳过",
-      "skipHint": "您可以稍后在“设置 → 助手 → 在我的设备上”中完成。",
       "continue": "继续",
       "downloadingHint": "您的模型正在后台下载——您可以立即开始使用应用。",
       "downloadStarted": "正在后台下载您的 AI 模型。"
@@ -171,9 +157,6 @@
       },
       "gemma-3-4b": {
         "description": "回答快速干净并支持屏幕视觉，但能力不及当前的 Gemma 4 模型。"
-      },
-      "kokoro-82m": {
-        "description": "助手的内置本地语音。无需下载。"
       },
       "small": {
         "name": "Whisper Small",
@@ -313,19 +296,14 @@
       },
       "aboutYou": {
         "label": "关于您",
-        "caption": "助手始终记在心里的简短概要。",
         "fieldLabel": "概要",
-        "placeholder": "例如：偏好简短直接的回答。使用 Rust 和 TypeScript。正在开发一款桌面语音助手。",
-        "hint": "记忆开启时始终会包含在内。请控制在几句话以内——这是助手对您的整体印象。",
         "edit": "编辑",
         "done": "完成",
-        "empty": "尚未保存任何内容——助手会在学习中逐步补充，您也可以点击“编辑”自行撰写。",
         "collapsedEmpty": "尚未保存任何内容"
       },
       "notes": {
         "label": "笔记",
         "caption": "值得记住的具体事项——由助手学习或由您添加。",
-        "empty": "还没有笔记。在下方添加，或让助手从您的聊天中学习。",
         "add": "添加",
         "addPlaceholder": "添加要记住的内容…",
         "delete": "删除笔记",
@@ -343,7 +321,6 @@
       "import": "导入",
       "wipe": {
         "button": "清空记忆",
-        "confirm": "删除助手记住的全部内容？",
         "yes": "全部删除",
         "cancel": "取消"
       }
@@ -361,7 +338,6 @@
         "sounds": "声音",
         "startup": "启动与托盘",
         "overlay": "悬浮窗",
-        "updates": "更新",
         "system": "系统"
       },
       "shortcut": {
@@ -387,18 +363,6 @@
           "transcribe_with_post_process": {
             "name": "后处理快捷键",
             "description": "先语音输入，再用 AI 清理，然后才输入文字。"
-          },
-          "assistant": {
-            "name": "询问助手",
-            "description": "用语音向助手提问；回答会流式显示在悬浮面板中。"
-          },
-          "assistant_vision": {
-            "name": "带屏幕提问",
-            "description": "用语音提问并附上您的屏幕，让它看到您正在看的内容。"
-          },
-          "assistant_panel_toggle": {
-            "name": "显示或隐藏面板",
-            "description": "显示或隐藏悬浮的助手面板。"
           }
         },
         "errors": {
@@ -439,16 +403,11 @@
       "deleteActiveConfirm": "{{modelName}} 是您当前使用的模型。删除后将停止转录，直到您选择新的模型。确定要删除吗？",
       "deleteTitle": "删除模型",
       "categories": {
-        "stt": "转录",
-        "llm": "助手",
-        "tts": "语音"
+        "stt": "转录"
       },
       "categoryDescriptions": {
-        "stt": "模型在准确度和速度之间取舍——选择适合您电脑的一个。",
-        "llm": "用于内置助手和 AI 清理的本地模型。",
-        "tts": "助手朗读回复时使用的语音。Kokoro 在您的设备上运行。"
+        "stt": "模型在准确度和速度之间取舍——选择适合您电脑的一个。"
       },
-      "llmHint": "下载完成后，在“助手”部分的内置（本地）提供商下选择此模型。",
       "ttsHint": "语音模型在您的设备上运行，无需下载。",
       "filters": {
         "all": "全部",
@@ -562,8 +521,7 @@
       },
       "aiCorrection": {
         "label": "AI 清理（开发中）",
-        "description": "实验性功能：用 AI 清理您的语音输入。仍然粗糙、尚未打磨——默认关闭。",
-        "info": "用语言模型处理您的语音输入，修正标点、去除口头语，并可选地调整语气。仅适用于语音输入（不影响助手聊天），并使用独立的快捷键。由于模型在转录之后运行，会增加一些延迟；如果失败或超时，则会粘贴原始文本。默认使用您助手的模型。此功能仍在开发中——目前还无法从独立列表中选择内置的本地模型，在成为正式功能前还需要更多调优。"
+        "description": "实验性功能：用 AI 清理您的语音输入。仍然粗糙、尚未打磨——默认关闭。"
       },
       "postProcessTimeout": {
         "title": "AI 清理超时",
@@ -744,7 +702,6 @@
         "checking": "正在检查 AI 清理的设置…",
         "checkFailed": "无法检查 AI 清理的设置。",
         "ready": "已就绪——{{provider}}。",
-        "assistantFallback": "已就绪——使用您的助手模型（{{provider}}）。",
         "selectPrompt": "请选择一个清理提示词。",
         "selectModel": "请为此提供商选择一个模型。",
         "addApiKey": "请为此提供商添加 API 密钥。",
@@ -796,29 +753,11 @@
       },
       "api": {
         "title": "API（兼容 OpenAI）",
-        "location": {
-          "title": "运行位置",
-          "description": "用已下载的模型在本地私密地清理，或使用云端提供商。"
-        },
-        "provider": {
-          "title": "提供商",
-          "description": "选择一个兼容 OpenAI 的提供商。"
-        },
         "appleIntelligence": {
           "title": "Apple Intelligence",
           "description": "完全在设备上运行。无需 API 密钥或网络访问。",
           "requirements": "需要运行 macOS Tahoe（26.0）或更高版本的 Apple Silicon Mac。必须在系统设置中启用 Apple Intelligence。",
           "unavailable": "Apple Intelligence 在此设备上不可用。需要运行 macOS Tahoe（26.0）或更高版本的 Apple Silicon Mac，并在系统设置中启用 Apple Intelligence。"
-        },
-        "baseUrl": {
-          "title": "基础 URL",
-          "description": "所选提供商的 API 基础 URL。Custom、Local 和 Azure OpenAI 可编辑（请填写您自己的资源地址，例如 https://your-resource.openai.azure.com/openai/v1）。",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API 密钥",
-          "description": "所选提供商的 API 密钥。",
-          "placeholder": "sk-..."
         },
         "builtin": {
           "modelDescription": "选择一个您已下载的模型。它在您的设备上运行，无需 API 密钥或任何设置。",
@@ -882,10 +821,7 @@
       "aiCleanup": {
         "groupTitle": "AI 清理",
         "modelGroupTitle": "清理模型",
-        "unloadTimeout": {
-          "title": "让清理模型保持加载",
-          "description": "停止使用后，设备上的清理模型在内存中保留多久。时间越长，下次语音输入前就无需重新加载；闲置的模型占用内存但不占用 CPU。与助手的同类设置相互独立。"
-        },
+        "unloadTimeout": {},
         "model": {
           "emptyTitle": "还没有清理模型",
           "emptyDescription": "SpeakoFlow Mini 是专为此打造的小型下载。",
@@ -917,12 +853,10 @@
     "history": {
       "title": "历史记录",
       "storage": {
-        "title": "录音存储",
-        "description": "这些设置作用于语音输入和 Flow 的录音。已保存的录音会始终保留。助手聊天单独存储。"
+        "title": "录音存储"
       },
       "openFolder": "打开录音文件夹",
       "loading": "加载历史记录中…",
-      "empty": "这里还没有内容。您的语音输入、Flow 生成和助手聊天会显示在这里。",
       "recordingLabel": "语音输入",
       "originalTranscriptionLabel": "原始转录",
       "finalTextLabel": "最终文本",
@@ -948,10 +882,6 @@
         "title": "日志级别",
         "description": "设置日志的详细程度"
       },
-      "updateChecks": {
-        "label": "检查更新",
-        "description": "自动检查 SpeakoFlow 的新版本"
-      },
       "soundTheme": {
         "label": "声音主题",
         "description": "选择录制开始和停止反馈的声音主题"
@@ -962,12 +892,10 @@
       },
       "historyLimit": {
         "title": "历史记录上限",
-        "description": "未保存的语音输入和 Flow 录音最多保留多少条。已保存的录音会始终保留，助手聊天不计入。",
         "entries": "条录音"
       },
       "recordingRetention": {
         "title": "自动删除录音",
-        "description": "选择未加星标的录音如何清理。更改立即生效，且永远不会影响助手聊天。",
         "never": "从不",
         "preserveLimit": "保留指定数量",
         "days3": "3 天后",
@@ -1022,27 +950,12 @@
         "title": "版本",
         "description": "SpeakoFlow 的当前版本"
       },
-      "updates": {
-        "title": "更新",
-        "button": "检查更新",
-        "disabledHint": "自动检查更新已关闭。可在“通用”中开启。"
-      },
       "folders": {
         "title": "文件夹"
       },
       "appDataDirectory": {
         "title": "应用数据目录",
         "description": "SpeakoFlow 存储数据的位置"
-      },
-      "sourceCode": {
-        "title": "源代码",
-        "description": "查看源代码并贡献",
-        "button": "在 GitHub 上查看"
-      },
-      "license": {
-        "title": "许可证",
-        "description": "SpeakoFlow 基于 MIT 许可证开源，构建于 CJ Pais 的 Handy（同为 MIT 许可）之上。",
-        "button": "查看许可证"
       },
       "supportDevelopment": {
         "title": "支持开发",
@@ -1070,7 +983,6 @@
       }
     },
     "cleanupModels": {
-      "title": "助手大脑",
       "whereLabel": "运行位置",
       "onDevice": "在我的设备上",
       "cloud": "云端提供商",
@@ -1080,7 +992,6 @@
       "catalogTitle": "选择一个本地模型",
       "catalogDescription": "下载一个私密的本地模型。它只留在这台电脑上，无需 API 密钥。",
       "currentModelTitle": "当前模型",
-      "currentModelDescription": "已为本设备上的内置助手选用。",
       "recommendedTitle": "推荐模型",
       "recommendedDescription": "三个以对话为先的选择：最快、推荐，以及能力更强但更慢。",
       "acceleratorDetected": "{{name}} · 报告显存 {{memory}} GB",
@@ -1108,23 +1019,13 @@
   },
   "footer": {
     "downloadingModel": "正在下载 {{model}}…",
-    "checkingUpdates": "检查更新中…",
-    "updateAvailable": "有可用更新: {{version}}",
-    "updateAvailableShort": "有可用更新",
     "upToDate": "已是最新版本",
-    "downloadUpdate": "下载更新",
     "restart": "重启",
-    "updateCheckingDisabled": "更新检查已禁用",
     "downloading": "下载中… {{progress}}%",
     "installing": "安装中…",
     "preparing": "准备中…",
-    "checkForUpdates": "检查更新",
     "checkFailed": "检查更新失败",
-    "updateFailed": "更新失败",
-    "clickToRetry": "点击重试",
-    "portableUpdateTitle": "需要手动更新",
-    "portableUpdateMessage": "便携版安装无法自动更新。更新方法：从 GitHub Releases 下载最新的 NSIS 安装程序，安装到同一文件夹，然后把旧版本的 Data/ 文件夹（设置、模型、录音）复制到新版本中。",
-    "portableUpdateButton": "打开 GitHub Releases"
+    "clickToRetry": "点击重试"
   },
   "common": {
     "loading": "加载中…",

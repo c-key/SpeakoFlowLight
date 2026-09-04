@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
-import { emit } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { SettingContainer } from "../../ui/SettingContainer";
@@ -10,17 +9,11 @@ import { Button } from "../../ui/Button";
 import { AppDataDirectory } from "../AppDataDirectory";
 import { AppLanguageSelector } from "../AppLanguageSelector";
 import { LogDirectory } from "../debug";
-import { useSettings } from "../../../hooks/useSettings";
 
 export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
-  const { getSetting } = useSettings();
   const [version, setVersion] = useState("");
-
-  // The auto-check preference lives in General; here we only offer a manual
-  // "check now" that reuses the footer updater (same path as the tray item).
-  const updateChecksEnabled =
-    (getSetting("update_checks_enabled") as boolean | undefined) ?? true;
+  const versionLabel = version ? `v${version}-light` : "";
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -48,27 +41,9 @@ export const AboutSettings: React.FC = () => {
           title={t("settings.about.version.title")}
           grouped={true}
         >
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          {version && <span className="text-sm font-mono">v{version}</span>}
-        </SettingContainer>
-
-        <SettingContainer
-          title={t("settings.about.updates.title")}
-          description={
-            updateChecksEnabled
-              ? undefined
-              : t("settings.about.updates.disabledHint")
-          }
-          grouped={true}
-        >
-          <Button
-            variant="secondary"
-            size="md"
-            disabled={!updateChecksEnabled}
-            onClick={() => void emit("check-for-updates")}
-          >
-            {t("settings.about.updates.button")}
-          </Button>
+          {versionLabel && (
+            <span className="text-sm font-mono">{versionLabel}</span>
+          )}
         </SettingContainer>
 
         <AppLanguageSelector descriptionMode="tooltip" grouped={true} />
@@ -78,13 +53,7 @@ export const AboutSettings: React.FC = () => {
           description={t("settings.about.sourceCode.description")}
           grouped={true}
         >
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={() =>
-              openUrl("https://github.com/AbhishekBarali/SpeakoFlow")
-            }
-          >
+          <Button variant="secondary" size="md" disabled>
             {t("settings.about.sourceCode.button")}
           </Button>
         </SettingContainer>
@@ -97,11 +66,7 @@ export const AboutSettings: React.FC = () => {
           <Button
             variant="secondary"
             size="md"
-            onClick={() =>
-              openUrl(
-                "https://github.com/AbhishekBarali/SpeakoFlow/blob/main/LICENSE",
-              )
-            }
+            onClick={() => openUrl("https://opensource.org/license/mit")}
           >
             {t("settings.about.license.button")}
           </Button>

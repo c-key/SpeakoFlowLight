@@ -837,8 +837,6 @@ pub struct AppSettings {
     pub start_hidden: bool,
     #[serde(default = "default_autostart_enabled")]
     pub autostart_enabled: bool,
-    #[serde(default = "default_update_checks_enabled")]
-    pub update_checks_enabled: bool,
     #[serde(default = "default_model")]
     pub selected_model: String,
     #[serde(default = "default_always_on_microphone")]
@@ -962,13 +960,6 @@ pub struct AppSettings {
     /// so the device ⇄ cloud switch can put it back.
     ///
     /// `post_process_provider_id` is a single slot: choosing "On my device"
-    /// overwrites it with `builtin` and destroys the record of which cloud
-    /// provider was configured. This used to be React state, which meant the
-    /// choice survived a toggle but not a navigation away from the page — the
-    /// user came back, switched to cloud, and landed on some other provider with
-    /// their model selection apparently gone.
-    #[serde(default)]
-    pub post_process_last_cloud_provider_id: Option<String>,
     #[serde(default)]
     pub mute_while_recording: bool,
     #[serde(default)]
@@ -1089,10 +1080,6 @@ fn default_autostart_enabled() -> bool {
     false
 }
 
-fn default_update_checks_enabled() -> bool {
-    true
-}
-
 fn default_selected_language() -> String {
     "auto".to_string()
 }
@@ -1172,139 +1159,16 @@ fn default_show_tray_icon() -> bool {
 }
 
 fn default_post_process_provider_id() -> String {
-    "openai".to_string()
+    // The bundled llama.cpp engine. Upstream defaulted to OpenAI; with the
+    // hosted providers gone, the on-device engine is the only sane default.
+    BUILTIN_POST_PROCESS_PROVIDER_ID.to_string()
 }
 
 fn default_post_process_providers() -> Vec<PostProcessProvider> {
-    let mut providers = vec![
-        PostProcessProvider {
-            id: "openai".to_string(),
-            label: "OpenAI".to_string(),
-            base_url: "https://api.openai.com/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "zai".to_string(),
-            label: "Z.AI".to_string(),
-            base_url: "https://api.z.ai/api/paas/v4".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "openrouter".to_string(),
-            label: "OpenRouter".to_string(),
-            base_url: "https://openrouter.ai/api/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "anthropic".to_string(),
-            label: "Anthropic".to_string(),
-            base_url: "https://api.anthropic.com/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "groq".to_string(),
-            label: "Groq".to_string(),
-            base_url: "https://api.groq.com/openai/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "cerebras".to_string(),
-            label: "Cerebras".to_string(),
-            base_url: "https://api.cerebras.ai/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        // Google Gemini via its OpenAI-compatible surface. Base URL has NO
-        // trailing `/v1` — the app appends `/chat/completions` and `/models`.
-        PostProcessProvider {
-            id: "gemini".to_string(),
-            label: "Google Gemini".to_string(),
-            base_url: "https://generativelanguage.googleapis.com/v1beta/openai".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "xai".to_string(),
-            label: "xAI (Grok)".to_string(),
-            base_url: "https://api.x.ai/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "deepseek".to_string(),
-            label: "DeepSeek".to_string(),
-            base_url: "https://api.deepseek.com/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "mistral".to_string(),
-            label: "Mistral".to_string(),
-            base_url: "https://api.mistral.ai/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-        PostProcessProvider {
-            id: "moonshot".to_string(),
-            label: "Moonshot (Kimi)".to_string(),
-            base_url: "https://api.moonshot.ai/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "together".to_string(),
-            label: "Together AI".to_string(),
-            base_url: "https://api.together.xyz/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "fireworks".to_string(),
-            label: "Fireworks AI".to_string(),
-            base_url: "https://api.fireworks.ai/inference/v1".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: false,
-        },
-        PostProcessProvider {
-            id: "perplexity".to_string(),
-            label: "Perplexity".to_string(),
-            base_url: "https://api.perplexity.ai".to_string(),
-            allow_base_url_edit: false,
-            models_endpoint: None,
-            supports_structured_output: false,
-        },
-        // Azure OpenAI via the v1 API surface. Users must edit the base URL to
-        // their resource, e.g. https://my-res.openai.azure.com/openai/v1
-        // (classic dated `?api-version=` deployment endpoints are not supported;
-        // the model name is the deployment name). Key auth is sent as both
-        // `Authorization: Bearer` and the `api-key` header.
-        PostProcessProvider {
-            id: "azure_openai".to_string(),
-            label: "Azure OpenAI".to_string(),
-            base_url: "https://YOUR-RESOURCE.openai.azure.com/openai/v1".to_string(),
-            allow_base_url_edit: true,
-            models_endpoint: Some("/models".to_string()),
-            supports_structured_output: true,
-        },
-    ];
+    // Local targets only. Upstream shipped a dozen cloud providers here; this
+    // fork removes them, so nothing in the picker can send a transcript off the
+    // machine. Model downloads are the only outbound traffic left.
+    let mut providers: Vec<PostProcessProvider> = Vec::new();
 
     // Note: We always include Apple Intelligence on macOS ARM64 without checking availability
     // at startup. The availability check is deferred to when the user actually tries to use it
@@ -1321,16 +1185,6 @@ fn default_post_process_providers() -> Vec<PostProcessProvider> {
             supports_structured_output: true,
         });
     }
-
-    // AWS Bedrock via Mantle (OpenAI-compatible endpoint)
-    providers.push(PostProcessProvider {
-        id: "bedrock_mantle".to_string(),
-        label: "AWS Bedrock (Mantle)".to_string(),
-        base_url: "https://bedrock-mantle.us-east-1.api.aws/v1".to_string(),
-        allow_base_url_edit: false,
-        models_endpoint: Some("/models".to_string()),
-        supports_structured_output: true,
-    });
 
     // Built-in local LLM (no setup, no API key). Served by the bundled
     // llama.cpp sidecar on a loopback port; the LocalLlmManager starts it on
@@ -1359,16 +1213,6 @@ fn default_post_process_providers() -> Vec<PostProcessProvider> {
     providers.push(PostProcessProvider {
         id: "local".to_string(),
         label: "Local (Ollama / LM Studio)".to_string(),
-        base_url: "http://localhost:11434/v1".to_string(),
-        allow_base_url_edit: true,
-        models_endpoint: Some("/models".to_string()),
-        supports_structured_output: false,
-    });
-
-    // Custom provider always comes last
-    providers.push(PostProcessProvider {
-        id: "custom".to_string(),
-        label: "Custom".to_string(),
         base_url: "http://localhost:11434/v1".to_string(),
         allow_base_url_edit: true,
         models_endpoint: Some("/models".to_string()),
@@ -1697,6 +1541,29 @@ fn ensure_profile_defaults(settings: &mut AppSettings) -> bool {
 
 fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
     let mut changed = false;
+
+    // A settings.json written by upstream — or by an earlier build of this fork
+    // — still lists the cloud providers. Removing them from the defaults is not
+    // enough on its own: without this the picker would keep offering a route
+    // off the machine for exactly the installs that already had one.
+    let allowed: std::collections::HashSet<String> = default_post_process_providers()
+        .into_iter()
+        .map(|provider| provider.id)
+        .collect();
+    let before = settings.post_process_providers.len();
+    settings
+        .post_process_providers
+        .retain(|provider| allowed.contains(&provider.id));
+    if settings.post_process_providers.len() != before {
+        changed = true;
+    }
+    settings
+        .post_process_api_keys
+        .retain(|id, _| allowed.contains(id));
+    if !allowed.contains(&settings.post_process_provider_id) {
+        settings.post_process_provider_id = default_post_process_provider_id();
+        changed = true;
+    }
     for provider in default_post_process_providers() {
         // Use match to do a single lookup - either sync existing or add new
         match settings
@@ -1781,20 +1648,6 @@ fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
 
     // Seed the "last cloud provider" memory from the current selection.
     //
-    // Without this an existing install upgrades with the slot empty, so the very
-    // first "On my device" → "Cloud provider" round trip lands on an arbitrary
-    // provider — exactly the bug these fields were added to fix, just deferred by
-    // one toggle. Whoever is selected right now is by definition the choice worth
-    // remembering.
-    if settings.post_process_last_cloud_provider_id.is_none()
-        && settings.post_process_provider_id != BUILTIN_POST_PROCESS_PROVIDER_ID
-        && !settings.post_process_provider_id.trim().is_empty()
-    {
-        settings.post_process_last_cloud_provider_id =
-            Some(settings.post_process_provider_id.clone());
-        changed = true;
-    }
-
     // Seed the SpeakoFlow Mini prompt for installs that predate it, and upgrade
     // an untouched copy of a previously shipped revision. Same untouched-text
     // rule as above: anything else the user has written at that id is theirs and
@@ -1944,7 +1797,6 @@ pub fn get_default_settings() -> AppSettings {
         sound_theme: default_sound_theme(),
         start_hidden: default_start_hidden(),
         autostart_enabled: default_autostart_enabled(),
-        update_checks_enabled: default_update_checks_enabled(),
         selected_model: "".to_string(),
         always_on_microphone: false,
         live_transcription_enabled: false,
@@ -1987,7 +1839,6 @@ pub fn get_default_settings() -> AppSettings {
         // Seeded rather than left None so `get_default_settings()` is a fixed
         // point of the repair pass below (several tests rely on that, and a
         // settings write on every launch would be pointless churn).
-        post_process_last_cloud_provider_id: Some(default_post_process_provider_id()),
         mute_while_recording: false,
         append_trailing_space: false,
         app_language: default_app_language(),
@@ -2106,30 +1957,13 @@ impl AppSettings {
     }
 }
 
-/// Fixed hosted providers require credentials before a request. Local,
-/// built-in, Apple, custom, and unknown OpenAI-compatible endpoints are kept
-/// permissive because they may be intentionally keyless; a real 401/403 is
-/// still classified at request time.
-pub(crate) fn post_process_provider_requires_api_key(provider_id: &str) -> bool {
-    matches!(
-        provider_id,
-        "openai"
-            | "zai"
-            | "openrouter"
-            | "anthropic"
-            | "groq"
-            | "cerebras"
-            | "gemini"
-            | "xai"
-            | "deepseek"
-            | "mistral"
-            | "moonshot"
-            | "together"
-            | "fireworks"
-            | "perplexity"
-            | "azure_openai"
-            | "bedrock_mantle"
-    )
+/// Nothing in this build requires credentials up front: every provider left
+/// is on this machine, and upstream's hosted list is gone. Kept as a function
+/// rather than inlined, because the resolver asks per provider and a local
+/// server sitting behind a proxy can still answer 401 at request time — which
+/// is classified there, not here.
+pub(crate) fn post_process_provider_requires_api_key(_provider_id: &str) -> bool {
+    false
 }
 
 fn resolve_post_process_candidate(
@@ -3075,27 +2909,42 @@ mod tests {
     }
 
     #[test]
-    fn the_last_cloud_provider_is_backfilled_for_existing_installs() {
-        // An install that predates the field must not lose its provider on the
-        // first device → cloud round trip after upgrading.
+    fn a_cloud_provider_left_in_stored_settings_is_dropped() {
+        // The upgrade path that matters: upstream's settings.json lists the
+        // cloud providers and may have one selected. Both have to go, or this
+        // build would still hold a route off the machine.
         let mut settings = get_default_settings();
+        settings.post_process_providers.push(PostProcessProvider {
+            id: "openai".to_string(),
+            label: "OpenAI".to_string(),
+            base_url: "https://api.openai.com/v1".to_string(),
+            allow_base_url_edit: false,
+            models_endpoint: Some("/models".to_string()),
+            supports_structured_output: true,
+        });
         settings.post_process_provider_id = "openai".to_string();
-        settings.post_process_last_cloud_provider_id = None;
 
         assert!(ensure_post_process_defaults(&mut settings));
-        assert_eq!(
-            settings.post_process_last_cloud_provider_id.as_deref(),
-            Some("openai")
+        assert!(
+            !settings
+                .post_process_providers
+                .iter()
+                .any(|provider| provider.id == "openai"),
+            "the cloud provider must not survive a load"
         );
-
-        // The built-in engine is not a cloud provider, so it must never be
-        // recorded as one — otherwise the switch back to cloud would return to
-        // "On my device" and appear to do nothing.
-        let mut on_device = get_default_settings();
-        on_device.post_process_provider_id = BUILTIN_POST_PROCESS_PROVIDER_ID.to_string();
-        on_device.post_process_last_cloud_provider_id = None;
-        ensure_post_process_defaults(&mut on_device);
-        assert!(on_device.post_process_last_cloud_provider_id.is_none());
+        assert_eq!(
+            settings.post_process_provider_id,
+            BUILTIN_POST_PROCESS_PROVIDER_ID
+        );
+        assert!(
+            settings
+                .post_process_providers
+                .iter()
+                .all(|provider| provider.base_url.contains("127.0.0.1")
+                    || provider.base_url.contains("localhost")
+                    || provider.base_url.is_empty()),
+            "every remaining provider must point at this machine"
+        );
     }
 
     #[test]
@@ -3128,14 +2977,14 @@ mod tests {
     #[test]
     fn resolver_prefers_valid_dedicated_selection_and_trims_model() {
         let mut settings = get_default_settings();
-        configure_target(&mut settings, "openai", "  cleanup-model  ", "secret");
+        configure_target(&mut settings, "local", "  cleanup-model  ", "secret");
 
         let resolved = resolve_post_process_config(&settings).expect("dedicated config");
         assert_eq!(
             resolved.source,
             PostProcessConfigSource::DedicatedCleanupSelection
         );
-        assert_eq!(resolved.provider.id, "openai");
+        assert_eq!(resolved.provider.id, "local");
         assert_eq!(resolved.model, "cleanup-model");
         assert_eq!(resolved.api_key, "secret");
     }
@@ -3143,7 +2992,7 @@ mod tests {
     #[test]
     fn resolver_reports_precise_prompt_failures() {
         let mut settings = get_default_settings();
-        configure_target(&mut settings, "openai", "cleanup-model", "secret");
+        configure_target(&mut settings, "local", "cleanup-model", "secret");
 
         settings.post_process_selected_prompt_id = None;
         assert_eq!(
@@ -3172,7 +3021,7 @@ mod tests {
         for provider in default_post_process_providers() {
             let should_require = !matches!(
                 provider.id.as_str(),
-                "builtin" | "local" | "custom" | APPLE_INTELLIGENCE_PROVIDER_ID
+                "builtin" | "local" | APPLE_INTELLIGENCE_PROVIDER_ID
             );
             assert_eq!(
                 post_process_provider_requires_api_key(&provider.id),
@@ -3191,7 +3040,7 @@ mod tests {
         let mut settings = get_default_settings();
         configure_target(
             &mut settings,
-            "openai",
+            "local",
             "cleanup-model",
             "do-not-serialize-this-key",
         );
@@ -3203,12 +3052,12 @@ mod tests {
                 ref provider_id,
                 ref model,
                 ..
-            } if provider_id == "openai" && model == "cleanup-model"
+            } if provider_id == "local" && model == "cleanup-model"
         ));
         let json = serde_json::to_string(&readiness).unwrap();
         assert!(!json.contains("do-not-serialize-this-key"));
         assert!(!json.contains(default_improve_transcriptions_prompt()));
-        assert!(!json.contains("api.openai.com"));
+        assert!(!json.contains("localhost:11434"));
     }
 
     /// The enlarged "Live" overlay is only for models that natively support

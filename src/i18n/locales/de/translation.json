@@ -1,7 +1,7 @@
 {
   "appearance": {
     "title": "Erscheinungsbild",
-    "description": "Wähle ein helles, dunkles oder am System ausgerichtetes Design für die App und das Assistenten-Panel.",
+    "description": "Wähle ein helles, dunkles oder am System ausgerichtetes Design für die App.",
     "system": "System",
     "light": "Hell",
     "dark": "Dunkel",
@@ -14,7 +14,6 @@
   },
   "tray": {
     "home": "Startseite",
-    "checkUpdates": "Nach Updates suchen…",
     "copyLastTranscript": "Letzte Transkription kopieren",
     "unloadModel": "Modell entladen",
     "model": "Modell",
@@ -77,21 +76,10 @@
       "downloadStarted": "Dein Modell wird im Hintergrund heruntergeladen."
     },
     "aiModel": {
-      "tiers": {
-        "small": {
-          "description": "Läuft auf jedem Rechner. Ideal, um deine Texte aufzuräumen."
-        },
-        "mid": {
-          "description": "Ein schneller Allrounder, der auch Fragen beantworten kann."
-        },
-        "capable": {
-          "description": "Die präzisesten Antworten, und es kann deinen Bildschirm sehen."
-        }
-      },
       "download": "Modell herunterladen",
       "useDownloaded": "Heruntergeladenes Modell verwenden",
       "skip": "Vorerst überspringen",
-      "skipHint": "Du kannst das später unter Einstellungen > Assistent > Auf meinem Gerät erledigen.",
+      "skipHint": "Du kannst ein Bereinigungsmodell später unter Einstellungen → Diktat hinzufügen.",
       "continue": "Weiter",
       "downloadingHint": "Dein Modell wird im Hintergrund heruntergeladen — du kannst die App sofort verwenden.",
       "downloadStarted": "Dein KI-Modell wird im Hintergrund heruntergeladen.",
@@ -180,9 +168,6 @@
       },
       "gemma-3-4b": {
         "description": "Schnelle, klare Antworten mit Bildschirmansicht, aber weniger leistungsfähig als die aktuellen Gemma-4-Modelle."
-      },
-      "kokoro-82m": {
-        "description": "Integrierte lokale Stimme für den Assistenten. Kein Download nötig."
       },
       "small": {
         "name": "Whisper Small",
@@ -323,19 +308,19 @@
       },
       "aboutYou": {
         "label": "Über dich",
-        "caption": "Eine kurze Zusammenfassung, die der Assistent immer im Blick hat.",
+        "caption": "Eine kurze Zusammenfassung, die die KI-Bereinigung immer im Blick hat.",
         "fieldLabel": "Zusammenfassung",
-        "placeholder": "z. B. Bevorzugt kurze, direkte Antworten. Arbeitet mit Rust und TypeScript. Entwickelt einen Desktop-Sprachassistenten.",
-        "hint": "Immer enthalten, wenn das Gedächtnis aktiv ist. Halte es bei wenigen Sätzen — das ist das Kurzporträt, das der Assistent von dir hat.",
+        "placeholder": "z. B. Schreibt auf Deutsch und Englisch. Arbeitet mit Rust und TypeScript. Namen, die vorkommen: Priya, Meierhofer.",
+        "hint": "Immer enthalten, wenn das Gedächtnis aktiv ist. Halte es bei wenigen Sätzen — es ist Hintergrund für das Bereinigungsmodell, keine Anweisung.",
         "edit": "Bearbeiten",
         "done": "Fertig",
-        "empty": "Noch nichts gespeichert — der Assistent füllt das mit der Zeit selbst aus, oder klicke auf Bearbeiten und schreibe es selbst.",
+        "empty": "Noch nichts gespeichert — es füllt sich, während aus deinen Diktaten gelernt wird, oder klicke auf Bearbeiten und schreibe es selbst.",
         "collapsedEmpty": "Noch nichts gespeichert"
       },
       "notes": {
         "label": "Notizen",
         "caption": "Konkrete Dinge, die es wert sind, erinnert zu werden — gelernt oder von dir hinzugefügt.",
-        "empty": "Noch keine Notizen. Füge unten eine hinzu oder lass den Assistenten sie aus deinen Chats lernen.",
+        "empty": "Noch keine Notizen. Füge unten eine hinzu oder lass sie aus deinen Diktaten lernen.",
         "add": "Hinzufügen",
         "addPlaceholder": "Etwas zum Merken hinzufügen…",
         "delete": "Notiz löschen",
@@ -354,7 +339,7 @@
       "import": "Importieren",
       "wipe": {
         "button": "Gedächtnis löschen",
-        "confirm": "Alles löschen, woran sich der Assistent erinnert?",
+        "confirm": "Alles aus deinem persönlichen Gedächtnis löschen?",
         "yes": "Alles löschen",
         "cancel": "Abbrechen"
       },
@@ -390,7 +375,6 @@
         "sounds": "Töne",
         "startup": "Start und Taskleiste",
         "overlay": "Overlay",
-        "updates": "Updates",
         "system": "System"
       },
       "shortcut": {
@@ -416,18 +400,6 @@
           "transcribe_with_post_process": {
             "name": "Nachbearbeitungs-Tastenkürzel",
             "description": "Diktieren und den Text mit KI bereinigen, bevor er geschrieben wird."
-          },
-          "assistant": {
-            "name": "Assistenten fragen",
-            "description": "Frage den Assistenten per Stimme; die Antwort erscheint live im schwebenden Panel."
-          },
-          "assistant_vision": {
-            "name": "Mit Bildschirm fragen",
-            "description": "Frage per Stimme mit angehängtem Bildschirm, damit der Assistent sieht, was du gerade ansiehst."
-          },
-          "assistant_panel_toggle": {
-            "name": "Panel ein- oder ausblenden",
-            "description": "Blendet das schwebende Assistenten-Panel ein oder aus."
           }
         },
         "errors": {
@@ -469,15 +441,13 @@
       "deleteTitle": "Modell löschen",
       "categories": {
         "stt": "Transkription",
-        "llm": "Assistent",
-        "tts": "Sprachausgabe"
+        "llm": "Bereinigung"
       },
       "categoryDescriptions": {
         "stt": "Modelle tauschen Genauigkeit gegen Geschwindigkeit — wähle eines, das zu deinem Rechner passt.",
-        "llm": "Lokale Modelle für den integrierten Assistenten und die KI-Bereinigung.",
-        "tts": "Stimmen für die gesprochenen Antworten des Assistenten. Kokoro läuft auf deinem Rechner."
+        "llm": "Lokale Sprachmodelle für die KI-Bereinigung."
       },
-      "llmHint": "Wähle dieses Modell nach dem Download im Bereich Assistent beim integrierten (lokalen) Anbieter aus.",
+      "llmHint": "Wähle dieses Modell nach dem Download unter Diktat → KI-Bereinigung aus.",
       "ttsHint": "Sprachmodelle laufen auf deinem Rechner und brauchen keinen Download.",
       "filters": {
         "all": "Alle",
@@ -591,8 +561,7 @@
       },
       "aiCorrection": {
         "label": "KI-Bereinigung (in Entwicklung)",
-        "description": "Experimentell: bereinige dein Diktat mit KI. Noch grob und unfertig — standardmäßig aus.",
-        "info": "Lässt ein Sprachmodell über dein Diktat laufen, um die Zeichensetzung zu korrigieren, Füllwörter zu entfernen und optional den Tonfall anzupassen. Gilt nur für das Diktat (nicht für den Assistenten-Chat) und läuft über ein eigenes Tastenkürzel. Es entsteht eine Verzögerung, weil das Modell erst nach der Transkription läuft; scheitert es oder läuft es in einen Timeout, wird dein Rohtext eingefügt. Nutzt standardmäßig das Modell deines Assistenten. Diese Funktion ist noch in Entwicklung — du kannst noch kein integriertes lokales Modell aus einer eigenen Liste wählen, und sie braucht mehr Feinschliff, bevor sie eine Hauptfunktion wird."
+        "description": "Experimentell: bereinige dein Diktat mit KI. Noch grob und unfertig — standardmäßig aus."
       },
       "postProcessTimeout": {
         "title": "Timeout der KI-Bereinigung",
@@ -773,7 +742,6 @@
         "checking": "Einrichtung der KI-Bereinigung wird geprüft…",
         "checkFailed": "Die Einrichtung der KI-Bereinigung konnte nicht geprüft werden.",
         "ready": "Bereit — {{provider}}.",
-        "assistantFallback": "Bereit — nutzt dein Assistenzmodell ({{provider}}).",
         "selectPrompt": "Wähle einen Bereinigungs-Prompt.",
         "selectModel": "Wähle ein Modell für diesen Anbieter.",
         "addApiKey": "Füge einen API-Schlüssel für diesen Anbieter hinzu.",
@@ -827,11 +795,7 @@
         "title": "API (OpenAI-kompatibel)",
         "location": {
           "title": "Wo es läuft",
-          "description": "Führe die Bereinigung mit einem heruntergeladenen Modell privat aus oder nutze einen Cloud-Anbieter."
-        },
-        "provider": {
-          "title": "Anbieter",
-          "description": "Wähle einen OpenAI-kompatiblen Anbieter."
+          "description": "Die Bereinigung läuft auf diesem Rechner. Wähle die mitgelieferte Engine, einen lokalen Server oder Apple Intelligence."
         },
         "appleIntelligence": {
           "title": "Apple Intelligence",
@@ -841,13 +805,8 @@
         },
         "baseUrl": {
           "title": "Basis-URL",
-          "description": "API-Basis-URL für den ausgewählten Anbieter. Bearbeitbar für Custom, Local und Azure OpenAI (setze sie auf deine Ressource, z. B. https://your-resource.openai.azure.com/openai/v1).",
-          "placeholder": "https://api.openai.com/v1"
-        },
-        "apiKey": {
-          "title": "API-Schlüssel",
-          "description": "API-Schlüssel für den ausgewählten Anbieter.",
-          "placeholder": "sk-..."
+          "description": "Adresse des lokalen Servers, der die Bereinigung ausführt, z. B. http://localhost:11434/v1 für Ollama oder LM Studio.",
+          "placeholder": "http://localhost:11434/v1"
         },
         "builtin": {
           "modelDescription": "Wähle ein Modell, das du heruntergeladen hast. Es läuft auf deinem Rechner, ohne API-Schlüssel und ohne Einrichtung.",
@@ -912,8 +871,8 @@
         "groupTitle": "KI-Bereinigung",
         "modelGroupTitle": "Bereinigungsmodell",
         "unloadTimeout": {
-          "title": "Bereinigungsmodell geladen halten",
-          "description": "Wie lange das lokale Bereinigungsmodell nach der letzten Nutzung im Speicher bleibt. Länger heißt kein Neuladen vor deinem nächsten Diktat; ein untätiges Modell belegt Speicher, aber keine CPU. Unabhängig von der Einstellung des Assistenten."
+          "title": "Bereinigungsmodell entladen",
+          "description": "Wie lange das lokale Bereinigungsmodell nach der letzten Nutzung im Speicher bleibt, bevor der Speicher freigegeben wird. „Nie“ hält es geladen, dann gibt es vor dem nächsten Diktat kein Neuladen; ein untätiges Modell belegt Speicher, braucht aber keine CPU."
         },
         "model": {
           "emptyTitle": "Noch kein Bereinigungsmodell",
@@ -947,11 +906,11 @@
       "title": "Verlauf",
       "storage": {
         "title": "Speicherung von Aufnahmen",
-        "description": "Diese Einstellungen betreffen Diktat- und Flow-Aufnahmen. Gespeicherte Aufnahmen bleiben immer erhalten. Assistenten-Chats haben einen eigenen Speicher."
+        "description": "Diese Einstellungen betreffen deine Diktataufnahmen. Markierte Aufnahmen bleiben immer erhalten."
       },
       "openFolder": "Aufnahmeordner öffnen",
       "loading": "Verlauf wird geladen…",
-      "empty": "Hier ist noch nichts. Deine Diktate, Flow-Ergebnisse und Assistenten-Chats erscheinen hier.",
+      "empty": "Hier ist noch nichts. Deine Diktate erscheinen hier.",
       "recordingLabel": "Diktat",
       "originalTranscriptionLabel": "Ursprüngliche Transkription",
       "finalTextLabel": "Endgültiger Text",
@@ -977,10 +936,6 @@
         "title": "Log-Level",
         "description": "Ausführlichkeit der Protokollierung festlegen"
       },
-      "updateChecks": {
-        "label": "Nach Updates suchen",
-        "description": "Automatisch nach neuen Versionen von SpeakoFlow suchen"
-      },
       "soundTheme": {
         "label": "Sound-Thema",
         "description": "Sound-Thema für Aufnahme-Start und -Stop-Feedback auswählen"
@@ -991,12 +946,12 @@
       },
       "historyLimit": {
         "title": "Verlaufslimit",
-        "description": "Maximale Anzahl nicht gespeicherter Diktat- und Flow-Aufnahmen, die behalten werden. Gespeicherte Aufnahmen bleiben immer erhalten, und Assistenten-Chats werden nicht mitgezählt.",
+        "description": "Maximale Anzahl nicht markierter Diktataufnahmen, die behalten werden. Markierte Aufnahmen bleiben immer erhalten.",
         "entries": "Aufnahmen"
       },
       "recordingRetention": {
         "title": "Aufnahmen automatisch löschen",
-        "description": "Wähle, wie nicht gespeicherte Aufnahmen gelöscht werden. Änderungen gelten sofort und betreffen niemals Assistenten-Chats.",
+        "description": "Wähle, wie nicht markierte Aufnahmen gelöscht werden. Änderungen gelten sofort.",
         "never": "Nie",
         "preserveLimit": "Feste Anzahl behalten",
         "days3": "Nach 3 Tagen",
@@ -1051,11 +1006,6 @@
         "title": "Version",
         "description": "Aktuelle Version von SpeakoFlow"
       },
-      "updates": {
-        "title": "Updates",
-        "button": "Nach Updates suchen",
-        "disabledHint": "Die automatische Update-Prüfung ist aus. Schalte sie unter Allgemein ein."
-      },
       "folders": {
         "title": "Ordner"
       },
@@ -1065,13 +1015,13 @@
       },
       "sourceCode": {
         "title": "Quellcode",
-        "description": "Quellcode ansehen und beitragen",
-        "button": "Auf GitHub ansehen"
+        "description": "Noch nicht veröffentlicht — dieser Build ist ein privater Fork.",
+        "button": "Repository nicht verfügbar"
       },
       "license": {
         "title": "Lizenz",
-        "description": "SpeakoFlow ist Open Source unter der MIT-Lizenz und baut auf Handy (ebenfalls MIT) von CJ Pais auf.",
-        "button": "Lizenz ansehen"
+        "description": "Steht unter der MIT-Lizenz, wie der SpeakoFlow-Build, von dem dieser Fork stammt, und das Projekt Handy (von CJ Pais), auf dem jener aufbaut.",
+        "button": "MIT-Lizenz lesen"
       },
       "supportDevelopment": {
         "title": "Entwicklung unterstützen",
@@ -1113,7 +1063,6 @@
       "noInstructions": "Keine zusätzlichen Anweisungen"
     },
     "cleanupModels": {
-      "title": "Gehirn des Assistenten",
       "whereLabel": "Wo es läuft",
       "onDevice": "Auf meinem Gerät",
       "cloud": "Cloud-Anbieter",
@@ -1123,7 +1072,7 @@
       "catalogTitle": "Modell für dieses Gerät wählen",
       "catalogDescription": "Lade ein privates lokales Modell herunter. Es bleibt auf diesem Rechner und braucht keinen API-Schlüssel.",
       "currentModelTitle": "Aktuelles Modell",
-      "currentModelDescription": "Ausgewählt für den integrierten Assistenten auf diesem Gerät.",
+      "currentModelDescription": "Für die KI-Bereinigung auf diesem Gerät ausgewählt.",
       "recommendedTitle": "Empfohlene Modelle",
       "recommendedDescription": "Drei auf Gespräche ausgelegte Optionen: das schnellste, das empfohlene und ein leistungsfähigeres, aber langsameres.",
       "acceleratorDetected": "{{name}} · {{memory}} GB gemeldeter Grafikspeicher",
@@ -1151,23 +1100,13 @@
   },
   "footer": {
     "downloadingModel": "Lade {{model}} herunter…",
-    "checkingUpdates": "Suche nach Updates…",
-    "updateAvailable": "Update verfügbar: {{version}}",
-    "updateAvailableShort": "Update verfügbar",
     "upToDate": "Aktuell",
-    "downloadUpdate": "Update herunterladen",
     "restart": "Neustart",
-    "updateCheckingDisabled": "Update-Prüfung deaktiviert",
     "downloading": "Wird heruntergeladen… {{progress}}%",
     "installing": "Wird installiert…",
     "preparing": "Wird vorbereitet…",
-    "checkForUpdates": "Nach Updates suchen",
     "checkFailed": "Update-Prüfung fehlgeschlagen",
-    "updateFailed": "Update fehlgeschlagen",
-    "clickToRetry": "Klicken, um es erneut zu versuchen",
-    "portableUpdateTitle": "Manuelles Update erforderlich",
-    "portableUpdateMessage": "Portable Installationen können nicht automatisch aktualisiert werden. Zum Aktualisieren: Lade den neuesten NSIS-Installer von GitHub Releases herunter, installiere ihn im selben Ordner und kopiere dann deinen Data/-Ordner (Einstellungen, Modelle, Aufnahmen) von der alten Version in die neue.",
-    "portableUpdateButton": "GitHub Releases öffnen"
+    "clickToRetry": "Klicken, um es erneut zu versuchen"
   },
   "common": {
     "loading": "Wird geladen…",

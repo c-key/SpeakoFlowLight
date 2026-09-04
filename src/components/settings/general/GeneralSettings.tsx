@@ -29,7 +29,6 @@ import { ShowTrayIcon } from "../ShowTrayIcon";
 import { QuitOnClose } from "../QuitOnClose";
 import { OverlayStyle } from "../OverlayStyle";
 import { ShowOverlay } from "../ShowOverlay";
-import { UpdateChecksToggle } from "../UpdateChecksToggle";
 import { ModelUnloadTimeoutSetting } from "../ModelUnloadTimeout";
 import { ExperimentalToggle } from "../ExperimentalToggle";
 import { KeyboardImplementationSelector } from "../debug/KeyboardImplementationSelector";
@@ -116,7 +115,6 @@ export const GeneralSettings: React.FC = () => {
         <StartHidden descriptionMode="tooltip" grouped={true} />
         <ShowTrayIcon descriptionMode="tooltip" grouped={true} />
         <QuitOnClose descriptionMode="tooltip" grouped={true} />
-        <UpdateChecksToggle descriptionMode="tooltip" grouped={true} />
       </SettingsGroup>
 
       <SettingsGroup title={t("settings.general.groups.system")}>

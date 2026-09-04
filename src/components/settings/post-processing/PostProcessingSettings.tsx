@@ -11,10 +11,8 @@ import { Input } from "../../ui/Input";
 import { useModelStore } from "@/stores/modelStore";
 import { getModelCategory } from "@/lib/utils/modelCategory";
 
-import { ProviderModeToggle } from "../PostProcessingSettingsApi/ProviderModeToggle";
 import { ProviderSelect } from "../PostProcessingSettingsApi/ProviderSelect";
 import { BaseUrlField } from "../PostProcessingSettingsApi/BaseUrlField";
-import { ApiKeyField } from "../PostProcessingSettingsApi/ApiKeyField";
 import { ModelCombo } from "../../ui/ModelCombo";
 import { CleanupModelRow } from "../dictation/CleanupModelRow";
 import { usePostProcessProviderState } from "../PostProcessingSettingsApi/usePostProcessProviderState";
@@ -34,37 +32,6 @@ const PostProcessingSettingsApiComponent: React.FC<{
   const { settings } = useSettings();
   const state = usePostProcessProviderState();
   const isBuiltin = state.selectedProvider?.id === "builtin";
-  const providerMode = isBuiltin ? "device" : "cloud";
-  const cloudProviderOptions = useMemo(
-    () => state.providerOptions.filter((option) => option.value !== "builtin"),
-    [state.providerOptions],
-  );
-
-  // Which cloud provider to return to, read from settings rather than local
-  // state. It used to be `useState`, which meant the choice survived a toggle
-  // but not a navigation away and back: the user returned, switched to cloud,
-  // and landed on a different provider — so their model, base URL, and key all
-  // looked lost even though they were still stored per provider.
-  const lastCloudProviderId =
-    settings?.post_process_last_cloud_provider_id ?? null;
-
-  const handleProviderModeChange = (mode: "device" | "cloud") => {
-    if (mode === "device") {
-      if (!isBuiltin) state.handleProviderSelect("builtin");
-      return;
-    }
-    if (!isBuiltin) return;
-
-    const target =
-      lastCloudProviderId &&
-      cloudProviderOptions.some(
-        (option) => option.value === lastCloudProviderId,
-      )
-        ? lastCloudProviderId
-        : cloudProviderOptions[0]?.value;
-    if (target) state.handleProviderSelect(target);
-  };
-
   const { models } = useModelStore();
   // The on-device cleanup model, resolved to a real catalog entry. Only a model
   // that is actually on disk counts as active — a selection whose file is gone
@@ -87,84 +54,43 @@ const PostProcessingSettingsApiComponent: React.FC<{
         title={t("settings.postProcessing.api.location.title")}
         description={t("settings.postProcessing.api.location.description")}
         descriptionMode="tooltip"
-        // Horizontal: a two-option segmented control is narrow enough to sit
-        // beside its label, and stacking it cost a whole row of height for
-        // nothing.
         layout="horizontal"
         grouped={true}
       >
-        <ProviderModeToggle
-          mode={providerMode}
-          onChange={handleProviderModeChange}
+        <ProviderSelect
+          options={state.providerOptions}
+          value={state.selectedProviderId}
+          onChange={state.handleProviderSelect}
           disabled={state.isProviderUpdating}
         />
       </SettingContainer>
 
-      {providerMode === "cloud" && (
+      {state.isAppleProvider && state.appleIntelligenceUnavailable ? (
+        <Alert variant="error" contained>
+          {t("settings.postProcessing.api.appleIntelligence.unavailable")}
+        </Alert>
+      ) : null}
+
+      {!state.isAppleProvider && state.selectedProvider?.allow_base_url_edit && (
         <SettingContainer
-          title={t("settings.postProcessing.api.provider.title")}
-          description={t("settings.postProcessing.api.provider.description")}
+          title={t("settings.postProcessing.api.baseUrl.title")}
+          description={t("settings.postProcessing.api.baseUrl.description")}
           descriptionMode="tooltip"
           layout="horizontal"
           grouped={true}
         >
-          <ProviderSelect
-            options={cloudProviderOptions}
-            value={state.selectedProviderId}
-            onChange={state.handleProviderSelect}
-            disabled={state.isProviderUpdating}
+          <BaseUrlField
+            value={state.baseUrl}
+            onBlur={state.handleBaseUrlChange}
+            placeholder={t("settings.postProcessing.api.baseUrl.placeholder")}
+            disabled={state.isBaseUrlUpdating}
+            className="min-w-[380px]"
           />
         </SettingContainer>
       )}
 
-      {state.isAppleProvider ? (
-        state.appleIntelligenceUnavailable ? (
-          <Alert variant="error" contained>
-            {t("settings.postProcessing.api.appleIntelligence.unavailable")}
-          </Alert>
-        ) : null
-      ) : providerMode === "cloud" ? (
-        <>
-          {state.selectedProvider?.allow_base_url_edit && (
-            <SettingContainer
-              title={t("settings.postProcessing.api.baseUrl.title")}
-              description={t("settings.postProcessing.api.baseUrl.description")}
-              descriptionMode="tooltip"
-              layout="horizontal"
-              grouped={true}
-            >
-              <BaseUrlField
-                value={state.baseUrl}
-                onBlur={state.handleBaseUrlChange}
-                placeholder={t(
-                  "settings.postProcessing.api.baseUrl.placeholder",
-                )}
-                disabled={state.isBaseUrlUpdating}
-                className="min-w-[380px]"
-              />
-            </SettingContainer>
-          )}
-
-          <SettingContainer
-            title={t("settings.postProcessing.api.apiKey.title")}
-            description={t("settings.postProcessing.api.apiKey.description")}
-            descriptionMode="tooltip"
-            layout="horizontal"
-            grouped={true}
-          >
-            <ApiKeyField
-              value={state.apiKey}
-              onBlur={state.handleApiKeyChange}
-              placeholder={t("settings.postProcessing.api.apiKey.placeholder")}
-              disabled={state.isApiKeyUpdating}
-              className="min-w-[320px]"
-            />
-          </SettingContainer>
-        </>
-      ) : null}
-
       {!state.isAppleProvider &&
-        (providerMode === "device" ? (
+        (isBuiltin ? (
           <CleanupModelRow
             model={activeLocalModel}
             onChangeModel={onBrowseModels}

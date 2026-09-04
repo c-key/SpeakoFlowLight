@@ -717,24 +717,6 @@ pub fn change_autostart_setting(app: AppHandle, enabled: bool) -> Result<(), Str
 
 #[tauri::command]
 #[specta::specta]
-pub fn change_update_checks_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
-    let mut settings = settings::get_settings(&app);
-    settings.update_checks_enabled = enabled;
-    settings::write_settings(&app, settings);
-
-    let _ = app.emit(
-        "settings-changed",
-        serde_json::json!({
-            "setting": "update_checks_enabled",
-            "value": enabled
-        }),
-    );
-
-    Ok(())
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn update_custom_words(app: AppHandle, words: Vec<String>) -> Result<(), String> {
     let mut settings = settings::get_settings(&app);
     settings.custom_words = words;
@@ -1211,12 +1193,6 @@ pub fn change_post_process_model_setting(
 pub fn set_post_process_provider(app: AppHandle, provider_id: String) -> Result<(), String> {
     let mut settings = settings::get_settings(&app);
     validate_provider_exists(&settings, &provider_id)?;
-    // Remember the cloud choice before it is overwritten. `post_process_provider_id`
-    // is one slot, so without this the "On my device" switch silently erases
-    // which cloud provider (and therefore which model) the user had configured.
-    if provider_id != settings::BUILTIN_POST_PROCESS_PROVIDER_ID {
-        settings.post_process_last_cloud_provider_id = Some(provider_id.clone());
-    }
     settings.post_process_provider_id = provider_id;
     settings::write_settings(&app, settings);
     Ok(())
