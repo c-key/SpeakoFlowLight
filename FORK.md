@@ -185,3 +185,7 @@ regenerated file.
   them.
 - **`docs-site/`** still describes the assistant, Flow, and screen vision. It is
   the upstream marketing site and is not built from this repo.
+- **Upstream's README translations** (`README.*.md`) are not carried over. This
+  fork's `README.md` is rewritten, so a verbatim translation would describe the
+  assistant, cloud providers and the updater to readers in their own language.
+  They are on the removed-paths list, so a sync drops them automatically.

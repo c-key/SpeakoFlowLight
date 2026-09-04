@@ -42,3 +42,9 @@ src/components/settings/PostProcessingSettingsApi/ApiKeyField.tsx
 
 # Dead on arrival in this build: a picker for the assistant's model.
 src/components/footer/LlmModelSelector.tsx
+
+# Upstream's README translations. README.md here is fork-specific — it describes
+# a build with no assistant, no cloud providers and no updater — so a verbatim
+# translation of upstream's README would tell readers the opposite in their own
+# language. Keeping them in sync is work with no audience for a private fork.
+README.*.md
