@@ -31,7 +31,6 @@ tauri.local-build.json
 *.sw?
 
 .claude/
-CLAUDE.md
 
 /target/
 recording_*
